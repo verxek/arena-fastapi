@@ -1,0 +1,72 @@
+# Виртуальные окружения
+venv/
+.venv/
+env/
+
+# Файлы базы данных
+*.sqlite
+*.db
+database.db
+
+# Логи
+logs/
+*.log
+*.tmp
+
+# Папки и файлы от IDE
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Файлы статики (если не нужны)
+static/
+images/
+uploads/
+
+# Файлы конфигурации
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Docker
+docker-compose.yml
+.docker/
+Dockerfile
+.dockerignore
+
+# Python
+.Python
+python.exe
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.egg-info/
+*.egg
+
+# Build
+build/
+dist/
+*.egg-info/
+*.whl
+*.pyi
+*.pyd
+*.so
+
+# IDE
+*.swp
+*.suo
+*.ntvs*
+*.njs*
+*.sln
+*.user
+*.useros
+*.userprefs
+*.vscode/
+*.idea/
+*.iml
