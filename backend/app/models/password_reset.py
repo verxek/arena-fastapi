@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, DateTime, Boolean, ForeignKey, UniqueConstraint, Index, Integer
 from sqlalchemy.orm import relationship
-from database import Base
+from app.database import Base, now_utc
 from datetime import datetime, timedelta
 from typing import Optional
 import secrets
@@ -12,7 +12,7 @@ class PasswordReset(Base):
 
     user_id = Column(Integer, ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False,index=True)
 
-    created_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(datetime.timezone.utc))
+    created_at = Column(DateTime(timezone=True), nullable=False, default=now_utc)
     expires_at = Column(DateTime(timezone=True), nullable=False)
 
     used = Column(Boolean, default=False, nullable=False)
@@ -34,7 +34,7 @@ class PasswordReset(Base):
         super().__init__()
         self.token = self._generate_token()
         self.user_id = user_id
-        self.expires_at = datetime.now(datetime.timezone.utc) + timedelta(minutes=duration_minutes)
+        self.expires_at = now_utc + timedelta(minutes=duration_minutes)
 
     @staticmethod
     def _generate_token() -> str:
@@ -43,12 +43,12 @@ class PasswordReset(Base):
 
     def is_valid(self) -> bool:
         """Проверяет, валиден ли токен (не истёк и не использован)"""
-        now = datetime.now(datetime.timezone.utc)
+        now = now_utc
         return not self.used and now < self.expires_at
 
     def is_expired(self) -> bool:
         """Проверяет, истёк ли токен"""
-        return datetime.now(datetime.timezone.utc) > self.expires_at
+        return now_utc > self.expires_at
 
     def mark_as_used(self):
         """Помечает токен как использованный"""

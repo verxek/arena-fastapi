@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey, UniqueConstraint, Index
 from sqlalchemy.orm import relationship
-from database import Base
+from app.database import Base
 from typing import List
 
 class Contest_Task(Base):

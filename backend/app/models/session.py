@@ -2,7 +2,7 @@ from sqlalchemy import Column, String, DateTime, Integer, Boolean, Text, Foreign
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import INET
 from datetime import datetime, timedelta
-from database import Base
+from app.database import Base, now_utc
 import secrets
 
 class Session(Base):
@@ -11,7 +11,7 @@ class Session(Base):
     session_id = Column(String(64), primary_key=True, unique=True, nullable=False,index=True)
 
     user_id = Column(Integer, ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False,index=True)
-    created_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(datetime.timezone.utc))
+    created_at = Column(DateTime(timezone=True), nullable=False, default=now_utc)
     expires_at = Column(DateTime(timezone=True), nullable=False)
 
     ip_address = Column(INET, nullable=False)
@@ -38,7 +38,7 @@ class Session(Base):
         self.user_id = user_id
         self.ip_address = ip_address
         self.user_agent = user_agent
-        self.expires_at = datetime.now(datetime.timezone.utc) + timedelta(minutes=duration_minutes)
+        self.expires_at = now_utc + timedelta(minutes=duration_minutes)
 
     @staticmethod
     def _generate_session_id() -> str:
@@ -47,11 +47,11 @@ class Session(Base):
 
     def is_expired(self) -> bool:
         """Проверяет, истекла ли сессия"""
-        return datetime.now(datetime.timezone.utc) > self.expires_at
+        return now_utc > self.expires_at
 
     def remaining_time(self) -> timedelta:
         """Возвращает оставшееся время сессии"""
-        now = datetime.now(datetime.timezone.utc)
+        now = now_utc
         if self.is_expired():
             return timedelta(0)
         return self.expires_at - now

@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, UniqueConstraint, Index
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-from database import Base
+from app.database import Base, now_utc
 from datetime import datetime
 from typing import List, Optional
 
@@ -12,7 +12,7 @@ class Task(Base):
 
     task_name = Column(String(50), nullable=False,unique=True,index=True)
     statement = Column(Text, nullable=False)
-    created_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(datetime.timezone.utc))
+    created_at = Column(DateTime(timezone=True), nullable=False, default=now_utc)
     visibility = Column(Boolean, default=True, nullable=False)
     make_visible_after_contest = Column(Boolean, default=False, nullable=False)
 

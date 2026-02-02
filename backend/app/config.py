@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     app_name: str = "Code Arena"
     debug: bool = True
-    database_url: str = "postgresql://postgres:123qwe@localhost:5432/code_arena"
+    database_url: str = "postgresql+asyncpg://postgres:123qwe@localhost:5432/code_arena"
     cors_origins: list = [
         "http://localhost:5173",
         "http://localhost:3000",

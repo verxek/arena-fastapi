@@ -1,22 +1,58 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-from .config import settings
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import DateTime
+from sqlalchemy.dialects.postgresql import TIMESTAMP
+from typing import AsyncGenerator
+import os
+from datetime import datetime, timezone
 
-engine = create_engine(
-    settings.database_url,
-    connect_args={"check_same_thread": False}
+# URL подключения
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql+asyncpg://postgres:123qwe@localhost:5432/code_arena"
 )
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+# Асинхронный движок
+engine = create_async_engine(
+    DATABASE_URL,
+    echo=False,
+    pool_pre_ping=True,
+    pool_size=10,
+    max_overflow=20,
+)
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+AsyncSessionLocal = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autocommit=False,
+    autoflush=False,
+)
 
-def init_db():
-    Base.metadata.create_all(bind=engine)
+class Base(DeclarativeBase):
+    """Базовый класс"""
+    type_annotation_map = {
+        datetime: TIMESTAMP(timezone=True),  # Храним всё в UTC
+    }
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """Асинхронная сессия для зависимостей FastAPI"""
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
+
+async def init_db():
+    """Создание всех таблиц (асинхронно)"""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+# Утилиты для работы со временем (только UTC)
+def now_utc() -> datetime:
+    """Текущее время в UTC"""
+    return datetime.now(timezone.utc)

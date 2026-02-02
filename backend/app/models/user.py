@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, UniqueConstraint, Index
 from sqlalchemy.orm import relationship
-from database import Base
+from app.database import Base, now_utc
 from datetime import datetime
 
 class User(Base):
@@ -11,7 +11,7 @@ class User(Base):
     nickname = Column(String(50), nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
     email = Column(String(100), nullable=False, unique=True, index=True)
-    registration_date = Column(DateTime(timezone=True), nullable=False, default=datetime.now(datetime.timezone.utc))
+    registration_date = Column(DateTime(timezone=True), nullable=False, default=now_utc)
 
     # связи
     authored_tasks = relationship(

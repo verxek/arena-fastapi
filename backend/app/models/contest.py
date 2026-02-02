@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, Time, ForeignKey, UniqueConstraint, Index
 from sqlalchemy.orm import relationship
-from database import Base
+from app.database import Base, now_utc
 from datetime import datetime, timedelta
 from typing import List, Optional
 
@@ -12,7 +12,7 @@ class Contest(Base):
     contest_name = Column(String(200), nullable=False,unique=True,index=True)
     start_time = Column(DateTime(timezone=True), nullable=False,index=True)
     duration = Column(Time, nullable=False,index=True)
-    contest_created_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(datetime.timezone.utc),index=True)
+    contest_created_at = Column(DateTime(timezone=True), nullable=False, default=now_utc,index=True)
     
     contest_status = Column(Integer, ForeignKey('contest_status.contest_status_id', ondelete='CASCADE'), nullable=False,index=True)
 
@@ -57,16 +57,16 @@ class Contest(Base):
 
     def is_active(self) -> bool:
         """Проверяет, активен ли контест в данный момент"""
-        now = datetime.now(datetime.timezone.utc)
+        now = now_utc
         return self.start_time <= now < self.get_end_time()
 
     def is_finished(self) -> bool:
         """Проверяет, завершён ли контест"""
-        return datetime.now(datetime.timezone.utc) >= self.get_end_time()
+        return now_utc >= self.get_end_time()
 
     def is_upcoming(self) -> bool:
         """Проверяет, запланирован лиест на будущее"""
-        return datetime.now(datetime.timezone.utc) < self.start_time
+        return now_utc < self.start_time
 
     @property
     def total_participants(self) -> int:

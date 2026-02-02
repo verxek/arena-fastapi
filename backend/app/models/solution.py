@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, DateTime, ForeignKey, UniqueConstraint, Index
 from sqlalchemy.orm import relationship
-from database import Base
+from app.database import Base, now_utc
 from datetime import datetime
 from typing import Optional, List
 
@@ -13,7 +13,7 @@ class Solution(Base):
     sol_user = Column(Integer, ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False,index=True)
     sol_prog_lang = Column(Integer, ForeignKey('prog_language.proglang_id', ondelete='SET NULL'), nullable=True,index=True)
     sol_state = Column(Integer, ForeignKey('solution_state.solution_state_id', ondelete='CASCADE'), nullable=False,index=True)
-    sol_created_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(datetime.timezone.utc))
+    sol_created_at = Column(DateTime(timezone=True), nullable=False, default=now_utc)
 
     # связи
     task_rel = relationship(
@@ -83,7 +83,7 @@ class Solution(Base):
     def time_since_created(self) -> str:
         """Возвращает время с момента создания решения"""
         from datetime import datetime
-        delta = datetime.now(datetime.timezone.utc) - self.sol_created_at
+        delta = now_utc - self.sol_created_at
         hours, remainder = divmod(delta.seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         return f"{delta.days}d {hours}h {minutes}m {seconds}s"
