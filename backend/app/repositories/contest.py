@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from datetime import datetime, timezone
-from app.models.contest import Contest
+from backend.app.models.contest import Contest
 from .base import BaseRepository
 
 

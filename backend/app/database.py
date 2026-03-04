@@ -32,7 +32,7 @@ AsyncSessionLocal = async_sessionmaker(
 class Base(DeclarativeBase):
     """Базовый класс"""
     type_annotation_map = {
-        datetime: TIMESTAMP(timezone=True),  # Храним всё в UTC
+        datetime: TIMESTAMP(timezone=True),  # пока что в utc
     }
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
@@ -52,7 +52,6 @@ async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-# Утилиты для работы со временем (только UTC)
 def now_utc() -> datetime:
     """Текущее время в UTC"""
     return datetime.now(timezone.utc)

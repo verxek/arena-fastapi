@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, DateTime, ForeignKey, UniqueConstraint, Index
 from sqlalchemy.orm import relationship
-from app.database import Base, now_utc
+from backend.app.database import Base, now_utc
 from datetime import datetime
 from typing import Optional, List
 

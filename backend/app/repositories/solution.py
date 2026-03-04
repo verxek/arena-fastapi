@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from app.models.solution import Solution
+from backend.app.models.solution import Solution
 from .base import BaseRepository
 
 

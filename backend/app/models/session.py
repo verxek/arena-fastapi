@@ -2,7 +2,7 @@ from sqlalchemy import Column, String, DateTime, Integer, Boolean, Text, Foreign
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import INET
 from datetime import datetime, timedelta
-from app.database import Base, now_utc
+from backend.app.database import Base, now_utc
 import secrets
 
 class Session(Base):

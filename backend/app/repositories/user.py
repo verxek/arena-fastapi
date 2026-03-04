@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from app.models.user import User
+from backend.app.models.user import User
 from .base import BaseRepository
 
 
@@ -18,6 +18,12 @@ class UserRepository(BaseRepository):
     async def get_by_email(self, email: str):
         result = await self.session.execute(
             select(User).where(User.email == email)
+        )
+        return result.scalar_one_or_none()
+    
+    async def get_by_nickname(self, nickname: str):
+        result = await self.session.execute(
+            select(User).where(User.nickname == nickname)
         )
         return result.scalar_one_or_none()
 

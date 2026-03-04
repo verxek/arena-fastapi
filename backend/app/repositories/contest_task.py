@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from app.models.contest_task import Contest_Task
+from backend.app.models.contest_task import Contest_Task
 from .base import BaseRepository
 
 

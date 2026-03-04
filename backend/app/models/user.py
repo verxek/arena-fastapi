@@ -1,17 +1,29 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, UniqueConstraint, Index
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, UniqueConstraint, Index, Enum
 from sqlalchemy.orm import relationship
-from app.database import Base, now_utc
+from backend.app.database import Base, now_utc
 from datetime import datetime
+import enum
+
+class UserRole(str, enum.Enum):
+    participant = "participant"
+    organizer = "organizer"
+    admin = "admin"
 
 class User(Base):
     __tablename__ = "user"
 
     user_id = Column(Integer, primary_key=True, autoincrement=True,index=True)
 
-    nickname = Column(String(50), nullable=False, index=True)
+    nickname = Column(String(50), nullable=False, unique=True, index=True)
     password_hash = Column(String(255), nullable=False)
     email = Column(String(100), nullable=False, unique=True, index=True)
     registration_date = Column(DateTime(timezone=True), nullable=False, default=now_utc)
+    
+    role = Column(
+        Enum(UserRole, name="user_role"),
+        nullable=False,
+        server_default=UserRole.participant.value
+    )
 
     # связи
     authored_tasks = relationship(

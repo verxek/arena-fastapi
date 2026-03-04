@@ -1,8 +1,9 @@
 from sqlalchemy import Column, Integer, String, DateTime, Time, ForeignKey, UniqueConstraint, Index
 from sqlalchemy.orm import relationship
-from app.database import Base, now_utc
+from backend.app.database import Base, now_utc
 from datetime import datetime, timedelta
 from typing import List, Optional
+from sqlalchemy.dialects.postgresql import INTERVAL
 
 class Contest(Base):
     __tablename__ = "contest"
@@ -11,7 +12,7 @@ class Contest(Base):
 
     contest_name = Column(String(200), nullable=False,unique=True,index=True)
     start_time = Column(DateTime(timezone=True), nullable=False,index=True)
-    duration = Column(Time, nullable=False,index=True)
+    duration = Column(INTERVAL, nullable=False)
     contest_created_at = Column(DateTime(timezone=True), nullable=False, default=now_utc,index=True)
     
     contest_status = Column(Integer, ForeignKey('contest_status.contest_status_id', ondelete='CASCADE'), nullable=False,index=True)

@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from app.models.task import Task
+from backend.app.models.task import Task
 from .base import BaseRepository
 
 

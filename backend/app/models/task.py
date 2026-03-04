@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, UniqueConstraint, Index
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-from app.database import Base, now_utc
+from backend.app.database import Base, now_utc
 from datetime import datetime
 from typing import List, Optional
 

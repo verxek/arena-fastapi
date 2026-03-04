@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Text, Time, Float, ForeignKey, UniqueConstraint, Index
 from sqlalchemy.orm import relationship
-from app.database import Base
+from backend.app.database import Base
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -21,7 +21,6 @@ class Sandbox(Base):
         "Solution",
         back_populates="sandbox_rel",
         uselist=False,
-        cascade="all, delete-orphan",
         lazy="selectin"
     )
     verdict_rel = relationship(
