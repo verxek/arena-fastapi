@@ -165,20 +165,16 @@ async def test_contest_structures():
 
             # === 9. Тест отмены контеста из Draft ===
             print("\nТест создания и отмены контеста (Draft → Cancelled)...")
-            # Создаём naive datetime (без временной зоны)
             start_time = now_utc() + timedelta(hours=1)
-
-
-            # Убираем временную зону, если она есть
             if start_time.tzinfo is not None:
                 start_time = start_time.replace(tzinfo=None)
 
-            # Используем в вызове
+
             await conn.execute(
                 text("CALL create_contest(:name, :start_time, :duration, :status)"),
                 {
                     "name": "Контест для отмены",
-                    "start_time": start_time,  # ← Теперь это naive datetime
+                    "start_time": start_time, 
                     "duration": timedelta(hours=1),
                     "status": 1
                 }

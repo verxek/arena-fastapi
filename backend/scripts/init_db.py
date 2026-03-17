@@ -5,7 +5,7 @@ from pathlib import Path
 backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
 
-# ⚠️ ЭТО КРИТИЧЕСКИ ВАЖНО — импортируем ВСЕ модели ДО создания таблиц
+
 from app.models import (
     User, Session, PasswordReset,
     Contest, Contest_Status, Contest_Role, Contest_User,

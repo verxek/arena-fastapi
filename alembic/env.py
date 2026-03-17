@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from alembic import context
 from backend.app.database import Base
 import asyncio
-from backend.app import models
+from backend.app.models import User, Task, RefreshToken, Contest, Contest_Role, Contest_Status, Contest_Task, Contest_User, PasswordReset, Task_Category, Prog_Language, Sandbox, Solution, Session, Sandbox_Verdict, Solution_State, Difficulty_Level
 config = context.config
 fileConfig(config.config_file_name)
 

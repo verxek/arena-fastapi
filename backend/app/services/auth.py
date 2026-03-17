@@ -2,14 +2,18 @@ from backend.app.repositories.user import UserRepository
 from backend.app.core.security import (
     hash_password,
     verify_password,
-    create_access_token
+    create_access_token,
+    create_refresh_token
 )
 from backend.app.models.user import UserRole
+from backend.app.models import RefreshToken
+from datetime import datetime, timedelta, timezone
 
 
 class AuthService:
 
     def __init__(self, session):
+        self.session = session
         self.user_repo = UserRepository(session)
 
     async def register(self, nickname: str, email: str, password: str):
@@ -38,11 +42,25 @@ class AuthService:
         if not verify_password(password, user.password_hash):
             raise ValueError("Invalid credentials")
 
-        token = create_access_token(
-            data={
-                "sub": str(user.user_id),
-                "role": user.role.value
-            }
+        access_token = create_access_token({
+            "sub": str(user.user_id)
+        })
+
+        refresh_token = create_refresh_token({
+            "sub": str(user.user_id)
+        })
+
+        self.session.add(
+            RefreshToken(
+                token=refresh_token,
+                user_id=user.user_id,
+                expires_at=datetime.now(timezone.utc) + timedelta(days=7)
+            )
         )
 
-        return token
+        await self.session.commit()
+
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token
+        }
