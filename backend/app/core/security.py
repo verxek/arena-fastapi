@@ -5,8 +5,8 @@ from passlib.context import CryptContext
 # !!!!!! В продакшене вынести в .env
 SECRET_KEY = "super-secret-key"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24     
+REFRESH_TOKEN_EXPIRE_DAYS = 30 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

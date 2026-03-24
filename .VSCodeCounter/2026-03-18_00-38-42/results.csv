@@ -1,0 +1,27 @@
+"filename", "language", "JavaScript", "PostCSS", "XML", "Markdown", "JSON", "JavaScript JSX", "HTML", "comment", "blank", "total"
+"d:\vscodeProjects\arena-fastapi\frontend\README.md", "Markdown", 0, 0, 0, 9, 0, 0, 0, 0, 8, 17
+"d:\vscodeProjects\arena-fastapi\frontend\eslint.config.js", "JavaScript", 28, 0, 0, 0, 0, 0, 0, 0, 2, 30
+"d:\vscodeProjects\arena-fastapi\frontend\index.html", "HTML", 0, 0, 0, 0, 0, 0, 13, 0, 1, 14
+"d:\vscodeProjects\arena-fastapi\frontend\package-lock.json", "JSON", 0, 0, 0, 0, 2978, 0, 0, 0, 1, 2979
+"d:\vscodeProjects\arena-fastapi\frontend\package.json", "JSON", 0, 0, 0, 0, 28, 0, 0, 0, 1, 29
+"d:\vscodeProjects\arena-fastapi\frontend\public\vite.svg", "XML", 0, 0, 1, 0, 0, 0, 0, 0, 0, 1
+"d:\vscodeProjects\arena-fastapi\frontend\src\App.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 60, 0, 0, 16, 76
+"d:\vscodeProjects\arena-fastapi\frontend\src\api\auth.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 8, 0, 1, 2, 11
+"d:\vscodeProjects\arena-fastapi\frontend\src\assets\react.svg", "XML", 0, 0, 1, 0, 0, 0, 0, 0, 0, 1
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\ContestCard.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 62, 0, 3, 8, 73
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\Navbar.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 101, 0, 5, 21, 127
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\ProtectedRoute.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 9, 0, 0, 5, 14
+"d:\vscodeProjects\arena-fastapi\frontend\src\hooks\useAuth.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"d:\vscodeProjects\arena-fastapi\frontend\src\index.css", "PostCSS", 0, 61, 0, 0, 0, 0, 0, 0, 8, 69
+"d:\vscodeProjects\arena-fastapi\frontend\src\layouts\MainLayout.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"d:\vscodeProjects\arena-fastapi\frontend\src\main.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 10, 0, 0, 2, 12
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\Contests.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 217, 0, 9, 24, 250
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\CreateContest.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 418, 0, 25, 43, 486
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\Drafts.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 48, 0, 1, 6, 55
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\Home.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 17, 0, 1, 8, 26
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\Login.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 77, 0, 3, 12, 92
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\OrganizerHome.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 12, 0, 0, 6, 18
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\StudentHome.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 12, 0, 0, 6, 18
+"d:\vscodeProjects\arena-fastapi\frontend\src\styles\global.css", "PostCSS", 0, 13, 0, 0, 0, 0, 0, 3, 2, 18
+"d:\vscodeProjects\arena-fastapi\frontend\vite.config.js", "JavaScript", 5, 0, 0, 0, 0, 0, 0, 1, 2, 8
+"Total", "-", 33, 74, 2, 9, 3006, 1051, 13, 52, 186, 4426

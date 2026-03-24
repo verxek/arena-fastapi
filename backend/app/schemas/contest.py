@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from typing import List, Optional
 
 class ContestBase(BaseModel):
@@ -21,7 +21,7 @@ class ContestListResponse(BaseModel):
     contest_id: int
     contest_name: str
     start_time: datetime
-    duration: time
+    duration: timedelta
     contest_status: int  
     is_upcoming: bool = False
     is_active: bool = False
@@ -30,9 +30,13 @@ class ContestListResponse(BaseModel):
     contest_duration_str: str = ""
     author_id: Optional[int] = None
     is_participant: bool = False
+    contest_duration_str: Optional[str] = None
 
     class Config:
         from_attributes = True
+        json_encoders = {
+            timedelta: lambda v: v.total_seconds() 
+        }
 
 class ContestDetailResponse(ContestBase):
     contest_id: int

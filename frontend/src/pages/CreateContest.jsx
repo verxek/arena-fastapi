@@ -68,11 +68,9 @@ function CreateContest() {
     })
     .catch(err => {
         console.error("Критическая ошибка:", err);
-        // alert(err.message); // Можно раскомментировать, чтобы видеть ошибку на экране
     });
     }, [navigate]);
 
-  // Обработчик выбора задачи из dropdown
   const handleSelectTask = (task) => {
     if (!selectedTasks.find(t => t.task_id === task.task_id)) {
       setSelectedTasks([...selectedTasks, task]);
@@ -81,12 +79,11 @@ function CreateContest() {
     setSearchQuery("");
   };
 
-  // Обработчик удаления задачи из списка
   const handleRemoveTask = (taskId) => {
     setSelectedTasks(selectedTasks.filter(t => t.task_id !== taskId));
   };
 
-  // Отправка формы
+ 
   const handleSubmit = async (statusParam = "active") => {
     if (!contestName || !startTime || selectedTasks.length === 0) {
         alert("Заполните название, дату начала и добавьте хотя бы одну задачу");
@@ -111,9 +108,9 @@ function CreateContest() {
         const contestData = {
         contest_name: contestName,
         start_time: new Date(startTime).toISOString(),
-        duration: durationString,      // Отправляем строку времени, Pydantic сам превратит в time
-        contest_status: statusId,      // Отправляем число ID статуса
-        task_ids: selectedTasks.map(t => t.task_id) // Передаем задачи отдельным полем для удобства бэкенда
+        duration: durationString,      
+        contest_status: statusId,      
+        task_ids: selectedTasks.map(t => t.task_id) 
         };
 
         console.log("Отправка данных:", contestData);
@@ -143,7 +140,7 @@ function CreateContest() {
     }
     };
 
-  // Фильтрация задач для dropdown
+
   const filteredTasks = allTasks.filter(task =>
     task.task_name.toLowerCase().includes(searchQuery.toLowerCase())
   );

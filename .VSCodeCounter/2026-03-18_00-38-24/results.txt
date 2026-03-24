@@ -1,0 +1,80 @@
+Date : 2026-03-18 00:38:24
+Directory : d:\vscodeProjects\arena-fastapi\backend
+Total : 45 files,  2300 codes, 245 comments, 572 blanks, all 3117 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Python   |         45 |      2,300 |        245 |        572 |      3,117 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                   |         45 |      2,300 |        245 |        572 |      3,117 |
+| . (Files)                                                                           |          1 |          0 |          0 |          1 |          1 |
+| app                                                                                 |         36 |      1,338 |        132 |        359 |      1,829 |
+| app (Files)                                                                         |          4 |         81 |          7 |         15 |        103 |
+| app\core                                                                            |          1 |         32 |          5 |         17 |         54 |
+| app\dependencies                                                                    |          1 |         40 |          0 |         11 |         51 |
+| app\models                                                                          |         12 |        684 |        103 |        173 |        960 |
+| app\repositories                                                                    |          7 |        141 |          0 |         38 |        179 |
+| app\routes                                                                          |          4 |        200 |         15 |         54 |        269 |
+| app\schemas                                                                         |          6 |        108 |          2 |         37 |        147 |
+| app\services                                                                        |          1 |         52 |          0 |         14 |         66 |
+| scripts                                                                             |          8 |        962 |        113 |        212 |      1,287 |
++-------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                            | language | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| d:\vscodeProjects\arena-fastapi\backend\__init__.py                                 | Python   |          0 |          0 |          1 |          1 |
+| d:\vscodeProjects\arena-fastapi\backend\app\__init__.py                             | Python   |          0 |          0 |          1 |          1 |
+| d:\vscodeProjects\arena-fastapi\backend\app\config.py                               | Python   |         16 |          0 |          3 |         19 |
+| d:\vscodeProjects\arena-fastapi\backend\app\core\security.py                        | Python   |         32 |          5 |         17 |         54 |
+| d:\vscodeProjects\arena-fastapi\backend\app\database.py                             | Python   |         44 |          6 |          7 |         57 |
+| d:\vscodeProjects\arena-fastapi\backend\app\dependencies\auth.py                    | Python   |         40 |          0 |         11 |         51 |
+| d:\vscodeProjects\arena-fastapi\backend\app\main.py                                 | Python   |         21 |          1 |          4 |         26 |
+| d:\vscodeProjects\arena-fastapi\backend\app\models\__init__.py                      | Python   |         13 |          0 |          2 |         15 |
+| d:\vscodeProjects\arena-fastapi\backend\app\models\contest.py                       | Python   |         69 |         10 |         15 |         94 |
+| d:\vscodeProjects\arena-fastapi\backend\app\models\contest_task.py                  | Python   |         51 |          7 |         13 |         71 |
+| d:\vscodeProjects\arena-fastapi\backend\app\models\contest_user.py                  | Python   |         45 |          6 |         11 |         62 |
+| d:\vscodeProjects\arena-fastapi\backend\app\models\dictionaries.py                  | Python   |        127 |         27 |         55 |        209 |
+| d:\vscodeProjects\arena-fastapi\backend\app\models\password_reset.py                | Python   |         39 |         12 |         13 |         64 |
+| d:\vscodeProjects\arena-fastapi\backend\app\models\refresh_token.py                 | Python   |          9 |          0 |          3 |         12 |
+| d:\vscodeProjects\arena-fastapi\backend\app\models\sandbox.py                       | Python   |         61 |          8 |         13 |         82 |
+| d:\vscodeProjects\arena-fastapi\backend\app\models\session.py                       | Python   |         45 |         14 |         12 |         71 |
+| d:\vscodeProjects\arena-fastapi\backend\app\models\solution.py                      | Python   |         80 |         10 |         14 |        104 |
+| d:\vscodeProjects\arena-fastapi\backend\app\models\task.py                          | Python   |         75 |          6 |         13 |         94 |
+| d:\vscodeProjects\arena-fastapi\backend\app\models\user.py                          | Python   |         70 |          3 |          9 |         82 |
+| d:\vscodeProjects\arena-fastapi\backend\app\repositories\__init__.py                | Python   |          0 |          0 |          1 |          1 |
+| d:\vscodeProjects\arena-fastapi\backend\app\repositories\base.py                    | Python   |          4 |          0 |          2 |          6 |
+| d:\vscodeProjects\arena-fastapi\backend\app\repositories\contest.py                 | Python   |         36 |          0 |          9 |         45 |
+| d:\vscodeProjects\arena-fastapi\backend\app\repositories\contest_task.py            | Python   |         20 |          0 |          6 |         26 |
+| d:\vscodeProjects\arena-fastapi\backend\app\repositories\solution.py                | Python   |         29 |          0 |          6 |         35 |
+| d:\vscodeProjects\arena-fastapi\backend\app\repositories\task.py                    | Python   |         21 |          0 |          6 |         27 |
+| d:\vscodeProjects\arena-fastapi\backend\app\repositories\user.py                    | Python   |         31 |          0 |          8 |         39 |
+| d:\vscodeProjects\arena-fastapi\backend\app\routes\auth.py                          | Python   |         87 |          2 |         24 |        113 |
+| d:\vscodeProjects\arena-fastapi\backend\app\routes\contests.py                      | Python   |         84 |         13 |         20 |        117 |
+| d:\vscodeProjects\arena-fastapi\backend\app\routes\test_roles.py                    | Python   |         19 |          0 |          7 |         26 |
+| d:\vscodeProjects\arena-fastapi\backend\app\routes\users.py                         | Python   |         10 |          0 |          3 |         13 |
+| d:\vscodeProjects\arena-fastapi\backend\app\schemas\__init__.py                     | Python   |          5 |          0 |          0 |          5 |
+| d:\vscodeProjects\arena-fastapi\backend\app\schemas\auth.py                         | Python   |         11 |          0 |          6 |         17 |
+| d:\vscodeProjects\arena-fastapi\backend\app\schemas\contest.py                      | Python   |         36 |          0 |          7 |         43 |
+| d:\vscodeProjects\arena-fastapi\backend\app\schemas\solution.py                     | Python   |         14 |          0 |          5 |         19 |
+| d:\vscodeProjects\arena-fastapi\backend\app\schemas\task.py                         | Python   |         29 |          0 |         12 |         41 |
+| d:\vscodeProjects\arena-fastapi\backend\app\schemas\user.py                         | Python   |         13 |          2 |          7 |         22 |
+| d:\vscodeProjects\arena-fastapi\backend\app\services\auth.py                        | Python   |         52 |          0 |         14 |         66 |
+| d:\vscodeProjects\arena-fastapi\backend\scripts\create_org.py                       | Python   |         50 |         14 |         13 |         77 |
+| d:\vscodeProjects\arena-fastapi\backend\scripts\init_db.py                          | Python   |         19 |          0 |          6 |         25 |
+| d:\vscodeProjects\arena-fastapi\backend\scripts\test_business_logic.py              | Python   |         24 |          5 |          6 |         35 |
+| d:\vscodeProjects\arena-fastapi\backend\scripts\test_contest_structures.py          | Python   |        170 |         19 |         42 |        231 |
+| d:\vscodeProjects\arena-fastapi\backend\scripts\test_contest_task_structures.py     | Python   |        177 |         20 |         36 |        233 |
+| d:\vscodeProjects\arena-fastapi\backend\scripts\test_contest_user_structures.py     | Python   |        175 |         13 |         37 |        225 |
+| d:\vscodeProjects\arena-fastapi\backend\scripts\test_solution_sandbox_structures.py | Python   |        168 |         26 |         39 |        233 |
+| d:\vscodeProjects\arena-fastapi\backend\scripts\test_task_structures.py             | Python   |        179 |         16 |         33 |        228 |
+| Total                                                                               |          |      2,300 |        245 |        572 |      3,117 |
++-------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

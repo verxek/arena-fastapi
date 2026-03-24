@@ -1,41 +1,39 @@
-from pydantic import BaseModel
+# backend/app/schemas/task.py
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
-
+from typing import Optional, List
 
 class TaskBase(BaseModel):
-    task_name: str
+    task_name: str = Field(..., min_length=1, max_length=200)
     statement: str
-    difficulty: int
-    category: int
-    time_limit: int
-    memory_limit: int
+    difficulty_id: int
+    category_id: int
+    time_limit: int  # мс
+    memory_limit: int  # МБ
     visibility: bool = True
-
+    make_visible_after_contest: bool = False
 
 class TaskCreate(TaskBase):
     pass
 
-
 class TaskUpdate(BaseModel):
-    task_name: str | None = None
-    statement: str | None = None
-    visibility: bool | None = None
+    task_name: Optional[str] = None
+    statement: Optional[str] = None
+    difficulty_id: Optional[int] = None
+    category_id: Optional[int] = None
+    time_limit: Optional[int] = None
+    memory_limit: Optional[int] = None
+    visibility: Optional[bool] = None
 
-
-class TaskListResponse(BaseModel):
+class TaskResponse(TaskBase):
     task_id: int
-    task_name: str
-    difficulty: int
-    category: int
-
-    class Config:
-        from_attributes = True
-
-
-class TaskDetailResponse(TaskBase):
-    task_id: int
+    author: Optional[int] = None
     created_at: datetime
-    author: int | None
+    visibility: bool
+    tests_path: Optional[str] = None
+    solution_path: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    category_name: Optional[str] = None
+    difficulty_name: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)

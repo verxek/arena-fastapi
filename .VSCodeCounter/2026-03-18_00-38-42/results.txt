@@ -1,0 +1,66 @@
+Date : 2026-03-18 00:38:42
+Directory : d:\vscodeProjects\arena-fastapi\frontend
+Total : 25 files,  4188 codes, 52 comments, 186 blanks, all 4426 lines
+
+Languages
++----------------+------------+------------+------------+------------+------------+
+| language       | files      | code       | comment    | blank      | total      |
++----------------+------------+------------+------------+------------+------------+
+| JSON           |          2 |      3,006 |          0 |          2 |      3,008 |
+| JavaScript JSX |         14 |      1,051 |         48 |        160 |      1,259 |
+| PostCSS        |          2 |         74 |          3 |         10 |         87 |
+| JavaScript     |          3 |         33 |          1 |          5 |         39 |
+| HTML           |          1 |         13 |          0 |          1 |         14 |
+| Markdown       |          1 |          9 |          0 |          8 |         17 |
+| XML            |          2 |          2 |          0 |          0 |          2 |
++----------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                       | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                          |         25 |      4,188 |         52 |        186 |      4,426 |
+| . (Files)                                                                  |          6 |      3,061 |          1 |         15 |      3,077 |
+| public                                                                     |          1 |          1 |          0 |          0 |          1 |
+| src                                                                        |         18 |      1,126 |         51 |        171 |      1,348 |
+| src (Files)                                                                |          3 |        131 |          0 |         26 |        157 |
+| src\api                                                                    |          1 |          8 |          1 |          2 |         11 |
+| src\assets                                                                 |          1 |          1 |          0 |          0 |          1 |
+| src\components                                                             |          3 |        172 |          8 |         34 |        214 |
+| src\hooks                                                                  |          1 |          0 |          0 |          1 |          1 |
+| src\layouts                                                                |          1 |          0 |          0 |          1 |          1 |
+| src\pages                                                                  |          7 |        801 |         39 |        105 |        945 |
+| src\styles                                                                 |          1 |         13 |          3 |          2 |         18 |
++----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| filename                                                                   | language       | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| d:\vscodeProjects\arena-fastapi\frontend\README.md                         | Markdown       |          9 |          0 |          8 |         17 |
+| d:\vscodeProjects\arena-fastapi\frontend\eslint.config.js                  | JavaScript     |         28 |          0 |          2 |         30 |
+| d:\vscodeProjects\arena-fastapi\frontend\index.html                        | HTML           |         13 |          0 |          1 |         14 |
+| d:\vscodeProjects\arena-fastapi\frontend\package-lock.json                 | JSON           |      2,978 |          0 |          1 |      2,979 |
+| d:\vscodeProjects\arena-fastapi\frontend\package.json                      | JSON           |         28 |          0 |          1 |         29 |
+| d:\vscodeProjects\arena-fastapi\frontend\public\vite.svg                   | XML            |          1 |          0 |          0 |          1 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\App.jsx                       | JavaScript JSX |         60 |          0 |         16 |         76 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\api\auth.jsx                  | JavaScript JSX |          8 |          1 |          2 |         11 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\assets\react.svg              | XML            |          1 |          0 |          0 |          1 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\components\ContestCard.jsx    | JavaScript JSX |         62 |          3 |          8 |         73 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\components\Navbar.jsx         | JavaScript JSX |        101 |          5 |         21 |        127 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\components\ProtectedRoute.jsx | JavaScript JSX |          9 |          0 |          5 |         14 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\hooks\useAuth.js              | JavaScript     |          0 |          0 |          1 |          1 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\index.css                     | PostCSS        |         61 |          0 |          8 |         69 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\layouts\MainLayout.jsx        | JavaScript JSX |          0 |          0 |          1 |          1 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\main.jsx                      | JavaScript JSX |         10 |          0 |          2 |         12 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\pages\Contests.jsx            | JavaScript JSX |        217 |          9 |         24 |        250 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\pages\CreateContest.jsx       | JavaScript JSX |        418 |         25 |         43 |        486 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\pages\Drafts.jsx              | JavaScript JSX |         48 |          1 |          6 |         55 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\pages\Home.jsx                | JavaScript JSX |         17 |          1 |          8 |         26 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\pages\Login.jsx               | JavaScript JSX |         77 |          3 |         12 |         92 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\pages\OrganizerHome.jsx       | JavaScript JSX |         12 |          0 |          6 |         18 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\pages\StudentHome.jsx         | JavaScript JSX |         12 |          0 |          6 |         18 |
+| d:\vscodeProjects\arena-fastapi\frontend\src\styles\global.css             | PostCSS        |         13 |          3 |          2 |         18 |
+| d:\vscodeProjects\arena-fastapi\frontend\vite.config.js                    | JavaScript     |          5 |          1 |          2 |          8 |
+| Total                                                                      |                |      4,188 |         52 |        186 |      4,426 |
++----------------------------------------------------------------------------+----------------+------------+------------+------------+------------+

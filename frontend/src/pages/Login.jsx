@@ -8,7 +8,7 @@ function Login() {
   const [password, setPassword] = useState("")
   const navigate = useNavigate()
 
-  // Проверка при загрузке: если уже залогинен, редиректим
+
   useEffect(() => {
     const token = localStorage.getItem("access_token")
     const role = localStorage.getItem("role")
@@ -28,6 +28,8 @@ function Login() {
 
       localStorage.setItem("access_token", data.access_token)
       localStorage.setItem("refresh_token", data.refresh_token)
+      localStorage.setItem("user_id", data.user_id); 
+
 
       const meResponse = await fetch("http://127.0.0.1:8000/users/me", {
         headers: {

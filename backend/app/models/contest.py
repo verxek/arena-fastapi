@@ -49,25 +49,32 @@ class Contest(Base):
 
     def get_end_time(self) -> datetime:
         """Возвращает время окончания контеста"""
-        duration_seconds = (
-            self.duration.hour * 3600 +
-            self.duration.minute * 60 +
-            self.duration.second
-        )
+        if not self.duration:
+            return self.start_time
+            
+        if hasattr(self.duration, 'total_seconds'):
+            duration_seconds = self.duration.total_seconds()
+        else:   
+            duration_seconds = (
+                getattr(self.duration, 'hours', 0) * 3600 +
+                getattr(self.duration, 'minutes', 0) * 60 +
+                getattr(self.duration, 'seconds', 0)
+            )
+            
         return self.start_time + timedelta(seconds=duration_seconds)
 
     def is_active(self) -> bool:
         """Проверяет, активен ли контест в данный момент"""
-        now = now_utc
+        now = now_utc()
         return self.start_time <= now < self.get_end_time()
 
     def is_finished(self) -> bool:
         """Проверяет, завершён ли контест"""
-        return now_utc >= self.get_end_time()
+        return now_utc() >= self.get_end_time()
 
     def is_upcoming(self) -> bool:
         """Проверяет, запланирован лиест на будущее"""
-        return now_utc < self.start_time
+        return now_utc() < self.start_time
 
     @property
     def total_participants(self) -> int:
@@ -87,8 +94,13 @@ class Contest(Base):
     @property
     def contest_duration_str(self) -> str:
         """Возвращает продолжительность контеста в строковом формате (чч:мм:сс)"""
-        total_seconds = self.duration.total_seconds()
-        hours = int(total_seconds // 3600)
-        minutes = int((total_seconds % 3600) // 60)
-        seconds = int(total_seconds % 60)
+        if not self.duration:
+            return "00:00:00"
+
+        total_seconds = int(self.duration.total_seconds())
+        
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
+        
         return f"{hours:02d}:{minutes:02d}:{seconds:02d}"

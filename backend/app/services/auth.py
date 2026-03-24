@@ -57,10 +57,13 @@ class AuthService:
                 expires_at=datetime.now(timezone.utc) + timedelta(days=7)
             )
         )
-
         await self.session.commit()
 
         return {
             "access_token": access_token,
-            "refresh_token": refresh_token
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "user_id": user.user_id,       
+            "role": user.role,            
+            "nickname": user.nickname      
         }

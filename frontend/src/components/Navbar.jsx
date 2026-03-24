@@ -13,6 +13,7 @@ function Navbar() {
     localStorage.removeItem("access_token")
     localStorage.removeItem("refresh_token")
     localStorage.removeItem("role")
+    localStorage.removeItem("user_id")
     navigate("/")
   }
 
@@ -39,14 +40,17 @@ function Navbar() {
       <div style={{
         display: "flex",
         alignItems: "center",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        fontSize: "20px",      
+        fontWeight: "700",   
+        color: "#1f2739",     
         gap: "10px",
         fontWeight: "bold",
-        fontSize: "18px",
-        color: "#111"
+        
       }}>
         <div style={{
-          width: "20px",
-          height: "20px",
+          width: "15px",
+          height: "15px",
           borderRadius: "50%",
           border: "5px solid #1f2739"
         }}></div>
@@ -74,6 +78,10 @@ function Navbar() {
           Задачи
         </Link>
 
+        <Link to="/contest/archive" style={{textDecoration:"none", color:"#1f2739"}}>
+          Архив
+        </Link>
+
       </div>
 
 
@@ -85,21 +93,56 @@ function Navbar() {
       }}>
 
         {token ? (
-          // ЕСЛИ АВТОРИЗОВАН
+          <>
+          
           <button
-            onClick={logout}
-            style={{
-              background: "#e5e7eb",
-              border: "none",
-              padding: "8px 16px",
-              borderRadius: "12px",
-              cursor: "pointer",
-              fontWeight: "500",
-              color: "#1f2739"
-            }}
-          >
-            Выйти
-          </button>
+              onClick={() => navigate("/profile")}
+              title="Профиль" 
+              style={{
+                background: "#f3f4f6",
+                border: "none",
+                width: "36px",   
+                height: "36px", 
+                borderRadius: "50%", 
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "18px",
+                color: "#1f2739",
+                transition: "all 0.2s",
+                padding: 0 
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = "#e5e7eb";
+                e.currentTarget.style.transform = "scale(1.05)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = "#f3f4f6";
+                e.currentTarget.style.transform = "scale(1)";
+              }}
+            >
+              👤
+            </button>
+          <button
+              onClick={logout}
+              style={{
+                background: "#f3f4f6",
+                border: "none",
+                padding: "8px 16px",
+                borderRadius: "12px",
+                cursor: "pointer",
+                fontWeight: "500",
+                fontSize: "14px",
+                color: "#1f2739",
+                transition: "background 0.2s"
+              }}
+              onMouseOver={(e) => e.target.style.background = "#e5e7eb"}
+              onMouseOut={(e) => e.target.style.background = "#f3f4f6"}
+            >
+              Выйти
+            </button>
+        </>
         ) : (
           // ЕСЛИ НЕ АВТОРИЗОВАН
           <button
