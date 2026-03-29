@@ -12,14 +12,14 @@ function ContestCard({ contest, userRole, isAuthor, onAction }) {
   } else if (contest.is_active) { 
     statusText = "Активен"; 
     statusColor = "#10b981"; 
-  }
+  } 
 
   let btnText = "";
   let btnDisabled = false;
   let isEditButton = false; 
 
 
-  if (userRole === 'organizer' && isAuthor) {
+  if (userRole === 'organizer' && isAuthor && !(contest.is_finished)) {
     btnText = "Редактировать";
     btnDisabled = false;
     isEditButton = true;

@@ -30,6 +30,7 @@ class ContestListResponse(BaseModel):
     contest_duration_str: str = ""
     author_id: Optional[int] = None
     is_participant: bool = False
+    is_organizer: bool = False
     contest_duration_str: Optional[str] = None
 
     class Config:

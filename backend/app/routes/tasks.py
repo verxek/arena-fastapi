@@ -42,7 +42,7 @@ def run_reference_solution_in_docker(
     output_path: str, 
     time_limit: int, 
     memory_limit: int,
-    task_dir: str = None  # Новый аргумент
+    task_dir: str = None  
 ):
     if not client:
         raise Exception("Docker клиент не инициализирован.")

@@ -16,6 +16,14 @@ class UserCreate(UserBase):
 class UserResponse(UserBase):
     user_id: int
     registration_date: datetime
+    nickname: str
+    email: str
+    role: str
+
+    authored_tasks_count: int = 0
+    organized_contests_count: int = 0
+    solved_tasks_count: int = 0
+    participated_contests_count: int = 0
 
     class Config:
         from_attributes = True

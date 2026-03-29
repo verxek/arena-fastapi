@@ -4,7 +4,6 @@ import Navbar from "../components/Navbar";
 import ContestCard from "../components/ContestCard";
 
 function Contests() {
-  // ... (ваш существующий код состояния и useEffect остается без изменений) ...
   const [allContests, setAllContests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState(null);
@@ -15,7 +14,6 @@ function Contests() {
 
   const navigate = useNavigate();
 
-  // ... (ваш существующий useEffect остается без изменений) ...
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const role = localStorage.getItem("role");
@@ -84,7 +82,7 @@ function Contests() {
 
   if (loading) return <div style={{paddingTop: "100px", textAlign: "center"}}>Загрузка...</div>;
 
-  return (
+    return (
     <div style={{ 
       backgroundColor: "#f3f4f6",
       minHeight: "100vh", 
@@ -92,25 +90,29 @@ function Contests() {
     }}>
       <Navbar />
       
-      {/* ГЛАВНЫЙ КОНТЕЙНЕР */}
+      {/*  ГЛАВНЫЙ КОНТЕЙНЕР */}
       <div style={{
         position: "absolute", 
-        top: "100px",         
+        top: "130px",         
         left: "50%",         
         transform: "translateX(-50%)",
         width: "90%",         
         maxWidth: "1200px",   
-        boxSizing: "border-box"
+        boxSizing: "border-box",
+        display: "flex",     
+        flexDirection: "column",
+        gap: "24px"         
       }}>
+         
+        {/*  ДОСТУПНЫЕ КОНТЕСТЫ */}
         
-        {/* ДОСТУПНЫЕ */}
-        <div style={{
-          backgroundColor: "#ffffff",
-          borderRadius: "16px",
+        <div style={{   
+          background: "#ffffff",
+          borderRadius: "20px",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
           padding: "24px",
-          marginBottom: "24px",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-          width: "100%" 
+          width: "100%",    
+          boxSizing: "border-box"
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "10px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "25px" }}>
@@ -120,57 +122,32 @@ function Contests() {
               
               {userRole === "organizer" && (
                 <>
-                  <button
-                    onClick={() => navigate("/contests/create")}
-                    style={{
-                      background: "#1f2739",
-                      color: "white",
-                      border: "none",
-                      padding: "6px 14px",
-                      borderRadius: "8px",
-                      fontSize: "13px",
-                      fontWeight: "600",
-                      cursor: "pointer"
-                    }}
-                  >
+                  <button onClick={() => navigate("/contests/create")} style={{ background: "#1f2739", color: "white", border: "none", padding: "6px 14px", borderRadius: "8px", fontSize: "13px", fontWeight: "600", cursor: "pointer" }}>
                     + Создать
                   </button>
-
-                  <button
-                    onClick={() => navigate("/contests/drafts")}
-                    style={{
-                      background: "#e5e7eb",
-                      color: "#374151",
-                      border: "none",
-                      padding: "6px 14px",
-                      borderRadius: "8px",
-                      fontSize: "13px",
-                      fontWeight: "600",
-                      cursor: "pointer"
-                    }}
-                  >
+                  <button onClick={() => navigate("/contests/drafts")} style={{ background: "#e5e7eb", color: "#374151", border: "none", padding: "6px 14px", borderRadius: "8px", fontSize: "13px", fontWeight: "600", cursor: "pointer" }}>
                     Черновики
                   </button>
                 </>
               )}
             </div>
 
-            
             <div className="tabs-container">
-              <button 
-                onClick={() => setActiveTabAvailable("all")} 
-                className={`tab-btn ${activeTabAvailable === "all" ? "active" : ""}`}
-              >
-                Все
-              </button>
-              
               {userRole === "organizer" && (
-                <button 
-                  onClick={() => setActiveTabAvailable("my")} 
-                  className={`tab-btn ${activeTabAvailable === "my" ? "active" : ""}`}
-                >
-                  Мои
-                </button>
+                <>
+                  <button 
+                    onClick={() => setActiveTabFinished("all")} 
+                    className={`tab-btn ${activeTabFinished === "all" ? "active" : ""}`}
+                  >
+                    Все
+                  </button>
+                  <button 
+                    onClick={() => setActiveTabFinished("my")} 
+                    className={`tab-btn ${activeTabFinished === "my" ? "active" : ""}`}
+                  >
+                    Мои
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -188,40 +165,39 @@ function Contests() {
           </div>
         </div>
 
-        {/* ЗАВЕРШЕННЫЕ */}
+        {/*  ЗАВЕРШЕННЫЕ КОНТЕСТЫ*/}
         <div style={{
-          backgroundColor: "#ffffff",
-          borderRadius: "16px",
+          background: "#ffffff",
+          borderRadius: "20px",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
           padding: "24px",
-          marginBottom: "24px",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-          width: "100%"
+          width: "100%",
+          boxSizing: "border-box"
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "10px" }}>
             <h2 style={{ fontSize: "18px", fontWeight: "600", color: "#111827", margin: 0 }}>Завершенные контесты</h2>
             
             <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-              
-            
               <div className="tabs-container">
-                <button 
-                  onClick={() => setActiveTabFinished("all")} 
-                  className={`tab-btn ${activeTabFinished === "all" ? "active" : ""}`}
-                >
-                  Все
-                </button>
-                
                 {userRole === "organizer" && (
-                  <button 
-                    onClick={() => setActiveTabFinished("my")} 
-                    className={`tab-btn ${activeTabFinished === "my" ? "active" : ""}`}
-                  >
-                    Мои
-                  </button>
+                  <>
+                    <button 
+                      onClick={() => setActiveTabFinished("all")} 
+                      className={`tab-btn ${activeTabFinished === "all" ? "active" : ""}`}
+                    >
+                      Все
+                    </button>
+                    <button 
+                      onClick={() => setActiveTabFinished("my")} 
+                      className={`tab-btn ${activeTabFinished === "my" ? "active" : ""}`}
+                    >
+                      Мои
+                    </button>
+                  </>
                 )}
               </div>
 
-              <span style={{ fontSize: "13px", color: "#6b7280", cursor: "pointer", textDecoration: "underline" }}>
+              <span style={{ fontSize: "13px", color: "#6b7280", cursor: "pointer", textDecoration: "underline" }} onClick={() => navigate("/archive")}>
                 Весь архив &rarr;
               </span>
             </div>

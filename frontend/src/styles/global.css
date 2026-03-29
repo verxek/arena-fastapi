@@ -1,6 +1,6 @@
 /* src/styles/global.css */
 
-/* === ГЛОБАЛЬНЫЕ НАСТРОЙКИ === */
+
 body {
   margin: 0;
   padding: 0;
@@ -9,7 +9,7 @@ body {
   color: #111827;
 }
 
-/* === ОБЩИЕ КОМПОНЕНТЫ === */
+
 .page-container {
   min-height: 100vh;
   padding-bottom: 40px;
@@ -346,13 +346,3 @@ body {
   font-size: 16px;
 }
 
-/* Адаптив для мобильных */
-@media (max-width: 600px) {
-  .grid-2 { grid-template-columns: 1fr; }
-  .header-row { flex-direction: column; align-items: flex-start; }
-  .action-buttons { width: 100%; justify-content: flex-start; }
-  .task-item { flex-direction: column; align-items: flex-start; gap: 16px; }
-  .task-actions { width: 100%; justify-content: flex-end; }
-  .filters-row { width: 100%; }
-  .sort-select { margin-left: 0; width: 100%; }
-}

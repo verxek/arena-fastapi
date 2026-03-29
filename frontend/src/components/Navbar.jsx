@@ -26,15 +26,17 @@ function Navbar() {
       transform: "translateX(-50%)",
       width: "90%",
       maxWidth: "1200px",
-      background: "#f3f4f6",
+      background: "#ffffff",
       borderRadius: "20px",
       boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
       padding: "15px 30px",
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
+      boxSizing: "border-box",
       zIndex: 1000
     }}>
+      
 
       {/* LOGO */}
       <div style={{
@@ -55,7 +57,7 @@ function Navbar() {
           border: "5px solid #1f2739"
         }}></div>
 
-        Contester
+        Code Arena
       </div>
 
 
@@ -78,7 +80,7 @@ function Navbar() {
           Задачи
         </Link>
 
-        <Link to="/contest/archive" style={{textDecoration:"none", color:"#1f2739"}}>
+        <Link to="/archive" style={{textDecoration:"none", color:"#1f2739"}}>
           Архив
         </Link>
 

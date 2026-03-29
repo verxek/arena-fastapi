@@ -84,7 +84,7 @@ class User(Base):
     @property
     def authored_tasks_count(self) -> int:
         """Количество задач, созданных пользователем"""
-        return len(self.created_tasks) if self.created_tasks else 0
+        return len(self.authored_tasks) if self.authored_tasks else 0
 
     @property
     def organized_contests_count(self) -> int:

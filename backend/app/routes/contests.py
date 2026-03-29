@@ -104,13 +104,17 @@ async def get_contests(
         
         author_id = None
         is_current_user_participant = False
-
+        is_current_user_organizer = False  
+        
         for participant in contest.participants:
             if participant.is_organizer:
-                author_id = participant.cu_user
-        
+                if author_id is None:  
+                    author_id = participant.cu_user
+            
             if participant.cu_user == current_user.user_id:
                 is_current_user_participant = True
+                if participant.is_organizer:
+                    is_current_user_organizer = True
 
         contest_dict = {
             "contest_id": contest.contest_id,
@@ -124,7 +128,8 @@ async def get_contests(
             "contest_duration_str": duration_str,
             "total_participants": total_participants,
             "author_id": author_id,
-            "is_participant": is_current_user_participant
+            "is_participant": is_current_user_participant,
+            "is_organizer": is_current_user_organizer 
         }
         response_list.append(contest_dict)
 

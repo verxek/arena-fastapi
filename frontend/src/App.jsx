@@ -24,7 +24,7 @@ function App() {
         <Route path="/tasks/create" element={<ProtectedRoute><CreateTask /></ProtectedRoute>} />
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="contest/archive" element={<ProtectedRoute><Archive /></ProtectedRoute>} />
+        <Route path="/archive" element={<ProtectedRoute><Archive /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /> </ProtectedRoute>} />
         <Route path="/student" element={<ProtectedRoute><StudentHome /></ProtectedRoute>}/>
         <Route path="/organizer" element={<ProtectedRoute> <OrganizerHome /></ProtectedRoute>}/>

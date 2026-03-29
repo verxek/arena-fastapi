@@ -97,13 +97,20 @@ function OrganizerHome() {
       <Navbar />
       
       <div style={{
-        position: "absolute", 
-        top: "140px",          
-        left: "50%",         
-        transform: "translateX(-50%)",
-        width: "90%",         
-        maxWidth: "1200px",   
-        boxSizing: "border-box"
+        position: "absolute",
+          top: 130,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "90%",
+          maxWidth: "1200px",
+          background: "rgba(0,0,0,0)",
+          borderRadius: "20px",
+          padding: "0px 0px",
+          justifyContent: "space-between",
+          alignItems: "center",
+          boxSizing: "border-box",
+
+          zIndex: 1000
       }}>
         
         {/* СТАТИСТИКА */}
@@ -111,7 +118,7 @@ function OrganizerHome() {
           display: "grid", 
           gridTemplateColumns: "1fr 1fr", 
           gap: "24px", 
-          marginBottom: "24px" 
+          marginBottom: "24px"
         }}>
           <div style={styles.statCard}>
             <h3 style={styles.statTitle}>Создано задач</h3>
@@ -150,7 +157,7 @@ function OrganizerHome() {
         <div style={styles.section}>
           <div style={styles.sectionHeader}>
             <h2 style={styles.sectionTitle}>Завершенные контесты</h2>
-            <span style={styles.archiveLink} onClick={() => navigate("/contest/archive")}>Перейти к архиву &rarr;</span>
+            <span style={styles.archiveLink} onClick={() => navigate("/archive")}>Перейти к архиву &rarr;</span>
           </div>
           
           <div style={styles.cardsRow}>
@@ -176,7 +183,7 @@ const styles = {
     background: "white",
     padding: "24px",
     borderRadius: "16px",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
     textAlign: "center"
   },
   statTitle: { margin: "0 0 10px 0", fontSize: "16px", color: "#6b7280", fontWeight: "500" },
@@ -186,7 +193,7 @@ const styles = {
     borderRadius: "16px",
     padding: "24px",
     marginBottom: "24px",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
   },
   sectionHeader: {
     display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "10px"

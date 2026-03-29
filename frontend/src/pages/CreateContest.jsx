@@ -169,7 +169,7 @@ function CreateContest() {
           backgroundColor: "#ffffff",
           borderRadius: "16px",
           padding: "32px",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
+          boxShadow: "0 8px 20px rgba(0,0,0,0.1)"
         }}>
           
           {/* Поле: Название */}

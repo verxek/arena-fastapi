@@ -27,7 +27,7 @@ class TaskUpdate(BaseModel):
 
 class TaskResponse(TaskBase):
     task_id: int
-    author: Optional[int] = None
+    author_id: Optional[int] = None
     created_at: datetime
     visibility: bool
     tests_path: Optional[str] = None

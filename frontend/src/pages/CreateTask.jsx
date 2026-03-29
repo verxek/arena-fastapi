@@ -103,8 +103,14 @@ function CreateTask() {
       <Navbar />
      
       <div style={{
-        position: "absolute", top: "140px", left: "50%", transform: "translateX(-50%)",
-        width: "90%", maxWidth: "1200px", boxSizing: "border-box", paddingBottom: "40px" 
+        position: "absolute",
+        top: "140px",
+        left: "50%", 
+        transform: "translateX(-50%)",
+        width: "90%", 
+        maxWidth: "1200px", 
+        boxSizing: "border-box", 
+        paddingBottom: "40px" 
       }}>
         <h1 className="form-title">Создать новую задачу</h1>
         

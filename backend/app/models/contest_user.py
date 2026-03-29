@@ -54,9 +54,9 @@ class Contest_User(Base):
     @property
     def is_organizer(self) -> bool:
         """Проверяет, является ли пользователь организатором контеста"""
-        return self.role_rel and self.role_rel.role_name == "Organizer"
+        return self.role_rel and self.role_rel.role_id == 2
 
     @property
     def is_participant(self) -> bool:
         """Проверяет, является ли пользователь участником контеста"""
-        return self.role_rel and self.role_rel.role_name == "Participant"
+        return self.role_rel and self.role_rel.role_id == 1

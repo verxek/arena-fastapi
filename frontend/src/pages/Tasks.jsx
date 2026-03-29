@@ -37,7 +37,7 @@ function Tasks() {
   }, [navigate]);
 
   const filteredTasks = tasks.filter(task => {
-    if (activeTab === "my" && String(task.author) !== String(userId)) return false;
+    if (activeTab === "my" && String(task.author_id) !== String(userId)) return false;
     if (searchQuery && !task.task_name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     if (filterCategory !== "all" && task.category_name !== filterCategory) return false;
     if (filterDifficulty !== "all" && task.difficulty_name !== filterDifficulty) return false;
@@ -72,72 +72,160 @@ function Tasks() {
       
       {/* Главный центрированный контейнер */}
       <div style={{
-        position: "absolute", 
-        top: "140px",          
-        left: "50%",         
-        transform: "translateX(-50%)",
-        width: "90%",         
-        maxWidth: "1200px",   
-        boxSizing: "border-box"
+        position: "absolute",
+          top: 130,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "90%",
+          maxWidth: "1200px",
+          background: "#ffffff",
+          borderRadius: "20px",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
+          padding: "24px",
+          justifyContent: "space-between",
+          alignItems: "center",
+          boxSizing: "border-box",
+          zIndex: 1000
       }}>
-        
-        <div className="card">
+        {/* Шапка с тремя секциями: слева-центр-справа */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          marginBottom: '24px',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}>
           
-          {/* Поиск, Табы, Кнопки */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            marginBottom: '24px',
-            flexWrap: 'wrap',
-            gap: '16px'
-          }}>
-            
-            {/* Поиск + Табы */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-              {/* Поле поиска */}
-              <input 
-                type="text" 
-                placeholder="Найти задачу..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="search-input"
-                style={{ width: '250px' }}
-              />
-              
-              {/* Табы (только для организатора) */}
-              {userRole === 'organizer' && (
-                <div className="tabs-container">
-                  <button 
-                    onClick={() => setActiveTab('all')} 
-                    className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`}
-                  >
-                    Все
-                  </button>
-                  <button 
-                    onClick={() => setActiveTab('my')} 
-                    className={`tab-btn ${activeTab === 'my' ? 'active' : ''}`}
-                  >
-                    Мои
-                  </button>
-                </div>
-              )}
-            </div>
+          {/* ЛЕВАЯ ЧАСТЬ - Название раздела */}
+          <div style={{ flex: '0 0 auto', minWidth: '150px' }}>
+            <h1 style={{ 
+              margin: 0, 
+              fontSize: '18px', 
+              fontWeight: '600',
+              color: '#1f2937'
+            }}>
+              Задачи
+            </h1>
+          </div>
 
-            {/* Кнопки действий (только для организатора) */}
+          {/* ЦЕНТРАЛЬНАЯ ЧАСТЬ - Поиск + Табы */}
+          <div style={{ 
+            flex: '1 1 auto', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '12px',
+            justifyContent: 'center',
+            minWidth: '300px'
+          }}>
+            {/* Поле поиска */}
+            <input 
+              type="text" 
+              placeholder="Найти задачу..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input"
+              style={{ 
+                width: '280px',
+                padding: '8px 16px',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '14px',
+                outline: 'none'
+              }}
+            />
+            
+            {/* Табы (только для организатора) */}
             {userRole === 'organizer' && (
-              <div className="action-buttons" style={{ display: 'flex', gap: '8px' }}>
-                <button onClick={() => navigate('/tasks/drafts')} className="btn btn-secondary">
-                  Черновики
+              <div className="tabs-container" style={{ 
+                display: 'flex',
+                background: '#f3f4f6',
+                borderRadius: '8px',
+                padding: '4px'
+              }}>
+                <button 
+                  onClick={() => setActiveTab('all')} 
+                  className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`}
+                  style={{
+                    padding: '6px 16px',
+                    border: 'none',
+                    background: activeTab === 'all' ? '#ffffff' : 'transparent',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: activeTab === 'all' ? '500' : '400',
+                    color: activeTab === 'all' ? '#1f2937' : '#6b7280',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  Все
                 </button>
-                <button onClick={() => navigate('/tasks/create')} className="btn btn-primary">
-                  + Создать
+                <button 
+                  onClick={() => setActiveTab('my')} 
+                  className={`tab-btn ${activeTab === 'my' ? 'active' : ''}`}
+                  style={{
+                    padding: '6px 16px',
+                    border: 'none',
+                    background: activeTab === 'my' ? '#ffffff' : 'transparent',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: activeTab === 'my' ? '500' : '400',
+                    color: activeTab === 'my' ? '#1f2937' : '#6b7280',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  Мои
                 </button>
               </div>
             )}
           </div>
 
-          
+  {/* ПРАВАЯ ЧАСТЬ - Кнопки действий (только для организатора) */}
+  {userRole === 'organizer' && (
+    <div className="action-buttons" style={{ 
+      display: 'flex', 
+      gap: '8px',
+      flex: '0 0 auto'
+    }}>
+      <button 
+        onClick={() => navigate('/tasks/drafts')} 
+        className="btn btn-secondary"
+        style={{
+          padding: '8px 16px',
+          background: '#f3f4f6',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          fontSize: '14px',
+          fontWeight: '500',
+          color: '#374151'
+        }}
+      >
+        Черновики
+      </button>
+      <button 
+        onClick={() => navigate('/tasks/create')} 
+        className="btn btn-primary"
+        style={{
+          padding: '8px 16px',
+          background: '#1f2937',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          fontSize: '14px',
+          fontWeight: '500',
+          color: '#ffffff',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px'
+        }}
+      >
+        <span>+ Создать</span>
+      </button>
+    </div>
+  )}
+</div>
           <div style={{ height: '1px', background: '#f3f4f6', margin: '0 0 24px 0' }}></div>
           
           {/* Фильтры и Список */}
@@ -194,7 +282,6 @@ function Tasks() {
               ))}
             </div>
           )}
-        </div>
       </div>
     </div>
   );
