@@ -60,14 +60,14 @@ function Archive() {
   const endIndex = startIndex + itemsPerPage;
   const currentContests = finishedContests.slice(startIndex, endIndex);
 
-  // Сброс на 1 страницу при смене таба
+ 
   useEffect(() => {
     setCurrentPage(1);
   }, [activeTabFinished]);
 
-  // Обработчик клика по карточке
+
   const handleAction = (contest) => {
-    navigate(`/contests/${contest.contest_id}/results`);
+    navigate(`/contests/${contest.contest_id}`);
   };
 
   if (loading) {
@@ -99,7 +99,7 @@ function Archive() {
         padding: "24px"
       }}>
         
-        {/* ЗАГОЛОВОК + ТАБЫ */}
+
         <div className="header-row">
           <h2  style={{ fontSize: "18px", fontWeight: "600", color: "#111827",margin: "0 0 24px 0"}}>
             Архив контестов

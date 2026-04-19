@@ -70,7 +70,7 @@ function Tasks() {
     <div className="page-container">
       <Navbar />
       
-      {/* Главный центрированный контейнер */}
+      {/* Главный контейнер */}
       <div style={{
         position: "absolute",
           top: 130,
@@ -84,10 +84,9 @@ function Tasks() {
           padding: "24px",
           justifyContent: "space-between",
           alignItems: "center",
-          boxSizing: "border-box",
-          zIndex: 1000
+          boxSizing: "border-box"
       }}>
-        {/* Шапка с тремя секциями: слева-центр-справа */}
+        {/* шапка с тремя секциями: слева-центр-справа */}
         <div style={{ 
           display: 'flex', 
           justifyContent: 'space-between', 
@@ -97,7 +96,7 @@ function Tasks() {
           gap: '16px'
         }}>
           
-          {/* ЛЕВАЯ ЧАСТЬ - Название раздела */}
+          {/* Название раздела */}
           <div style={{ flex: '0 0 auto', minWidth: '150px' }}>
             <h1 style={{ 
               margin: 0, 
@@ -109,7 +108,7 @@ function Tasks() {
             </h1>
           </div>
 
-          {/* ЦЕНТРАЛЬНАЯ ЧАСТЬ - Поиск + Табы */}
+          {/* Поиск + Табы */}
           <div style={{ 
             flex: '1 1 auto', 
             display: 'flex', 
@@ -181,7 +180,7 @@ function Tasks() {
             )}
           </div>
 
-  {/* ПРАВАЯ ЧАСТЬ - Кнопки действий (только для организатора) */}
+  {/* Кнопки действий (только для организатора) */}
   {userRole === 'organizer' && (
     <div className="action-buttons" style={{ 
       display: 'flex', 

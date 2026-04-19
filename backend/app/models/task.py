@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, UniqueConstraint, Index
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, UniqueConstraint, Index, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from backend.app.database import Base, now_utc
@@ -23,6 +23,12 @@ class Task(Base):
 
     time_limit = Column(Integer, nullable=False)  # в миллисекундах
     memory_limit = Column(Integer, nullable=False)  # в мегабайтах
+
+    input_format = Column(Text, nullable=True) 
+    output_format = Column(Text, nullable=True) 
+    examples = Column(JSON, nullable=True)
+
+    status = Column(String, default="PENDING")
 
     # связи
     author_rel = relationship(

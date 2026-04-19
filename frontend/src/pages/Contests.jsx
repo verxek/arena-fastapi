@@ -59,20 +59,20 @@ function Contests() {
   // Логика фильтрации
   const availableContestsRaw = allContests.filter(c => c.is_upcoming || c.is_active);
   const availableContests = availableContestsRaw.filter(c => {
-    if (activeTabAvailable === "my") return c.author === userId;
+    if (activeTabAvailable === "my") return c.author_id === userId;
     return true;
   });
 
   const finishedContestsRaw = allContests.filter(c => c.is_finished);
   const finishedContests = finishedContestsRaw.filter(c => {
-    if (activeTabFinished === "my") return c.author === userId;
+    if (activeTabFinished === "my") return c.author_id === userId;
     return true;
   });
 
   const handleAction = (contest) => {
     if (contest.is_finished) alert(`Результаты: ${contest.contest_name}`);
     else if (contest.is_active) {
-      if (userRole === "organizer" && contest.author === userId) alert(`Управление: ${contest.contest_name}`);
+      if (userRole === "organizer" && contest.author_id === userId) alert(`Управление: ${contest.contest_name}`);
       else alert(`Решение: ${contest.contest_name}`);
     } else if (contest.is_upcoming) {
       if (contest.is_participant) alert("Вы уже зарегистрированы");
@@ -136,14 +136,14 @@ function Contests() {
               {userRole === "organizer" && (
                 <>
                   <button 
-                    onClick={() => setActiveTabFinished("all")} 
-                    className={`tab-btn ${activeTabFinished === "all" ? "active" : ""}`}
+                    onClick={() => setActiveTabAvailable("all")} 
+                    className={`tab-btn ${activeTabAvailable === "all" ? "active" : ""}`}
                   >
                     Все
                   </button>
                   <button 
-                    onClick={() => setActiveTabFinished("my")} 
-                    className={`tab-btn ${activeTabFinished === "my" ? "active" : ""}`}
+                    onClick={() => setActiveTabAvailable("my")} 
+                    className={`tab-btn ${activeTabAvailable === "my" ? "active" : ""}`}
                   >
                     Мои
                   </button>

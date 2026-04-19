@@ -1,8 +1,10 @@
 // frontend/src/components/ContestCard.jsx
 import React from 'react';
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 function ContestCard({ contest, userRole, isAuthor, onAction }) {
-
+  const [userId, setUserId] = useState(null)
   let statusText = "Завершен";
   let statusColor = "#6b7280"; 
 
@@ -19,38 +21,36 @@ function ContestCard({ contest, userRole, isAuthor, onAction }) {
   let isEditButton = false; 
 
 
-  if (userRole === 'organizer' && isAuthor && !(contest.is_finished)) {
+  
+  if (contest.get_contest_author == userId && contest.is_upcoming) {
     btnText = "Редактировать";
-    btnDisabled = false;
     isEditButton = true;
-  } 
- 
-  else {
-    if (contest.is_finished) {
-      btnText = "Результаты";
-    } else if (contest.is_active) {
-      if (isAuthor && userRole !== 'organizer') { 
-        btnText = "Управлять"; 
-      } else if (contest.is_participant) { 
-        btnText = "Решать"; 
-      } else { 
-        btnText = "Только для участников"; 
-        btnDisabled = true; 
-      }
-    } else if (contest.is_upcoming) {
-      if (contest.is_participant) { 
-        btnText = "Вы участвуете"; 
-        btnDisabled = true; 
-      } else { 
-        btnText = "Зарегистрироваться"; 
-      }
+  }
+  else if (contest.is_finished) {
+    btnText = "Результаты";
+  }
+  else if (contest.is_active) {
+    if (contest.is_participant) {
+      btnText = "Решать";
+    } else {
+      btnText = "Только для участников";
+      btnDisabled = true;
+    }
+  }
+  else if (contest.is_upcoming) {
+    if (contest.is_participant) {
+      btnText = "Вы участвуете";
+      btnDisabled = true;
+    } else {
+      btnText = "Зарегистрироваться";
     }
   }
 
-
+  const navigate = useNavigate();
   const handleClick = () => {
     if (isEditButton) {
-      window.location.href = `/contests/${contest.contest_id}/edit`;
+      
+      navigate(`/contests/${contest.contest_id}/edit`);
     } else {
       onAction(contest);
     }

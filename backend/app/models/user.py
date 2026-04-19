@@ -94,7 +94,7 @@ class User(Base):
         
         count = 0
         for participation in self.contest_participations:
-            if participation.is_organizer:
+            if participation.is_organizer and participation.contest_rel.is_finished:
                 count += 1
         return count
     

@@ -25,6 +25,7 @@ class Contest(Base):
     )
     participants = relationship(
         "Contest_User",
+        primaryjoin="and_(Contest.contest_id == Contest_User.cu_contest, Contest_User.role == 1)",
         back_populates="contest_rel",
         cascade="all, delete-orphan",
         lazy="selectin"
@@ -46,6 +47,9 @@ class Contest(Base):
 
     def __repr__(self):
         return f"<Contest(id={self.contest_id}, name='{self.contest_name}')>"
+    @property
+    def get_tasks_list(self) -> List[int]:
+        return self.tasks
 
     def get_end_time(self) -> datetime:
         """Возвращает время окончания контеста"""
@@ -62,16 +66,17 @@ class Contest(Base):
             )
             
         return self.start_time + timedelta(seconds=duration_seconds)
-
+    
+    @property
     def is_active(self) -> bool:
         """Проверяет, активен ли контест в данный момент"""
         now = now_utc()
         return self.start_time <= now < self.get_end_time()
-
+    @property
     def is_finished(self) -> bool:
         """Проверяет, завершён ли контест"""
         return now_utc() >= self.get_end_time()
-
+    @property
     def is_upcoming(self) -> bool:
         """Проверяет, запланирован лиест на будущее"""
         return now_utc() < self.start_time
@@ -90,6 +95,15 @@ class Contest(Base):
     def active_participants(self) -> List:
         """Список активных участников (с фильтром по статусу)"""
         return [p for p in self.participants if p.role_rel.role_name != "Removed"]
+
+    @property
+    def get_contest_author(self) -> int:
+        author_id = None
+        for participant in self.participants:
+                if participant.is_organizer:
+                    if author_id is None:  
+                        author_id = participant.cu_user
+        return author_id
 
     @property
     def contest_duration_str(self) -> str:

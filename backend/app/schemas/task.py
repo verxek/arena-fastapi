@@ -37,3 +37,8 @@ class TaskResponse(TaskBase):
     difficulty_name: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+class TaskSimple(BaseModel):
+    task_id: int
+    task_name: str
+    

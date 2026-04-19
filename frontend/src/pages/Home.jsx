@@ -42,7 +42,7 @@ function Home() {
       navigate("/login");
     } else {
       // Если авторизован
-      if (contest.is_finished) navigate(`/contests/${contest.contest_id}/results`);
+      if (contest.is_finished) navigate(`/contests/${contest.contest_id}`);
       else if (contest.is_active) navigate(`/contests/${contest.contest_id}`);
       else if (contest.is_upcoming) navigate(`/contests/${contest.contest_id}`);
     }
@@ -89,7 +89,7 @@ function Home() {
           </div>
         )}
 
-        {/* ЗОНА 1: АКТИВНЫЕ И ПРЕДСТОЯЩИЕ */}
+        {/*  АКТИВНЫЕ И ПРЕДСТОЯЩИЕ */}
         <div style={{
           backgroundColor: "#ffffff",
           borderRadius: "16px",

@@ -2,10 +2,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { useParams } from "react-router-dom";
 
 function CreateContest() {
   const navigate = useNavigate();
-  
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
   // Состояния формы
   const [contestName, setContestName] = useState("");
   const [startTime, setStartTime] = useState("");
@@ -21,56 +23,87 @@ function CreateContest() {
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState(null);
 
-  // Загрузка данных пользователя и его задач
   
-  useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    const role = localStorage.getItem("role");
-    
-    console.log("Token:", token);
-    console.log("Role:", role);
+  
+  const [contestData, setContestData] = useState(null);
 
-    if (!token) {
-        console.warn("Нет токена, редирект на логин");
-        navigate("/login");
-        return;
-    }
+useEffect(() => {
+  if (!isEditMode) return;
 
-    // Разрешаем доступ только организаторам
-    if (role !== "organizer") {
-        console.warn("Роль не organizer, редирект на логин. Текущая роль:", role);
-        navigate("/login");
-        return;
-    }
+  const token = localStorage.getItem("access_token");
 
-    fetch("http://127.0.0.1:8000/users/me", {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-    .then(res => {
-        if (!res.ok) throw new Error("Ошибка получения пользователя");
-        return res.json();
-    })
+  fetch(`http://127.0.0.1:8000/contests/${id}`, {
+  headers: { Authorization: `Bearer ${token}` }
+})
+  .then(res => {
+  if (!res.ok) {
+    throw new Error("Ошибка загрузки контеста");
+  }
+  return res.json();
+})
+  .then(data => {
+ 
+
+  setContestData(data); 
+
+  setContestName(data.contest_name);
+
+  const date = new Date(data.start_time);
+
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16);
+
+  setStartTime(localDate);
+
+  const [h, m] = data.contest_duration_str.split(":");
+  setDurationHours(parseInt(h));
+  setDurationMinutes(parseInt(m));
+  });
+}, [id, isEditMode]);
+
+useEffect(() => {
+  if (!contestData || !Array.isArray(contestData.task_list) || allTasks.length === 0) {
+    return;
+  }
+
+  const matchedTasks = allTasks.filter(task =>
+    contestData?.task_list?.includes(task.task_id)
+  );
+
+  setSelectedTasks(matchedTasks);
+
+}, [contestData, allTasks]);
+
+
+
+useEffect(() => {
+  const token = localStorage.getItem("access_token");
+  const role = localStorage.getItem("role");
+
+  if (!token || role !== "organizer") {
+    navigate("/login");
+    return;
+  }
+
+  fetch("http://127.0.0.1:8000/users/me", {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then(res => res.json())
     .then(user => {
-        setUserId(user.user_id);
-        
-        // Загружаем задачи.
-        return fetch(`http://127.0.0.1:8000/tasks?author_id=${user.user_id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-        });
-    })
-    .then(res => {
-        if (!res.ok) throw new Error("Ошибка получения задач");
-        return res.json();
-    })
-    .then(tasks => {
-        console.log("Задачи загружены:", tasks);
-        setAllTasks(tasks);
-    })
-    .catch(err => {
-        console.error("Критическая ошибка:", err);
-    });
-    }, [navigate]);
+      setUserId(user.user_id);
 
+      return fetch(`http://127.0.0.1:8000/tasks?author_id=${user.user_id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    })
+    .then(res => res.json())
+    .then(tasks => {
+      setAllTasks(tasks);
+    })
+    .catch(err => console.error("Ошибка загрузки задач:", err));
+
+}, []);
   const handleSelectTask = (task) => {
     if (!selectedTasks.find(t => t.task_id === task.task_id)) {
       setSelectedTasks([...selectedTasks, task]);
@@ -85,47 +118,64 @@ function CreateContest() {
 
  
   const handleSubmit = async (statusParam = "active") => {
-    if (!contestName || !startTime || selectedTasks.length === 0) {
+    if (statusParam !== "draft") {
+      if (!contestName || !startTime || selectedTasks.length === 0) {
         alert("Заполните название, дату начала и добавьте хотя бы одну задачу");
         return;
+      }
     }
 
     setLoading(true);
     const token = localStorage.getItem("access_token");
+    const fullDateTime = `${date}T${time}`;
+    const iso = new Date(fullDateTime).toISOString();
 
     try {
         const h = parseInt(durationHours) || 0;
         const m = parseInt(durationMinutes) || 0;
       
-        // Форматируем в "HH:MM:SS"
         const durationString = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
 
         let statusId = 2; 
         if (statusParam === "active") statusId = 3;
         if (statusParam === "draft") statusId = 1;
-        
+        const dateObj = new Date(startTime);
 
-        const contestData = {
+        if (isNaN(dateObj.getTime())) {
+          alert("Некорректная дата");
+          setLoading(false);
+          return;
+        }
+
+        const requestData = {
         contest_name: contestName,
         start_time: new Date(startTime).toISOString(),
-        duration: durationString,      
-        contest_status: statusId,      
-        task_ids: selectedTasks.map(t => t.task_id) 
-        };
+        duration: durationString,
+        contest_status: statusId,
+        task_ids: selectedTasks.map(t => t.task_id)
+      };
 
-        console.log("Отправка данных:", contestData);
+        console.log("Отправка данных:", requestData);
 
-        const response = await fetch("http://127.0.0.1:8000/contests", {
-        method: "POST",
+        const url = isEditMode
+          ? `http://127.0.0.1:8000/contests/${id}`
+          : "http://127.0.0.1:8000/contests";
+
+        const method = isEditMode ? "PUT" : "POST";
+        
+        const response = await fetch(url, {
+        method,
         headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(contestData)
-        });
-
+        body: JSON.stringify(requestData)
+      });
         if (response.ok) {
-        alert("Контест успешно создан!");
+        alert(isEditMode 
+          ? "Контест успешно обновлён!" 
+          : "Контест успешно создан!"
+        );
         navigate("/contests");
         } else {
         const error = await response.json();
@@ -160,9 +210,9 @@ function CreateContest() {
       }}>
         
         {/* Заголовок страницы */}
-        <h1 style={{ fontSize: "24px", fontWeight: "700", color: "#111827", marginBottom: "24px" }}>
-          Новый контест
-        </h1>
+        <h3>
+          {isEditMode ? "Редактирование контеста" : "Новый контест"}
+        </h3>
 
         {/* Основная форма */}
         <div style={{
@@ -363,54 +413,58 @@ function CreateContest() {
             </div>
 
             {/* Список выбранных задач */}
-            {selectedTasks.length > 0 && (
-              <div style={{ marginTop: "16px" }}>
-                {selectedTasks.map((task, index) => (
-                  <div
-                    key={task.task_id}
+            <div style={{ marginTop: "16px" }}>
+
+              {selectedTasks.length === 0 && (
+                <div style={{ color: "#9ca3af", fontSize: "14px" }}>
+                  Задачи не добавлены
+                </div>
+              )}
+
+              {selectedTasks.map((task, index) => (
+                <div
+                  key={task.task_id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "12px 16px",
+                    backgroundColor: "#f9fafb",
+                    borderRadius: "8px",
+                    marginBottom: "8px",
+                    border: "1px solid #e5e7eb"
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <span style={{ 
+                      fontWeight: "600", 
+                      color: "#6b7280",
+                      minWidth: "20px"
+                    }}>
+                      {String.fromCharCode(65 + index)}.
+                    </span>
+                    <span style={{ fontSize: "14px", color: "#111827" }}>
+                      {task.task_name}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => handleRemoveTask(task.task_id)}
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: "12px 16px",
-                      backgroundColor: "#f9fafb",
-                      borderRadius: "8px",
-                      marginBottom: "8px",
-                      border: "1px solid #e5e7eb"
+                      background: "none",
+                      border: "none",
+                      color: "#ef4444",
+                      cursor: "pointer",
+                      fontSize: "18px"
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                      <span style={{ 
-                        fontWeight: "600", 
-                        color: "#6b7280",
-                        minWidth: "20px"
-                      }}>
-                        {String.fromCharCode(65 + index)}.
-                      </span>
-                      <span style={{ fontSize: "14px", color: "#111827" }}>
-                        {task.task_name}
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => handleRemoveTask(task.task_id)}
-                      style={{
-                        background: "none",
-                        border: "none",
-                        color: "#ef4444",
-                        cursor: "pointer",
-                        fontSize: "18px",
-                        padding: "4px 8px",
-                        borderRadius: "4px"
-                      }}
-                      onMouseOver={(e) => e.target.style.backgroundColor = "#fee2e2"}
-                      onMouseOut={(e) => e.target.style.backgroundColor = "transparent"}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+                    ✕
+                  </button>
+                </div>
+              ))}
+
+            </div>
+         
           </div>
 
           {/* Кнопки действий */}
@@ -435,26 +489,32 @@ function CreateContest() {
                 opacity: loading ? 0.7 : 1
               }}
             >
-              {loading ? "Сохранение..." : "Сохранить"}
+              {loading
+              ? "Сохранение..."
+              : isEditMode
+                ? "Сохранить изменения"
+                : "Сохранить"}
             </button>
             
-            <button
-              onClick={() => handleSubmit("draft")}
-              disabled={loading}
-              style={{
-                background: "#e5e7eb",
-                color: "#374151",
-                border: "none",
-                padding: "10px 24px",
-                borderRadius: "8px",
-                fontSize: "14px",
-                fontWeight: "600",
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1
-              }}
-            >
-              В черновики
-            </button>
+            {!isEditMode && (
+              <button
+                onClick={() => handleSubmit("draft")}
+                disabled={loading}
+                style={{
+                  background: "#e5e7eb",
+                  color: "#374151",
+                  border: "none",
+                  padding: "10px 24px",
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  cursor: loading ? "not-allowed" : "pointer",
+                  opacity: loading ? 0.7 : 1
+                }}
+              >
+                В черновики
+              </button>
+            )}
             
             <button
               onClick={() => navigate("/contests")}

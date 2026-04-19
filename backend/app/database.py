@@ -5,6 +5,8 @@ from sqlalchemy.dialects.postgresql import TIMESTAMP
 from typing import AsyncGenerator
 import os
 from datetime import datetime, timezone
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 # URL подключения
 DATABASE_URL = os.getenv(
@@ -55,3 +57,24 @@ async def init_db():
 def now_utc() -> datetime:
     """Текущее время в UTC"""
     return datetime.now(timezone.utc)
+
+
+
+# СИНХРОННАЯ ВЕРСИЯ ДЛЯ CELERY
+SYNC_DATABASE_URL = DATABASE_URL.replace(
+    "postgresql+asyncpg",
+    "postgresql+psycopg2"
+)
+
+sync_engine = create_engine(
+    SYNC_DATABASE_URL,
+    pool_pre_ping=True,
+    pool_size=10,
+    max_overflow=20,
+)
+
+SessionLocal = sessionmaker(
+    bind=sync_engine,
+    autocommit=False,
+    autoflush=False,
+)

@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete as sql_delete
-from sqlalchemy.orm import selectinload # Для оптимизации загрузки связей, если нужно
+from sqlalchemy.orm import selectinload
 from typing import List, Optional
 import os
 import shutil
@@ -11,6 +11,8 @@ import logging
 from datetime import datetime
 import docker
 import time
+import json
+from backend.app.worker.tasks import generate_task_tests
 
 from backend.app.database import get_db
 from backend.app.models.task import Task
@@ -20,7 +22,6 @@ from backend.app.models.dictionaries import Task_Category, Difficulty_Level
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
-client = docker.from_env()
 logger = logging.getLogger(__name__)
 
 try:
@@ -36,89 +37,7 @@ os.makedirs(BASE_UPLOAD_DIR, exist_ok=True)
 def generate_unique_id():
     return str(uuid.uuid4())
 
-def run_reference_solution_in_docker(
-    solution_path: str, 
-    input_path: str, 
-    output_path: str, 
-    time_limit: int, 
-    memory_limit: int,
-    task_dir: str = None  
-):
-    if not client:
-        raise Exception("Docker клиент не инициализирован.")
 
-    ext = os.path.splitext(solution_path)[1].lower()
-    filename = os.path.basename(solution_path)
-    
-
-    if task_dir:
-        # Если передали корневую папку задачи - используем её
-        work_dir = os.path.abspath(task_dir)
-        # Путь к решению внутри контейнера будет /app/solutions/solution.py
-        container_sol_path = f"/app/solutions/{filename}"
-        # Путь к входу внутри контейнера будет /app/tests/1.in
-        container_input_filename = f"tests/{os.path.basename(input_path)}"
-    else:
-        # монтируем папку решения
-        work_dir = os.path.abspath(os.path.dirname(solution_path))
-        container_sol_path = f"/app/{filename}"
-        container_input_filename = os.path.basename(input_path)
-
-    timeout_seconds = max(5, (time_limit / 1000.0) + 2.0)
-    mem_limit_str = f"{memory_limit}m"
-
-    if ext == ".py":
-        image = "python:3.9-slim"
-        command = ["sh", "-c", f"python {container_sol_path} < /app/{container_input_filename}"]
-        
-    elif ext == ".cpp":
-        image = "gcc:latest"
-        binary_name = filename.replace(".cpp", "")
-        # Для C++ бинарник тоже кладем в solutions
-        command = ["sh", "-c", f"g++ -std=c++17 -O2 -o /app/solutions/{binary_name} {container_sol_path} && /app/solutions/{binary_name} < /app/{container_input_filename}"]
-        
-    else:
-        raise ValueError(f"Неподдерживаемый язык: {ext}")
-
-    try:
-        logger.info(f"Запуск в Docker: {image} | Папка: {work_dir}")
-
-        result_output = client.containers.run(
-            image=image,
-            command=command,
-            volumes={
-                work_dir: {'bind': '/app', 'mode': 'ro'}
-            },
-            stdout=True,
-            stderr=True,
-            detach=False,
-            remove=True,
-            network_disabled=True,
-            mem_limit=mem_limit_str,
-            nano_cpus=int(1 * 1e9),
-        )
-
-        with open(output_path, "wb") as outfile:
-            outfile.write(result_output)
-            
-        logger.info(f"Успешно сгенерирован тест: {output_path}")
-
-    except docker.errors.APIError as e:
-        error_msg = str(e).lower()
-        if "out of memory" in error_msg or "signal 9" in error_msg:
-            raise Exception(f"Превышен лимит памяти ({memory_limit} МБ).")
-        elif "no such file" in error_msg:
-            raise Exception(f"Ошибка: файл не найден. Проверьте пути: решение={container_sol_path}, вход=/app/{container_input_filename}")
-        else:
-            raise Exception(f"Ошибка Docker API: {str(e)}")
-            
-    except FileNotFoundError:
-        raise Exception(f"Входной файл не найден на хосте: {input_path}")
-        
-    except Exception as e:
-        if "timeout" in str(e).lower() or "timed out" in str(e).lower():
-            raise Exception(f"Превышен лимит времени ({time_limit} мс).")
-        raise Exception(f"Ошибка выполнения кода в песочнице: {str(e)}")
     
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=dict)
 async def create_task(
@@ -131,7 +50,10 @@ async def create_task(
     tests_file: UploadFile = File(...),
     solution_file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    input_format: str = Form(None),
+    output_format: str = Form(None),
+    examples_json: str = Form(None)
 ):
     #  Проверка уникальности названия
     stmt = select(Task).where(Task.task_name == task_name)
@@ -145,6 +67,9 @@ async def create_task(
     new_task = Task(
         task_name=task_name,
         statement=statement,
+        input_format=input_format,
+        output_format=output_format,
+        examples=json.loads(examples_json) if examples_json else [],
         difficulty=difficulty_id,
         category=category_id,
         time_limit=time_limit,
@@ -185,20 +110,15 @@ async def create_task(
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(tests_dir)
         os.remove(zip_path)
-
-        # генерация .out файлов
-        in_files = [f for f in os.listdir(tests_dir) if f.endswith('.in')]
-        if not in_files:
-            raise Exception("В архиве не найдено файлов .in")
-
-        for in_file in in_files:
-            in_path = os.path.join(tests_dir, in_file)
-            out_file = in_file.replace('.in', '.out')
-            out_path = os.path.join(tests_dir, out_file)
-            
-            run_reference_solution_in_docker(
-                sol_path, in_path, out_path, time_limit, memory_limit, task_dir=task_dir
-            )
+        await db.commit() 
+        generate_task_tests.delay(
+            task_id,
+            time_limit,
+            memory_limit
+        )
+        new_task.status = "GENERATING_TESTS"
+        await db.commit()
+        
 
     except Exception as e:
         await db.delete(new_task) 
@@ -221,7 +141,6 @@ async def create_task(
 
 @router.get("/", response_model=List[dict])
 async def get_tasks(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
-    # запрос всех задач
     stmt = select(Task)
     result = await db.execute(stmt)
     tasks = result.scalars().all()
@@ -282,3 +201,70 @@ async def get_difficulties(db: AsyncSession = Depends(get_db)):
     difficulties = result.scalars().all()
     
     return [{"difficulty_id": d.difficulty_id, "diff_name": d.diff_name} for d in difficulties]
+
+
+
+
+@router.get("/batch")
+async def get_tasks_batch(
+    task_ids: str = Query(..., description="Task IDs separated by commas or repeated parameter"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    
+    import re
+    ids_list = [int(x.strip()) for x in re.split(r'[,&]', task_ids) if x.strip()]
+    
+    result = await db.execute(
+        select(Task).where(Task.task_id.in_(ids_list))
+    )
+    tasks = result.scalars().all()
+    
+    return [
+        {
+            "task_id": t.task_id,
+            "task_name": t.task_name,
+            "author_id": t.author,
+            "category_name": t.category_rel.category_name,
+            "difficulty_name": t.difficulty_rel.diff_name,
+            "created_at": t.created_at.isoformat() if t.created_at else None,
+            "time_limit": t.time_limit,
+            "memory_limit": t.memory_limit,
+            "tests_url": f"/static/tasks/{t.task_id}/tests/",
+            "solution_url": f"/static/tasks/{t.task_id}/solutions/"
+        }
+        for t in tasks
+    ]
+
+
+@router.get("/{task_id}", response_model=dict)
+async def get_task(
+    task_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    stmt = select(Task).where(Task.task_id == task_id).options(
+        selectinload(Task.category_rel),
+        selectinload(Task.difficulty_rel)
+    )
+    result = await db.execute(stmt)
+    task = result.scalar_one_or_none()
+
+    if not task:
+        raise HTTPException(status_code=404, detail="Задача не найдена")
+
+    return {
+        "task_id": task.task_id,
+        "task_name": task.task_name,
+        "statement": task.statement,
+        "author_id": task.author,
+        "category_name": task.category_rel.category_name if task.category_rel else "Unknown",
+        "difficulty_name": task.difficulty_rel.diff_name if task.difficulty_rel else "Unknown",
+        "created_at": task.created_at.isoformat() if task.created_at else None,
+        "time_limit": task.time_limit,
+        "memory_limit": task.memory_limit,
+
+        "input_format": task.input_format,
+        "output_format": task.output_format,
+        "examples": task.examples or []
+    }

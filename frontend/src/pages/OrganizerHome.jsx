@@ -76,7 +76,7 @@ function OrganizerHome() {
   const finished = safeContests.filter(c => c.is_finished);
 
   const handleAction = (contest) => {
-    if (contest.is_finished) navigate(`/contests/${contest.contest_id}/results`);
+    if (contest.is_finished) navigate(`/contests/${contest.contest_id}`);
     else if (contest.is_active) navigate(`/contests/${contest.contest_id}`);
     else if (contest.is_upcoming) navigate(`/contests/${contest.contest_id}`);
   };
@@ -93,7 +93,11 @@ function OrganizerHome() {
   }
 
   return (
-    <div className="page-container">
+    <div style={{ 
+      backgroundColor: "#f3f4f6",
+      minHeight: "100vh", 
+      paddingBottom: "40px" 
+    }}>
       <Navbar />
       
       <div style={{
@@ -108,9 +112,7 @@ function OrganizerHome() {
           padding: "0px 0px",
           justifyContent: "space-between",
           alignItems: "center",
-          boxSizing: "border-box",
-
-          zIndex: 1000
+          boxSizing: "border-box"
       }}>
         
         {/* СТАТИСТИКА */}

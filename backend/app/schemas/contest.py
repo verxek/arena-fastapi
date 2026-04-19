@@ -1,6 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime, time, timedelta
 from typing import List, Optional
+from backend.app.schemas.task import TaskSimple
 
 class ContestBase(BaseModel):
     contest_name: str
@@ -8,14 +9,19 @@ class ContestBase(BaseModel):
     duration: time
     contest_status: int
 
-class ContestCreate(ContestBase):
-    task_ids: List[int] = []
+class ContestCreate(BaseModel):
+    contest_name: Optional[str] = None
+    start_time: Optional[datetime] = None
+    duration: Optional[time] = None
+    contest_status: int
+    task_ids: Optional[List[int]] = []
 
 class ContestUpdate(BaseModel):
     contest_name: Optional[str] = None
     start_time: Optional[datetime] = None
     duration: Optional[time] = None
     contest_status: Optional[int] = None
+
 
 class ContestListResponse(BaseModel):
     contest_id: int
@@ -27,7 +33,6 @@ class ContestListResponse(BaseModel):
     is_active: bool = False
     is_finished: bool = False
     total_participants: int = 0
-    contest_duration_str: str = ""
     author_id: Optional[int] = None
     is_participant: bool = False
     is_organizer: bool = False
@@ -46,3 +51,21 @@ class ContestDetailResponse(ContestBase):
 
     class Config:
         from_attributes = True
+
+
+class ContestResponse(BaseModel):
+    contest_id: int
+    contest_name: str
+    start_time: datetime
+    end_time: datetime
+    contest_status: int
+    is_finished: bool
+    is_active: bool
+    is_upcoming: bool
+    total_participants: int
+    contest_duration_str: str
+    author_id: Optional[int]
+    is_organizer: bool
+    task_list: Optional[List[TaskSimple]] = []
+    
+    model_config = ConfigDict(from_attributes=True)

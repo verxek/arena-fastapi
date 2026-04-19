@@ -42,7 +42,7 @@ function Login() {
       const user = await meResponse.json()
       localStorage.setItem("role", user.role)  
 
-      // Перенаправление в зависимости от роли
+
       if (user.role === "organizer") {
         navigate("/organizer")
       } else {
