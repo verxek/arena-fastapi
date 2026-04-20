@@ -109,7 +109,7 @@ function StudentHome() {
           alignItems: "center",
           boxSizing: "border-box",
 
-          zIndex: 1000
+          
       }}>
         
         {/* СТАТИСТИКА */}

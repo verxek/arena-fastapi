@@ -3,6 +3,29 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 
+const loadSolutions = async () => {
+  const userId = localStorage.getItem("user_id");
+  const token = localStorage.getItem("access_token");
+
+  const res = await fetch(
+    `http://127.0.0.1:8000/solutions/my?user_id=${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  const data = await res.json();
+
+  if (Array.isArray(data)) {
+    setSolutions(data);
+  } else {
+    setSolutions([]);
+  }
+};
+
+
 function ContestMenu() {
   const { contest_id } = useParams();
   const navigate = useNavigate();
@@ -11,9 +34,56 @@ function ContestMenu() {
   const [tasks, setTasks] = useState([]);
   const [timeLeft, setTimeLeft] = useState("");
   const [loading, setLoading] = useState(true);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [selectedLang, setSelectedLang] = useState(1);
+  const [file, setFile] = useState(null);
+  const [solutions, setSolutions] = useState([]);
+  const isFinished = contest?.is_finished;
+  const [openedTask, setOpenedTask] = useState(null);
   
   const token = localStorage.getItem("access_token");
   const userId = localStorage.getItem("user_id");
+  const handleSubmit = async () => {
+    if (!file || !selectedTask) {
+      alert("Выбери задачу и файл");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("task_id", selectedTask);
+    formData.append("language_id", selectedLang);
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/solutions/submit", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (res.ok) {
+        alert("Решение отправлено ");
+      } else {
+        alert("Ошибка при отправке");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Ошибка сети");
+    }
+  };
+  useEffect(() => {
+    if (activeTab === "submissions") {
+      loadSolutions();
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+  if (isFinished && (activeTab === "submit" || activeTab === "submissions")) {
+    setActiveTab("tasks");
+  }
+}, [isFinished]);
 
   useEffect(() => {
   const loadContestData = async () => {
@@ -59,58 +129,111 @@ function ContestMenu() {
   loadContestData();
 }, [contest_id, token]);
   
+  const TasksTab = () => {
 
-const TasksTab = () => {
-
-  if (!tasks || tasks.length === 0) {
+  // 👉 если открыта задача
+  if (openedTask) {
     return (
-      <div className="empty-state" style={{ textAlign: "center", padding: "40px", color: "#9ca3af" }}>
-        В этом контесте пока нет задач
+      <div>
+        <div
+          className="task-info"
+          style={{ marginBottom: "20px", cursor: "pointer" }}
+          onClick={() => setOpenedTask(null)}
+        >
+          ← Назад к задачам
+        </div>
+
+        <h2>{openedTask.task_name}</h2>
+
+        <div className="task-meta" style={{ marginBottom: "20px" }}>
+          <span className="meta-item">{openedTask.category_name}</span>
+          <span className="meta-item">{openedTask.difficulty_name}</span>
+        </div>
+
+        <hr />
+
+        <h3>Условие</h3>
+        <div className="task-item" style={{ marginTop: "10px" }}>
+          {openedTask.statement}
+        </div>
+
+        {!contest.is_finished && (
+          <button
+            className="btn btn-primary"
+            style={{ marginTop: "20px" }}
+            onClick={() => setActiveTab("submit")}
+          >
+            Отправить решение
+          </button>
+        )}
       </div>
     );
   }
 
+  // 👉 список задач (ТВОЙ СТИЛЬ)
   return (
     <div className="tasks-list">
-      {tasks.map((task, index) => {
-        const taskLetter = String.fromCharCode(1040 + index); 
-        
-        return (
-          <div key={task.task_id} className="task-item">
-            <div className="task-info" onClick={() => navigate(`/contests/${contest_id}/tasks/${task.task_id}`)}>
-              <span className="task-name">{taskLetter}. {task.task_name}</span>
-              <span className="task-meta">
-                <span className="meta-item">{task.category_name}</span>
-                <span className="meta-item">{task.difficulty_name}</span>
-              </span>
-            </div>
-            
+      {tasks.map(task => (
+        <div key={task.task_id} className="task-item">
+          
+          {/* КЛИК ПО ЗАДАЧЕ */}
+          <div
+            className="task-info"
+            onClick={() => setOpenedTask(task)}
+          >
+            <span className="task-name">{task.task_name}</span>
+
+            <span className="task-meta">
+              <span className="meta-item">{task.category_name}</span>
+              <span className="meta-item">{task.difficulty_name}</span>
+            </span>
           </div>
-        );
-      })}
+
+          {/* ПРАВАЯ ЧАСТЬ */}
+          <div className="task-actions">
+            {!contest.is_finished && (
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={() => setActiveTab("submit")}
+              >
+                Решить
+              </button>
+            )}
+          </div>
+
+        </div>
+      ))}
     </div>
   );
 };
+
+
   // Вкладка Отправить решение 
   const SubmitTab = () => (
     <div style={styles.submitContainer}>
       <div style={styles.submitForm}>
         <div style={styles.formGroup}>
           <label style={styles.label}>Выберите язык программирования:</label>
-          <select style={styles.select}>
-            <option>Python 3.8</option>
-            <option>C++ 20</option>
+          <select
+            style={styles.select}
+            onChange={(e) => setSelectedLang(e.target.value)}
+          >
+            <option value={1}>Python 3.8</option>
+            <option value={2}>C++ 20</option>
           </select>
         </div>
 
         <div style={styles.formGroup}>
           <label style={styles.label}>Выберите задачу:</label>
-          <select style={styles.select}>
+          <select
+            style={styles.select}
+            onChange={(e) => setSelectedTask(e.target.value)}
+          >
             {tasks.map((task, index) => {
               const taskLetter = String.fromCharCode(1040 + index);
               return (
                 <option key={task.task_id} value={task.task_id}>
-                  {taskLetter}. {task.title}
+                  {taskLetter}. {task.task_name}
                 </option>
               );
             })}
@@ -122,15 +245,15 @@ const TasksTab = () => {
           <div style={styles.fileInputWrapper}>
             <input 
               type="file" 
-              accept=".py,.cpp,.java,.js" 
+              accept=".py,.cpp"
               style={styles.fileInput}
-              onChange={(e) => console.log(e.target.files[0])}
+              onChange={(e) => setFile(e.target.files[0])}
             />
             <button style={styles.fileButton}>Импортировать файл с решением</button>
           </div>
         </div>
 
-        <button style={styles.submitButton}>
+        <button style={styles.submitButton} onClick={handleSubmit}>
           Отправить решение
         </button>
       </div>
@@ -153,10 +276,30 @@ const TasksTab = () => {
             <th style={styles.th}>Память</th>
           </tr>
         </thead>
+
         <tbody>
-          <tr>
-            <td colSpan="8" style={styles.emptyCell}>Пока нет отправок</td>
-          </tr>
+          {solutions.length === 0 ? (
+            <tr>
+              <td colSpan="8" style={styles.emptyCell}>
+                Пока нет отправок
+              </td>
+            </tr>
+          ) : (
+            solutions.map((s, index) => (
+              <tr key={s.id}>
+                <td style={styles.td}>{index + 1}</td>
+                <td style={styles.td}>
+                  {new Date(s.time).toLocaleString()}
+                </td>
+                <td style={styles.td}>{s.user_nickname || "-"}</td>
+                <td style={styles.td}>{s.task || "-"}</td>
+                <td style={styles.td}>{s.language || "-"}</td>
+                <td style={styles.td}>{s.status}</td>
+                <td style={styles.td}>-</td>
+                <td style={styles.td}>-</td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
@@ -232,24 +375,31 @@ const TasksTab = () => {
           >
             Задачи
           </button>
-          <button 
-            style={{
-              ...styles.tab,
-              ...(activeTab === "submit" ? styles.activeTab : {})
-            }}
-            onClick={() => setActiveTab("submit")}
-          >
-            Отправить решение
-          </button>
-          <button 
-            style={{
-              ...styles.tab,
-              ...(activeTab === "submissions" ? styles.activeTab : {})
-            }}
-            onClick={() => setActiveTab("submissions")}
-          >
-            Все отправления
-          </button>
+
+          {!isFinished && (
+            <>
+              <button 
+                style={{
+                  ...styles.tab,
+                  ...(activeTab === "submit" ? styles.activeTab : {})
+                }}
+                onClick={() => setActiveTab("submit")}
+              >
+                Отправить решение
+              </button>
+
+              <button 
+                style={{
+                  ...styles.tab,
+                  ...(activeTab === "submissions" ? styles.activeTab : {})
+                }}
+                onClick={() => setActiveTab("submissions")}
+              >
+                Все отправления
+              </button>
+            </>
+          )}
+
           <button 
             style={{
               ...styles.tab,
@@ -264,8 +414,8 @@ const TasksTab = () => {
         {/* Контент вкладок */}
         <div style={styles.content}>
           {activeTab === "tasks" && <TasksTab />}
-          {activeTab === "submit" && <SubmitTab />}
-          {activeTab === "submissions" && <SubmissionsTab />}
+          {!isFinished && activeTab === "submit" && <SubmitTab />}
+          {!isFinished && activeTab === "submissions" && <SubmissionsTab />}
           {activeTab === "rating" && <RatingTab />}
         </div>
       </div>
@@ -280,6 +430,12 @@ const TasksTab = () => {
 }
 
 const styles = {
+  box: {
+    background: "#f9fafb",
+    padding: "15px",
+    borderRadius: "10px",
+    border: "1px solid #e5e7eb"
+  },
   header: {
     position: "absolute",
     top: 100,
@@ -287,7 +443,6 @@ const styles = {
     transform: "translateX(-50%)",
     width: "90%",
     maxWidth: "1200px",
-    zIndex: 1000
   },
   contestTitle: {
     fontSize: "24px",
@@ -302,7 +457,7 @@ const styles = {
     transform: "translateX(-50%)",
     width: "90%",
     maxWidth: "1200px",
-    zIndex: 1000
+
   },
   tabs: {
     display: "flex",

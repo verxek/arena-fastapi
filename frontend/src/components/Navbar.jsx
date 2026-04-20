@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LoginModal from "./LoginModal";  
 import RegisterModal from "./RegisterModal";
+import { FaUser } from "react-icons/fa";
+
 
 function Navbar() {
   const navigate = useNavigate();
@@ -101,7 +103,7 @@ function Navbar() {
                   e.currentTarget.style.transform = "scale(1)";
                 }}
               >
-                👤
+                <FaUser size={16} />
               </button>
               <button
                 onClick={logout}

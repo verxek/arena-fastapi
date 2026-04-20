@@ -70,15 +70,11 @@ function Contests() {
   });
 
   const handleAction = (contest) => {
-    if (contest.is_finished) alert(`Результаты: ${contest.contest_name}`);
-    else if (contest.is_active) {
-      if (userRole === "organizer" && contest.author_id === userId) alert(`Управление: ${contest.contest_name}`);
-      else alert(`Решение: ${contest.contest_name}`);
-    } else if (contest.is_upcoming) {
-      if (contest.is_participant) alert("Вы уже зарегистрированы");
-      else alert(`Регистрация: ${contest.contest_name}`);
-    }
+    if (contest.is_finished) navigate(`/contests/${contest.contest_id}`);
+    else if (contest.is_active) navigate(`/contests/${contest.contest_id}`);
+    else if (contest.is_upcoming) navigate(`/contests/${contest.contest_id}`);
   };
+
 
   if (loading) return <div style={{paddingTop: "100px", textAlign: "center"}}>Загрузка...</div>;
 

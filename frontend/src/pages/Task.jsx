@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
+import SubmitModal from "../components/SubmitModal";
 
 function TaskPage() {
   const { id } = useParams();
   const [task, setTask] = useState(null);
-
+  const [showSubmit, setShowSubmit] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -159,10 +161,30 @@ function TaskPage() {
               border: "none",
               borderRadius: "8px",
               cursor: "pointer"
-            }}>
+            }} onClick={() => setShowSubmit(true)}>
               Отправить решение
             </button>
+            <button
+            style={{
+              padding: "10px 25px",
+              background: "#374151",
+              color: "#fff",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+              marginLeft: "10px"
+            }}
+            onClick={() => navigate("/my-submissions", { state: { taskId: id } })}
+          >
+            Мои отправления
+          </button>
           </div>
+          {showSubmit && (
+            <SubmitModal
+              task={task}
+              onClose={() => setShowSubmit(false)}
+            />
+          )}
 
         </div>
       </div>

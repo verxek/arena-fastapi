@@ -165,3 +165,130 @@ def _generate_task_tests(task_id: int, time_limit: int, memory_limit: int):
 
     finally:
         db.close()
+
+
+
+@celery.task
+def run_solution(solution_id: int):
+    from backend.app.database import SessionLocal
+    from backend.app.models.solution import Solution
+    from backend.app.worker.executor import (
+        run_with_limits,
+        run_python,
+        run_cpp,
+        compile_cpp_container
+    )
+
+    import os
+
+    db = SessionLocal()
+
+    try:
+        solution = db.get(Solution, solution_id)
+        task_id = solution.sol_task
+
+        # =========================
+        # PATHS
+        # =========================
+        base_dir = f"uploads/tasks/{task_id}"
+        sol_dir = os.path.join(base_dir, "solutions")
+        tests_dir = os.path.join(base_dir, "tests")
+
+        # =========================
+        # FIND FILE
+        # =========================
+        files = os.listdir(sol_dir)
+        file_name = next(f for f in files if f.startswith(str(solution_id)))
+        file_path = os.path.join(sol_dir, file_name)
+
+        is_py = file_name.endswith(".py")
+
+        # =========================
+        # COMPILE IF CPP
+        # =========================
+        if not is_py:
+            try:
+                container = compile_cpp_container(
+                    code_path=f"/app/solutions/{file_name}",
+                    workdir=base_dir,
+                    memory_limit_mb=256
+                )
+                container.wait()
+            except Exception:
+                solution.sol_state = 9  # Compilation Error
+                db.commit()
+                return
+
+        # =========================
+        # TESTS
+        # =========================
+        test_files = sorted(f for f in os.listdir(tests_dir) if f.endswith(".in"))
+
+        def compare_output(actual: str, expected_path: str) -> bool:
+            with open(expected_path, "r", encoding="utf-8") as f:
+                expected = f.read().strip()
+            return actual.strip() == expected.strip()
+
+        final_status = "OK"
+
+        for test in test_files:
+
+            if is_py:
+                result = run_with_limits(
+                    run_python,
+                    code_file=f"solutions/{file_name}",
+                    input_file=f"/app/tests/{test}",
+                    workdir=base_dir,
+                    time_limit_ms=2000,
+                    memory_limit_mb=256
+                )
+            else:
+                result = run_with_limits(
+                    run_cpp,
+                    input_file=f"/app/tests/{test}",
+                    workdir=base_dir,
+                    time_limit_ms=2000,
+                    memory_limit_mb=256
+                )
+
+            # =========================
+            # CHECK STATUS
+            # =========================
+            if result["status"] != "OK":
+                final_status = result["status"]
+                break
+
+            # =========================
+            # CHECK ANSWER
+            # =========================
+            expected_path = os.path.join(
+                tests_dir,
+                test.replace(".in", ".out")
+            )
+
+            if not compare_output(result["output"], expected_path):
+                final_status = "WA"
+                break
+
+        # =========================
+        # VERDICT MAP
+        # =========================
+        verdict_map = {
+            "OK": 4,   # Accepted
+            "WA": 5,
+            "TLE": 6,
+            "MLE": 7,
+            "RE": 8,
+            "CE": 9
+        }
+
+        solution.sol_state = verdict_map.get(final_status, 9)
+        db.commit()
+
+    finally:
+        db.close()
+
+def compare_output(actual: str, expected_path: str) -> bool:
+    with open(expected_path, "r") as f:
+        expected = f.read().strip()
+    return actual.strip() == expected

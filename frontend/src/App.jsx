@@ -13,6 +13,7 @@ import Profile from "./pages/Profile"
 import Archive from "./pages/Archive"
 import ContestMenu from "./pages/ContestMenu"
 import TaskPage from "./pages/Task"
+import MySubmissions from "./pages/MySubmissions"
 
 import ProtectedRoute from "./components/ProtectedRoute"
 
@@ -36,6 +37,7 @@ function App() {
         <Route path="/contests/:contest_id" element={<ProtectedRoute><ContestMenu /> </ProtectedRoute>}/>
         <Route path="/contests/:id/edit" element={<CreateContest />} />
         <Route path="/tasks/:id" element={<TaskPage />} />
+        <Route path="/my-submissions" element={<MySubmissions />} /> 
 
       </Routes>
 

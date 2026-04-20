@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar"; 
+import { MdEdit, MdDelete } from "react-icons/md";
 
 function Tasks() {
   const navigate = useNavigate();
@@ -270,8 +271,8 @@ function Tasks() {
                   <div className="task-actions">
                     {userRole === 'organizer' ? (
                       <>
-                        <button onClick={() => navigate(`/tasks/${task.task_id}/edit`)} className="icon-btn edit">✏️</button>
-                        <button onClick={() => handleDelete(task.task_id)} className="icon-btn delete">🗑️</button>
+                        <button onClick={() => navigate(`/tasks/${task.task_id}/edit`)} className="icon-btn edit"><MdEdit /></button>
+                        <button onClick={() => handleDelete(task.task_id)} className="icon-btn delete"><MdDelete /></button>
                       </>
                     ) : (
                       <button onClick={() => navigate(`/tasks/${task.task_id}`)} className="btn btn-sm btn-primary">Решить</button>
