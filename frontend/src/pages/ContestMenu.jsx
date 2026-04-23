@@ -40,9 +40,12 @@ function ContestMenu() {
   const [solutions, setSolutions] = useState([]);
   const isFinished = contest?.is_finished;
   const [openedTask, setOpenedTask] = useState(null);
+  const [loadingTask, setLoadingTask] = useState(false);
+   
   
   const token = localStorage.getItem("access_token");
   const userId = localStorage.getItem("user_id");
+  const isOrganizer = contest?.is_organizer;
   const handleSubmit = async () => {
     if (!file || !selectedTask) {
       alert("Выбери задачу и файл");
@@ -130,14 +133,37 @@ function ContestMenu() {
 }, [contest_id, token]);
   
   const TasksTab = () => {
+  
 
-  // 👉 если открыта задача
+  const token = localStorage.getItem("access_token");
+
+  const openTask = async (taskId) => {
+    try {
+      setLoadingTask(true);
+
+      const res = await fetch(`http://127.0.0.1:8000/tasks/${taskId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!res.ok) throw new Error("Failed to load task");
+
+      const data = await res.json();
+      setOpenedTask(data);
+
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingTask(false);
+    }
+  };
+
+ 
   if (openedTask) {
     return (
       <div>
+
         <div
-          className="task-info"
-          style={{ marginBottom: "20px", cursor: "pointer" }}
+          style={{ cursor: "pointer", marginBottom: "20px", color: "#6b7280" }}
           onClick={() => setOpenedTask(null)}
         >
           ← Назад к задачам
@@ -145,64 +171,91 @@ function ContestMenu() {
 
         <h2>{openedTask.task_name}</h2>
 
-        <div className="task-meta" style={{ marginBottom: "20px" }}>
-          <span className="meta-item">{openedTask.category_name}</span>
-          <span className="meta-item">{openedTask.difficulty_name}</span>
+        <div style={{ display: "flex", gap: "20px", color: "#6b7280" }}>
+          <span>{openedTask.category_name}</span>
+          <span>{openedTask.difficulty_name}</span>
+          <span>{openedTask.time_limit} ms</span>
+          <span>{openedTask.memory_limit} MB</span>
         </div>
 
-        <hr />
+        <hr style={{ margin: "20px 0" }} />
 
         <h3>Условие</h3>
-        <div className="task-item" style={{ marginTop: "10px" }}>
+        <div style={{ background: "#f9fafb", padding: "15px", borderRadius: "10px" }}>
           {openedTask.statement}
         </div>
 
-        {!contest.is_finished && (
-          <button
-            className="btn btn-primary"
-            style={{ marginTop: "20px" }}
-            onClick={() => setActiveTab("submit")}
-          >
-            Отправить решение
-          </button>
+        <h3 style={{ marginTop: "20px" }}>Входные данные</h3>
+        <div style={{ background: "#f9fafb", padding: "10px", borderRadius: "8px" }}>
+          {openedTask.input_format || "Не указано"}
+        </div>
+
+        <h3 style={{ marginTop: "20px" }}>Выходные данные</h3>
+        <div style={{ background: "#f9fafb", padding: "10px", borderRadius: "8px" }}>
+          {openedTask.output_format || "Не указано"}
+        </div>
+
+        <h3 style={{ marginTop: "20px" }}>Примеры</h3>
+        {openedTask.examples?.length > 0 ? (
+          <table style={{ width: "100%", marginTop: "10px" }}>
+            <thead>
+              <tr>
+                <th>Ввод</th>
+                <th>Вывод</th>
+              </tr>
+            </thead>
+            <tbody>
+              {openedTask.examples.map((ex, i) => (
+                <tr key={i}>
+                  <td style={{ whiteSpace: "pre-wrap" }}>{ex.input}</td>
+                  <td style={{ whiteSpace: "pre-wrap" }}>{ex.output}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>Нет примеров</p>
         )}
+
       </div>
     );
   }
 
-  // 👉 список задач (ТВОЙ СТИЛЬ)
+
   return (
     <div className="tasks-list">
-      {tasks.map(task => (
-        <div key={task.task_id} className="task-item">
-          
-          {/* КЛИК ПО ЗАДАЧЕ */}
-          <div
-            className="task-info"
-            onClick={() => setOpenedTask(task)}
-          >
-            <span className="task-name">{task.task_name}</span>
 
-            <span className="task-meta">
-              <span className="meta-item">{task.category_name}</span>
-              <span className="meta-item">{task.difficulty_name}</span>
-            </span>
-          </div>
-
-          {/* ПРАВАЯ ЧАСТЬ */}
-          <div className="task-actions">
-            {!contest.is_finished && (
-              <button
-                className="btn btn-sm btn-primary"
-                onClick={() => setActiveTab("submit")}
-              >
-                Решить
-              </button>
-            )}
-          </div>
-
+      {loadingTask && (
+        <div style={{ color: "#6b7280", marginBottom: "10px" }}>
+          Загрузка задачи...
         </div>
-      ))}
+      )}
+
+      {tasks.map((task, index) => {
+        const letter = String.fromCharCode(1040 + index);
+
+        return (
+          <div key={task.task_id} className="task-item">
+
+            <div
+              className="task-info"
+              onClick={() => openTask(task.task_id)}
+              style={{ cursor: "pointer" }}
+            >
+              <span className="task-name">
+                {letter}. {task.task_name}
+              </span>
+
+              <span className="task-meta">
+                <span>{task.category_name}</span>
+                <span>{task.difficulty_name}</span>
+              </span>
+            </div>
+
+          </div>
+        );
+      })}
+
     </div>
   );
 };
@@ -353,7 +406,7 @@ function ContestMenu() {
       </div>
     );
   }
-
+ 
   return (
     <div className="page-container">
       <Navbar />
@@ -376,7 +429,7 @@ function ContestMenu() {
             Задачи
           </button>
 
-          {!isFinished && (
+          {!isFinished && !isOrganizer && (
             <>
               <button 
                 style={{
@@ -387,7 +440,10 @@ function ContestMenu() {
               >
                 Отправить решение
               </button>
-
+              </>
+          )}
+          {!isFinished && (
+             <>
               <button 
                 style={{
                   ...styles.tab,
@@ -397,8 +453,9 @@ function ContestMenu() {
               >
                 Все отправления
               </button>
-            </>
+              </>
           )}
+          
 
           <button 
             style={{
@@ -414,7 +471,7 @@ function ContestMenu() {
         {/* Контент вкладок */}
         <div style={styles.content}>
           {activeTab === "tasks" && <TasksTab />}
-          {!isFinished && activeTab === "submit" && <SubmitTab />}
+          {!isFinished && !isOrganizer && activeTab === "submit" && <SubmitTab />}
           {!isFinished && activeTab === "submissions" && <SubmissionsTab />}
           {activeTab === "rating" && <RatingTab />}
         </div>

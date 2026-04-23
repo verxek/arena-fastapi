@@ -13,7 +13,7 @@ function SubmitModal({ task, onClose }) {
 
     const token = localStorage.getItem("access_token");
 
-    await fetch("http://127.0.0.1:8000/submit", {
+    await fetch("http://127.0.0.1:8000/solutions/submit", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`

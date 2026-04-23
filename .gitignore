@@ -25,6 +25,7 @@ __pycache__/
 static/
 images/
 uploads/
+node_modules/
 
 # Файлы конфигурации
 .env

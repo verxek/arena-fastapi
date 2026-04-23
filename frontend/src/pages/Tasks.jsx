@@ -271,11 +271,48 @@ function Tasks() {
                   <div className="task-actions">
                     {userRole === 'organizer' ? (
                       <>
-                        <button onClick={() => navigate(`/tasks/${task.task_id}/edit`)} className="icon-btn edit"><MdEdit /></button>
-                        <button onClick={() => handleDelete(task.task_id)} className="icon-btn delete"><MdDelete /></button>
+                        <button onClick={() => navigate(`/tasks/${task.task_id}/edit`)} className="icon-btn edit">
+                          <MdEdit />
+                        </button>
+                        <button onClick={() => handleDelete(task.task_id)} className="icon-btn delete">
+                          <MdDelete />
+                        </button>
                       </>
                     ) : (
-                      <button onClick={() => navigate(`/tasks/${task.task_id}`)} className="btn btn-sm btn-primary">Решить</button>
+                      <>
+                        {/* ЕСЛИ РЕШЕНО */}
+                        {task.is_solved ? (
+                          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                            
+                            <span style={{
+                              fontSize: "12px",
+                              color: "#10b981",
+                              fontWeight: "600"
+                            }}>
+                              ✓ Решено
+                            </span>
+
+                            <button
+                              onClick={() => navigate(`/tasks/${task.task_id}`)}
+                              className="btn btn-sm"
+                              style={{
+                                background: "#f3f4f6",
+                                color: "#374151"
+                              }}
+                            >
+                              Решить заново
+                            </button>
+
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => navigate(`/tasks/${task.task_id}`)}
+                            className="btn btn-sm btn-primary"
+                          >
+                            Решить
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>

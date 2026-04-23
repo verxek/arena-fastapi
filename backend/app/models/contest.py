@@ -30,6 +30,12 @@ class Contest(Base):
         cascade="all, delete-orphan",
         lazy="selectin"
     )
+    organizers = relationship(
+        "Contest_User",
+        primaryjoin="and_(Contest.contest_id == Contest_User.cu_contest, Contest_User.role == 2)",
+        viewonly=True,
+        lazy="selectin"
+    )
     tasks = relationship(
         "Contest_Task",
         back_populates="contest_rel",
@@ -51,6 +57,7 @@ class Contest(Base):
     def get_tasks_list(self) -> List[int]:
         return self.tasks
 
+    
     def get_end_time(self) -> datetime:
         """Возвращает время окончания контеста"""
         if not self.duration:
@@ -104,7 +111,9 @@ class Contest(Base):
                     if author_id is None:  
                         author_id = participant.cu_user
         return author_id
-
+    @property
+    def organizer(self):
+        return self.organizers[0] if self.organizers else None
     @property
     def contest_duration_str(self) -> str:
         """Возвращает продолжительность контеста в строковом формате (чч:мм:сс)"""

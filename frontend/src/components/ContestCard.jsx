@@ -2,9 +2,11 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import RegisterContestModal from "./RegisterContestModal";
 
 function ContestCard({ contest, userRole, isAuthor, onAction }) {
   const [userId, setUserId] = useState(null)
+  const [showRegister, setShowRegister] = useState(false);
   let statusText = "Завершен";
   let statusColor = "#6b7280"; 
 
@@ -18,42 +20,51 @@ function ContestCard({ contest, userRole, isAuthor, onAction }) {
 
   let btnText = "";
   let btnDisabled = false;
-  let isEditButton = false; 
+  let isEditButton = false;
+  let isRegisterButton = false;
 
 
+  const isParticipant = contest.is_participant;
+  const isActive = contest.is_active;
+  const isUpcoming = contest.is_upcoming;
+  const isFinished = contest.is_finished;
+
+  if (isAuthor) {
+    if (isUpcoming) {
+      btnText = "Редактировать";
+      isEditButton = true;}
+    else if (isActive) btnText = "Войти в контест";
+    else btnText = "Результаты";
+  }
+  else if (isParticipant) {
+    if (isActive) btnText = "Решать";
+    else if (isUpcoming) {
+      btnDisabled = true;
+      btnText = "Вы участвуете"; }
+    else btnText = "Результаты";
+  }
+  else {
+  if (isUpcoming) btnText = "Зарегистрироваться";
+  else if (isActive){
+    btnDisabled = true;
+    btnText = "Только для участников";}
+  else btnText = "Результаты";
+}
   
-  if (contest.get_contest_author == userId && contest.is_upcoming) {
-    btnText = "Редактировать";
-    isEditButton = true;
-  }
-  else if (contest.is_finished) {
-    btnText = "Результаты";
-  }
-  else if (contest.is_active) {
-    if (contest.is_participant) {
-      btnText = "Решать";
-    } else {
-      btnText = "Только для участников";
-      btnDisabled = true;
-    }
-  }
-  else if (contest.is_upcoming) {
-    if (contest.is_participant) {
-      btnText = "Вы участвуете";
-      btnDisabled = true;
-    } else {
-      btnText = "Зарегистрироваться";
-    }
-  }
-
+  
   const navigate = useNavigate();
   const handleClick = () => {
     if (isEditButton) {
-      
       navigate(`/contests/${contest.contest_id}/edit`);
-    } else {
-      onAction(contest);
+      return;
     }
+
+    if (isRegisterButton) {
+      setShowRegister(true);
+      return;
+    }
+
+    onAction(contest);
   };
 
   return (
@@ -119,6 +130,15 @@ function ContestCard({ contest, userRole, isAuthor, onAction }) {
       >
         {btnText}
       </button>
+      {showRegister && (
+          <RegisterContestModal
+            contest={contest}
+            onClose={() => setShowRegister(false)}
+            onSuccess={() => {
+              alert("Вы зарегистрированы!");
+            }}
+          />
+        )}
     </div>
   );
 }

@@ -160,7 +160,11 @@ async def get_tasks(db: AsyncSession = Depends(get_db), current_user: User = Dep
             "time_limit": t.time_limit,
             "memory_limit": t.memory_limit,
             "tests_url": f"/static/tasks/{t.task_id}/tests/",
-            "solution_url": f"/static/tasks/{t.task_id}/solutions/"
+            "solution_url": f"/static/tasks/{t.task_id}/solutions/",
+            "is_solved": any(
+                sol.sol_task == t.task_id and sol.sol_user == current_user.user_id
+                for sol in current_user.solutions
+            )
         })
     return result_list
 

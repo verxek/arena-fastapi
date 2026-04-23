@@ -127,8 +127,7 @@ useEffect(() => {
 
     setLoading(true);
     const token = localStorage.getItem("access_token");
-    const fullDateTime = `${date}T${time}`;
-    const iso = new Date(fullDateTime).toISOString();
+    
 
     try {
         const h = parseInt(durationHours) || 0;
@@ -156,6 +155,7 @@ useEffect(() => {
       };
 
         console.log("Отправка данных:", requestData);
+   
 
         const url = isEditMode
           ? `http://127.0.0.1:8000/contests/${id}`
