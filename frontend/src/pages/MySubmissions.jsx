@@ -1,19 +1,17 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import "../styles/global.css";
 
 function MySubmissions() {
   const [solutions, setSolutions] = useState([]);
 
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const userId = localStorage.getItem("user_id");
   const token = localStorage.getItem("access_token");
-
-  const location = useLocation();
   const taskId = location.state?.taskId;
-
 
   useEffect(() => {
     const loadSolutions = async () => {
@@ -22,18 +20,13 @@ function MySubmissions() {
           `http://127.0.0.1:8000/solutions/my?user_id=${userId}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
 
         const data = await res.json();
-
-        if (Array.isArray(data)) {
-          setSolutions(data);
-        } else {
-          setSolutions([]);
-        }
+        setSolutions(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error(err);
         setSolutions([]);
@@ -44,105 +37,83 @@ function MySubmissions() {
   }, [userId, token]);
 
   return (
-    <div>
+    <div className="page-container">
       <Navbar />
 
-      <div style={{ padding: "120px 40px" }}>
-        
-        {/* КНОПКА ВОЗВРАТА */}
-        {taskId && (
-          <button
-            onClick={() => navigate(`/tasks/${taskId}`)}
-            style={{
-              marginBottom: "20px",
-              padding: "13px 15px",
-              background: "#272a2e",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontWeight: "500"
-            }}
-          >
-            ← Вернуться к задаче
-          </button>
-        )}
+      <div className="page-main-container">
 
-        <h2 style={{ marginBottom: "20px" }}>Мои отправления</h2>
+        {/* HEADER */}
+        <div className="header-row">
 
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
-            <thead>
-              <tr>
-                <th style={styles.th}>№</th>
-                <th style={styles.th}>Время</th>
-                <th style={styles.th}>Задача</th>
-                <th style={styles.th}>Язык</th>
-                <th style={styles.th}>Вердикт</th>
-              </tr>
-            </thead>
+          <h1 className="page-title">Мои отправления</h1>
 
-            <tbody>
-              {solutions.length === 0 ? (
+          {taskId && (
+            <button
+              className="btn btn-secondary"
+              onClick={() => navigate(`/tasks/${taskId}`)}
+            >
+              ← Вернуться к задаче
+            </button>
+          )}
+
+        </div>
+
+        {/* TABLE */}
+        <div className="section">
+
+          <div style={{ overflowX: "auto" }}>
+            <table className="table">
+              <thead>
                 <tr>
-                  <td colSpan="5" style={styles.emptyCell}>
-                    Пока нет отправок
-                  </td>
+                  <th>№</th>
+                  <th>Время</th>
+                  <th>Задача</th>
+                  <th>Язык</th>
+                  <th>Вердикт</th>
                 </tr>
-              ) : (
-                solutions.map((s, index) => (
-                  <tr key={s.id}>
-                    <td style={styles.td}>{index + 1}</td>
-                    <td style={styles.td}>
-                      {new Date(s.time).toLocaleString()}
-                    </td>
-                    <td style={styles.td}>{s.task || "-"}</td>
-                    <td style={styles.td}>{s.language || "-"}</td>
-                    <td style={styles.td}>
-                      <span
-                        style={{
-                          color:
-                            s.status === "Accepted"
-                              ? "green"
-                              : s.status === "Wrong Answer"
-                              ? "red"
-                              : "#f59e0b",
-                          fontWeight: "500"
-                        }}
-                      >
-                        {s.status}
-                      </span>
+              </thead>
+
+              <tbody>
+                {solutions.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="empty-state">
+                      Пока нет отправок
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  solutions.map((s, index) => (
+                    <tr key={s.id}>
+                      <td>{index + 1}</td>
+                      <td>{new Date(s.time).toLocaleString()}</td>
+                      <td>{s.task || "-"}</td>
+                      <td>{s.language || "-"}</td>
+                      <td>
+                        <span
+                          style={{
+                            color:
+                              s.status === "Accepted"
+                                ? "green"
+                                : s.status === "Wrong Answer"
+                                ? "red"
+                                : "#f59e0b",
+                            fontWeight: "500",
+                          }}
+                        >
+                          {s.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
         </div>
+
       </div>
     </div>
   );
 }
-
-const styles = {
-  th: {
-    textAlign: "left",
-    padding: "12px",
-    borderBottom: "2px solid #e5e7eb",
-    fontWeight: "600",
-    color: "#374151",
-    whiteSpace: "nowrap"
-  },
-  td: {
-    padding: "12px",
-    borderBottom: "1px solid #f3f4f6",
-    color: "#6b7280"
-  },
-  emptyCell: {
-    textAlign: "center",
-    padding: "40px",
-    color: "#9ca3af"
-  }
-};
 
 export default MySubmissions;

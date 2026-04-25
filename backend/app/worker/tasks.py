@@ -15,6 +15,7 @@ import os
 import time
 from backend.app.worker.utils import file_hash
 from backend.app.worker.redis_client import redis_client
+from backend.app.models.sandbox import Sandbox
 
 
 # =========================
@@ -231,7 +232,7 @@ def run_solution(solution_id: int):
 
         final_status = "OK"
 
-        for test in test_files:
+        for i, test in enumerate(test_files, start=1):
 
             if is_py:
                 result = run_with_limits(
@@ -252,35 +253,59 @@ def run_solution(solution_id: int):
                 )
 
             # =========================
-            # CHECK STATUS
+            # DEFAULT VALUES
             # =========================
-            if result["status"] != "OK":
-                final_status = result["status"]
-                break
+            output = result.get("output", "")
+            error = result.get("error", "")
+            exec_time = result.get("time_ms", 0)
+            memory = result.get("memory_kb", 0)
 
             # =========================
-            # CHECK ANSWER
+            # STATUS
             # =========================
-            expected_path = os.path.join(
-                tests_dir,
-                test.replace(".in", ".out")
+            status = result.get("status", "RE")
+
+            if status != "OK":
+                final_status = status
+            else:
+                expected_path = os.path.join(
+                    tests_dir,
+                    test.replace(".in", ".out")
+                )
+
+                if not compare_output(output, expected_path):
+                    final_status = "WA"
+                else:
+                    final_status = "OK"
+
+            # =========================
+            # VERDICT MAP
+            # =========================
+            verdict_map = {
+                "OK": 4,
+                "WA": 5,
+                "TLE": 6,
+                "MLE": 7,
+                "RE": 8,
+                "CE": 9
+            }
+
+            verdict_id = verdict_map.get(final_status, 8)
+
+            sandbox = Sandbox(
+                sandbox_sol=solution.solution_id,
+                sandbox_ver=verdict_id,
+                output=output,
+                execution_time_ms=exec_time,
+                memory_used_kb=memory,
+                test_number=i,
+                error_output=error
             )
 
-            if not compare_output(result["output"], expected_path):
-                final_status = "WA"
-                break
+            db.add(sandbox)
 
-        # =========================
-        # VERDICT MAP
-        # =========================
-        verdict_map = {
-            "OK": 4,   # Accepted
-            "WA": 5,
-            "TLE": 6,
-            "MLE": 7,
-            "RE": 8,
-            "CE": 9
-        }
+            if final_status != "OK":
+                break
 
         solution.sol_state = verdict_map.get(final_status, 9)
         db.commit()

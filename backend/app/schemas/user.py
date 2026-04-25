@@ -1,5 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
+from backend.app.models.user import UserRole
+
 
 
 class UserBase(BaseModel):
@@ -11,6 +13,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8)
+    role: UserRole
 
 
 class UserResponse(UserBase):
@@ -18,7 +21,7 @@ class UserResponse(UserBase):
     registration_date: datetime
     nickname: str
     email: str
-    role: str
+    role: UserRole
 
     authored_tasks_count: int = 0
     organized_contests_count: int = 0
@@ -27,3 +30,4 @@ class UserResponse(UserBase):
 
     class Config:
         from_attributes = True
+        use_enum_values = True

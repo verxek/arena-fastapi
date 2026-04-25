@@ -74,13 +74,12 @@ class User(Base):
 
     @property
     def solved_tasks_count(self) -> int:
-        """Актуальное количество решённых задач через связь с решениями"""
-        return sum(
-            1 for sol in self.solutions 
-            if hasattr(sol, 'sol_state_rel') 
-            and sol.state_rel 
-            and sol.state_rel.state_name == "Accepted"
-        )
+        solved_tasks = {
+            sol.sol_task
+            for sol in self.solutions
+            if sol.sol_state == 4
+        }
+        return len(solved_tasks)
     @property
     def authored_tasks_count(self) -> int:
         """Количество задач, созданных пользователем"""
@@ -136,7 +135,7 @@ class User(Base):
                 
                 # Рассчитываем конец контеста
                 from datetime import timedelta
-                end_time = start_time + timedelta(minutes=duration_minutes)
+                end_time = start_time + timedelta(minutes=contest.duration)
 
                 if start_time <= submit_time <= end_time:
                     unique_contest_ids.add(contest.contest_id)

@@ -9,14 +9,11 @@ def build_user_response(user: User) -> UserResponse:
         role=user.role,
         registration_date=user.registration_date,
 
-        authored_tasks_count=len(user.authored_tasks or []),
+        authored_tasks_count=user.authored_tasks_count,
 
-        solved_tasks_count=len(user.solutions or []),
+        solved_tasks_count=user.solved_tasks_count,
 
-        organized_contests_count=sum(
-            1 for p in user.contest_participations
-            if p.role == 2
-        ) if user.contest_participations else 0,
+        organized_contests_count=user.organized_contests_count,
 
-        participated_contests_count=0  # пока убери сложную логику
+        participated_contests_count=user.participated_contests_count
     )

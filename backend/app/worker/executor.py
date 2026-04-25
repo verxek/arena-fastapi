@@ -70,7 +70,7 @@ def run_python(code_file, input_file, workdir, memory_limit_mb):
 def run_cpp(input_file, workdir, memory_limit_mb):
     workdir = os.path.abspath(workdir)
 
-    container = client.containers.run(
+    return client.containers.run(
         image="gcc:latest",
         command=f"sh -c '/build/a.out < /app/tests/{os.path.basename(input_file)}'",
         volumes={
@@ -83,15 +83,10 @@ def run_cpp(input_file, workdir, memory_limit_mb):
         stdout=True,
         stderr=True,
         remove=False,
-        detach=True
+        detach=True  
     )
 
-    container.wait()
-
-    logs = container.logs(stdout=True, stderr=True)
-    container.remove(force=True)
-
-    return logs.decode("utf-8", errors="ignore")
+    
 # =========================
 # TIME + MEMORY LIMIT WRAPPER
 # =========================
@@ -110,7 +105,12 @@ def run_with_limits(func, *, time_limit_ms: int, memory_limit_mb: int, **kwargs)
         try:
             container.wait(timeout=time_limit_ms / 1000)
         except Exception:
-            container.kill()
+            try:
+                container.kill()
+                container.wait()
+            except:
+                pass
+
             return {
                 "status": "TLE",
                 "output": "",
@@ -126,8 +126,8 @@ def run_with_limits(func, *, time_limit_ms: int, memory_limit_mb: int, **kwargs)
         }
 
     finally:
-        try:
-            if container:
-                container.remove(force=True)
-        except:
-            pass
+        if container:
+            try:
+                container.remove(force=True) 
+            except:
+                pass

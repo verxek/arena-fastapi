@@ -1,65 +1,78 @@
-// frontend/src/components/ContestCard.jsx
-import React from 'react';
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import RegisterContestModal from "./RegisterContestModal";
 
+import { RiTimeLine } from "react-icons/ri";
+import { BiCube } from "react-icons/bi";
+import { MdOutlineDateRange, MdOutlinePeople } from "react-icons/md";
+
+import "../styles/global.css";
+
+function formatDate(dateStr) {
+  return new Date(dateStr).toLocaleString("ru-RU", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function getHours(durationStr) {
+  if (!durationStr) return "0 ч";
+  return Number(durationStr.split(":")[0]) + " ч";
+}
+
 function ContestCard({ contest, userRole, isAuthor, onAction }) {
-  const [userId, setUserId] = useState(null)
   const [showRegister, setShowRegister] = useState(false);
-  let statusText = "Завершен";
-  let statusColor = "#6b7280"; 
-
-  if (contest.is_upcoming) { 
-    statusText = "Скоро"; 
-    statusColor = "#3b82f6"; 
-  } else if (contest.is_active) { 
-    statusText = "Активен"; 
-    statusColor = "#10b981"; 
-  } 
-
-  let btnText = "";
-  let btnDisabled = false;
-  let isEditButton = false;
-  let isRegisterButton = false;
-
+  const navigate = useNavigate();
 
   const isParticipant = contest.is_participant;
   const isActive = contest.is_active;
   const isUpcoming = contest.is_upcoming;
-  const isFinished = contest.is_finished;
+
+  let statusText = "Завершен";
+  let statusColor = "#6b7280";
+
+  if (isUpcoming) {
+    statusText = "Скоро";
+    statusColor = "#3b82f6";
+  } else if (isActive) {
+    statusText = "Активен";
+    statusColor = "#10b981";
+  }
+
+  let btnText = "";
+  let btnDisabled = false;
+  let isEdit = false;
 
   if (isAuthor) {
     if (isUpcoming) {
       btnText = "Редактировать";
-      isEditButton = true;}
-    else if (isActive) btnText = "Войти в контест";
+      isEdit = true;
+    } else if (isActive) btnText = "Войти в контест";
     else btnText = "Результаты";
-  }
-  else if (isParticipant) {
+  } else if (isParticipant) {
     if (isActive) btnText = "Решать";
     else if (isUpcoming) {
+      btnText = "Вы участвуете";
       btnDisabled = true;
-      btnText = "Вы участвуете"; }
-    else btnText = "Результаты";
+    } else btnText = "Результаты";
+  } else {
+    if (isUpcoming) btnText = "Зарегистрироваться";
+    else if (isActive) {
+      btnText = "Только для участников";
+      btnDisabled = true;
+    } else btnText = "Результаты";
   }
-  else {
-  if (isUpcoming) btnText = "Зарегистрироваться";
-  else if (isActive){
-    btnDisabled = true;
-    btnText = "Только для участников";}
-  else btnText = "Результаты";
-}
-  
-  
-  const navigate = useNavigate();
+
   const handleClick = () => {
-    if (isEditButton) {
+    if (isEdit) {
       navigate(`/contests/${contest.contest_id}/edit`);
       return;
     }
 
-    if (isRegisterButton) {
+    if (btnText === "Зарегистрироваться") {
       setShowRegister(true);
       return;
     }
@@ -68,77 +81,65 @@ function ContestCard({ contest, userRole, isAuthor, onAction }) {
   };
 
   return (
-    <div style={{
-      border: "1px solid #e5e7eb",
-      borderRadius: "12px",
-      padding: "20px",
-      background: "white",
-      display: "flex",
-      flexDirection: "column",
-      boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-      height: "100%", 
-      boxSizing: "border-box"
-    }}>
+    <div className="contest-card">
 
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "15px", alignItems: "flex-start" }}>
-        <h3 style={{ margin: 0, fontSize: "18px", color: "#1f2739", lineHeight: "1.2" }}>
-          {contest.contest_name}
+      {/* HEADER */}
+      <div className="contest-card-header">
+        <h3 className="contest-card-title">
+          <span className="title-row">
+            <BiCube size={20} />
+            {contest.contest_name}
+          </span>
         </h3>
-        <span style={{ 
-          fontSize: "11px", padding: "4px 8px", borderRadius: "6px", 
-          background: `${statusColor}15`, color: statusColor, fontWeight: "700",
-          whiteSpace: "nowrap", marginLeft: "10px"
-        }}>
+
+        <span
+          className="contest-status"
+          style={{
+            background: `${statusColor}15`,
+            color: statusColor,
+          }}
+        >
           {statusText}
         </span>
       </div>
 
-      <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "20px", flexGrow: 1, display: "flex", flexDirection: "column", gap: "6px" }}>
-        <div style={{display: "flex", alignItems: "center", gap: "6px"}}>
-          <span></span> {new Date(contest.start_time).toLocaleDateString()}
+      {/* INFO */}
+      <div className="contest-info">
+
+        <div className="contest-info-row">
+          <MdOutlineDateRange />
+          {formatDate(contest.start_time)}
         </div>
-        <div style={{display: "flex", alignItems: "center", gap: "6px"}}>
-          <span></span> {contest.contest_duration_str || "00:00:00"}
+
+        <div className="contest-info-row">
+          <RiTimeLine />
+          {getHours(contest.contest_duration_str)}
         </div>
-        <div style={{display: "flex", alignItems: "center", gap: "6px"}}>
-          <span></span> {contest.total_participants || 0} участников
+
+        <div className="contest-info-row">
+          <MdOutlinePeople />
+          {contest.total_participants || 0} участников
         </div>
+
       </div>
 
-      {/* Кнопка */}
+      {/* BUTTON */}
       <button
+        className={`contest-btn ${btnDisabled ? "disabled" : "primary"}`}
         onClick={handleClick}
         disabled={btnDisabled}
-        style={{
-          width: "100%",
-          padding: "10px",
-          borderRadius: "8px",
-          border: "none",
-          background: btnDisabled ? "#f3f4f6" : "#1f2739",
-          color: btnDisabled ? "#9ca3af" : "white",
-          cursor: btnDisabled ? "not-allowed" : "pointer",
-          fontWeight: "600",
-          fontSize: "14px",
-          transition: "background 0.2s"
-        }}
-        onMouseEnter={(e) => {
-          if (!btnDisabled) e.target.style.background = "#374151";
-        }}
-        onMouseLeave={(e) => {
-          if (!btnDisabled) e.target.style.background = "#1f2739";
-        }}
       >
         {btnText}
       </button>
+
+      {/* MODAL */}
       {showRegister && (
-          <RegisterContestModal
-            contest={contest}
-            onClose={() => setShowRegister(false)}
-            onSuccess={() => {
-              alert("Вы зарегистрированы!");
-            }}
-          />
-        )}
+        <RegisterContestModal
+          contest={contest}
+          onClose={() => setShowRegister(false)}
+          onSuccess={() => alert("Вы зарегистрированы!")}
+        />
+      )}
     </div>
   );
 }

@@ -19,6 +19,7 @@ async def get_current_user(
     try:
         payload = decode_token(token)
         user_id = int(payload.get("sub"))
+        role = payload.get("role")
     except (JWTError, ValueError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -49,3 +50,6 @@ def require_role(required_role: str):
         return user
 
     return role_checker
+
+def require_admin():
+    return require_role("admin")

@@ -31,7 +31,18 @@ function Home() {
         setLoading(false);
       });
   }, [token]);
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    const role = localStorage.getItem("role");
 
+    if (token && role) {
+      if (role === "organizer") {
+        navigate("/organizer");
+      } else if (role === "student") {
+        navigate("/student");
+      }
+    }
+  }, [navigate]);
   // Фильтрация контестов
   const activeAndUpcoming = allContests.filter(c => c.is_upcoming || c.is_active);
   const finished = allContests.filter(c => c.is_finished);

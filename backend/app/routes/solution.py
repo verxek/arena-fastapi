@@ -60,8 +60,9 @@ async def get_my_solutions(
         .where(Solution.sol_user == user_id)
         .order_by(Solution.sol_created_at.desc())
     )
-
+    
     solutions = result.scalars().all()
+    
 
     return [
         {

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import LoginModal from "./LoginModal";  
 import RegisterModal from "./RegisterModal";
 import { FaUser } from "react-icons/fa";
-
+import { GrCodeSandbox } from "react-icons/gr";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -12,8 +12,6 @@ function Navbar() {
 
   const role = localStorage.getItem("role");
   const token = localStorage.getItem("access_token");
-
-  const homePath = role === "organizer" ? "/organizer" : "/student";
 
   const logout = () => {
     localStorage.removeItem("access_token");
@@ -43,68 +41,75 @@ function Navbar() {
         boxSizing: "border-box",
         zIndex: 1000
       }}>
-        
+
         {/* LOGO */}
         <div style={{
           display: "flex",
           alignItems: "center",
-          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-          fontSize: "20px",      
-          fontWeight: "700",   
-          color: "#1f2739",     
+          fontSize: "20px",
+          fontWeight: "700",
+          color: "#1f2739",
           gap: "10px",
-          lineHeight: 1 
+          lineHeight: 1
         }}>
-          <div style={{
-            width: "10px",
-            height: "10px",
-            borderRadius: "50%",
-            border: "4px solid #1f2739",
-          }}></div>
-          
+          <GrCodeSandbox size={22} />
           code arena
         </div>
 
+        {/* МЕНЮ */}
         <div style={{ display: "flex", gap: "25px", alignItems: "center" }}>
-          <Link to={homePath} style={{textDecoration:"none", color:"#1f2739"}}>Главная</Link>
-          <Link to="/contests" style={{textDecoration:"none", color:"#1f2739"}}>Контесты</Link>
-          <Link to="/tasks" style={{textDecoration:"none", color:"#1f2739"}}>Задачи</Link>
-          <Link to="/archive" style={{textDecoration:"none", color:"#1f2739"}}>Архив</Link>
+
+          
+          {role === "admin" ? (
+            <Link
+              to="/admin"
+              style={{ textDecoration: "none", color: "#1f2739", fontWeight: "600" }}
+            >
+              Админ панель
+            </Link>
+          ) : (
+            <>
+              <Link to={role === "organizer" ? "/organizer" : "/student"} style={{textDecoration:"none", color:"#1f2739"}}>
+                Главная
+              </Link>
+              <Link to="/contests" style={{textDecoration:"none", color:"#1f2739"}}>
+                Контесты
+              </Link>
+              <Link to="/tasks" style={{textDecoration:"none", color:"#1f2739"}}>
+                Задачи
+              </Link>
+              <Link to="/archive" style={{textDecoration:"none", color:"#1f2739"}}>
+                Архив
+              </Link>
+            </>
+          )}
+
         </div>
 
-
+        {/* ПРАВАЯ ЧАСТЬ */}
         <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
+
           {token ? (
             <>
-              <button
-                onClick={() => navigate("/profile")}
-                title="Профиль" 
-                style={{
-                  background: "#f3f4f6",
-                  border: "none",
-                  width: "36px",   
-                  height: "36px", 
-                  borderRadius: "50%", 
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "18px",
-                  color: "#1f2739",
-                  transition: "all 0.2s",
-                  padding: 0 
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = "#e5e7eb";
-                  e.currentTarget.style.transform = "scale(1.05)";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = "#f3f4f6";
-                  e.currentTarget.style.transform = "scale(1)";
-                }}
-              >
-                <FaUser size={16} />
-              </button>
+              {role !== "admin" && (
+                <button
+                  onClick={() => navigate("/profile")}
+                  style={{
+                    background: "#f3f4f6",
+                    border: "none",
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "50%",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <FaUser  />
+                </button>
+              )}
+
               <button
                 onClick={logout}
                 style={{
@@ -115,18 +120,15 @@ function Navbar() {
                   cursor: "pointer",
                   fontWeight: "500",
                   fontSize: "14px",
-                  color: "#1f2739",
-                  transition: "background 0.2s"
+                  color: "#1f2739"
                 }}
-                onMouseOver={(e) => e.target.style.background = "#e5e7eb"}
-                onMouseOut={(e) => e.target.style.background = "#f3f4f6"}
               >
                 Выйти
               </button>
             </>
           ) : (
             <button
-              onClick={() => setShowLogin(true)}  
+              onClick={() => setShowLogin(true)}
               style={{
                 background: "#1f2739",
                 color: "white",
@@ -140,9 +142,11 @@ function Navbar() {
               Войти
             </button>
           )}
+
         </div>
       </div>
 
+      {/* MODALS */}
       <LoginModal 
         isOpen={showLogin} 
         onClose={() => setShowLogin(false)}

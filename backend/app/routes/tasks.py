@@ -53,12 +53,18 @@ async def create_task(
     current_user: User = Depends(get_current_user),
     input_format: str = Form(None),
     output_format: str = Form(None),
-    examples_json: str = Form(None)
+    examples_json: str = Form(None),
+    is_contest_task: bool = Form(False),
+    make_visible_after: bool = Form(False)
 ):
     #  Проверка уникальности названия
     stmt = select(Task).where(Task.task_name == task_name)
     result = await db.execute(stmt)
     existing_task = result.scalar_one_or_none()
+    if is_contest_task:
+        visibility = False
+    else:
+        visibility = True
     
     if existing_task:
         raise HTTPException(status_code=400, detail="Задача с таким названием уже существует")
@@ -75,8 +81,8 @@ async def create_task(
         time_limit=time_limit,
         memory_limit=memory_limit,
         author=current_user.user_id, 
-        visibility=True,
-        make_visible_after_contest=False
+        visibility=visibility,
+        make_visible_after_contest=make_visible_after
     )
     
     db.add(new_task)
@@ -141,7 +147,7 @@ async def create_task(
 
 @router.get("/", response_model=List[dict])
 async def get_tasks(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
-    stmt = select(Task)
+    stmt = select(Task).where(Task.visibility == True)
     result = await db.execute(stmt)
     tasks = result.scalars().all()
     

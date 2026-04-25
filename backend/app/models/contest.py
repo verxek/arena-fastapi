@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from backend.app.database import Base, now_utc
 from datetime import datetime, timedelta
 from typing import List, Optional
-from sqlalchemy.dialects.postgresql import INTERVAL
+
 
 class Contest(Base):
     __tablename__ = "contest"
@@ -12,7 +12,7 @@ class Contest(Base):
 
     contest_name = Column(String(200), nullable=False,unique=True,index=True)
     start_time = Column(DateTime(timezone=True), nullable=False,index=True)
-    duration = Column(INTERVAL, nullable=False)
+    duration = Column(Integer, nullable=False)
     contest_created_at = Column(DateTime(timezone=True), nullable=False, default=now_utc,index=True)
     
     contest_status = Column(Integer, ForeignKey('contest_status.contest_status_id', ondelete='CASCADE'), nullable=False,index=True)
@@ -59,20 +59,7 @@ class Contest(Base):
 
     
     def get_end_time(self) -> datetime:
-        """Возвращает время окончания контеста"""
-        if not self.duration:
-            return self.start_time
-            
-        if hasattr(self.duration, 'total_seconds'):
-            duration_seconds = self.duration.total_seconds()
-        else:   
-            duration_seconds = (
-                getattr(self.duration, 'hours', 0) * 3600 +
-                getattr(self.duration, 'minutes', 0) * 60 +
-                getattr(self.duration, 'seconds', 0)
-            )
-            
-        return self.start_time + timedelta(seconds=duration_seconds)
+        return self.start_time + timedelta(minutes=self.duration)
     
     @property
     def is_active(self) -> bool:
@@ -114,16 +101,9 @@ class Contest(Base):
     @property
     def organizer(self):
         return self.organizers[0] if self.organizers else None
+   
     @property
     def contest_duration_str(self) -> str:
-        """Возвращает продолжительность контеста в строковом формате (чч:мм:сс)"""
-        if not self.duration:
-            return "00:00:00"
-
-        total_seconds = int(self.duration.total_seconds())
-        
-        hours = total_seconds // 3600
-        minutes = (total_seconds % 3600) // 60
-        seconds = total_seconds % 60
-        
-        return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        hours = self.duration // 60
+        minutes = self.duration % 60
+        return f"{hours:02d}:{minutes:02d}:00"

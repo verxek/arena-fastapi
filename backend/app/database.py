@@ -58,7 +58,8 @@ def now_utc() -> datetime:
     """Текущее время в UTC"""
     return datetime.now(timezone.utc)
 
-
+def get_async_session() -> AsyncSession:
+    return AsyncSessionLocal()
 
 # СИНХРОННАЯ ВЕРСИЯ ДЛЯ CELERY
 SYNC_DATABASE_URL = DATABASE_URL.replace(

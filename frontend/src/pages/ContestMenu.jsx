@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import "../styles/global.css";
 
 const loadSolutions = async () => {
   const userId = localStorage.getItem("user_id");
@@ -41,7 +42,7 @@ function ContestMenu() {
   const isFinished = contest?.is_finished;
   const [openedTask, setOpenedTask] = useState(null);
   const [loadingTask, setLoadingTask] = useState(false);
-   
+
   
   const token = localStorage.getItem("access_token");
   const userId = localStorage.getItem("user_id");
@@ -81,6 +82,35 @@ function ContestMenu() {
       loadSolutions();
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    if (!contest?.end_time) return;
+
+    const endTime = new Date(contest.end_time).getTime();
+
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const diff = endTime - now;
+
+      if (diff <= 0) {
+        setTimeLeft("00:00:00");
+        clearInterval(interval);
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setTimeLeft(
+        `${String(hours).padStart(2, "0")}:` +
+        `${String(minutes).padStart(2, "0")}:` +
+        `${String(seconds).padStart(2, "0")}`
+      );
+    }, 1000);
+
+  return () => clearInterval(interval);
+}, [contest]);
 
   useEffect(() => {
   if (isFinished && (activeTab === "submit" || activeTab === "submissions")) {
@@ -246,10 +276,7 @@ function ContestMenu() {
                 {letter}. {task.task_name}
               </span>
 
-              <span className="task-meta">
-                <span>{task.category_name}</span>
-                <span>{task.difficulty_name}</span>
-              </span>
+              
             </div>
 
           </div>
@@ -263,12 +290,12 @@ function ContestMenu() {
 
   // Вкладка Отправить решение 
   const SubmitTab = () => (
-    <div style={styles.submitContainer}>
-      <div style={styles.submitForm}>
-        <div style={styles.formGroup}>
-          <label style={styles.label}>Выберите язык программирования:</label>
+    <div className="submit-container">
+      <div className="submit-form">
+        <div className="form-group">
+          <label className="label">Выберите язык программирования:</label>
           <select
-            style={styles.select}
+            className="select"
             onChange={(e) => setSelectedLang(e.target.value)}
           >
             <option value={1}>Python 3.8</option>
@@ -276,10 +303,10 @@ function ContestMenu() {
           </select>
         </div>
 
-        <div style={styles.formGroup}>
-          <label style={styles.label}>Выберите задачу:</label>
+        <div className="form-group">
+          <label className="label">Выберите задачу:</label>
           <select
-            style={styles.select}
+            className="select"
             onChange={(e) => setSelectedTask(e.target.value)}
           >
             {tasks.map((task, index) => {
@@ -293,20 +320,27 @@ function ContestMenu() {
           </select>
         </div>
 
-        <div style={styles.formGroup}>
-          <label style={styles.label}>Файл с решением:</label>
-          <div style={styles.fileInputWrapper}>
-            <input 
-              type="file" 
+        <div className="form-group">
+          <label className="label">Файл с решением:</label>
+
+          <div className="file-input-wrapper">
+            
+            <input
+              type="file"
               accept=".py,.cpp"
-              style={styles.fileInput}
+              id="solution-file"
+              className="file-input-hidden"
               onChange={(e) => setFile(e.target.files[0])}
             />
-            <button style={styles.fileButton}>Импортировать файл с решением</button>
+
+            <label htmlFor="solution-file" className="file-button">
+              {file ? file.name : "Импортировать файл с решением"}
+            </label>
+
           </div>
         </div>
 
-        <button style={styles.submitButton} onClick={handleSubmit}>
+        <button className="submit-button" onClick={handleSubmit}>
           Отправить решение
         </button>
       </div>
@@ -315,41 +349,41 @@ function ContestMenu() {
 
   // Все отправления
   const SubmissionsTab = () => (
-    <div style={styles.submissionsContainer}>
-      <table style={styles.table}>
+    <div className="submissions-container">
+      <table className="table">
         <thead>
           <tr>
-            <th style={styles.th}>№</th>
-            <th style={styles.th}>Время</th>
-            <th style={styles.th}>Никнейм</th>
-            <th style={styles.th}>Задача</th>
-            <th style={styles.th}>Язык программирования</th>
-            <th style={styles.th}>Вердикт</th>
-            <th style={styles.th}>Время выполнения</th>
-            <th style={styles.th}>Память</th>
+            <th className="th">№</th>
+            <th className="th">Время</th>
+            <th className="th">Никнейм</th>
+            <th className="th">Задача</th>
+            <th className="th">Язык программирования</th>
+            <th className="th">Вердикт</th>
+            <th className="th">Время выполнения</th>
+            <th className="th">Память</th>
           </tr>
         </thead>
 
         <tbody>
           {solutions.length === 0 ? (
             <tr>
-              <td colSpan="8" style={styles.emptyCell}>
+              <td colSpan="8" className="empty-cell">
                 Пока нет отправок
               </td>
             </tr>
           ) : (
             solutions.map((s, index) => (
               <tr key={s.id}>
-                <td style={styles.td}>{index + 1}</td>
-                <td style={styles.td}>
+                <td className="td">{index + 1}</td>
+                <td className="td">
                   {new Date(s.time).toLocaleString()}
                 </td>
-                <td style={styles.td}>{s.user_nickname || "-"}</td>
-                <td style={styles.td}>{s.task || "-"}</td>
-                <td style={styles.td}>{s.language || "-"}</td>
-                <td style={styles.td}>{s.status}</td>
-                <td style={styles.td}>-</td>
-                <td style={styles.td}>-</td>
+                <td className="td">{s.user_nickname || "-"}</td>
+                <td className="td">{s.task || "-"}</td>
+                <td className="td">{s.language || "-"}</td>
+                <td className="td">{s.status}</td>
+                <td className="td">-</td>
+                <td className="td">-</td>
               </tr>
             ))
           )}
@@ -360,28 +394,28 @@ function ContestMenu() {
 
   // Положение участников
   const RatingTab = () => (
-    <div style={styles.ratingContainer}>
-      <table style={styles.table}>
+    <div className="rating-container">
+      <table className="table">
         <thead>
           <tr>
-            <th style={styles.th}>№</th>
-            <th style={styles.th}>Никнейм</th>
-            <th style={styles.th}>Всего очков</th>
+            <th className="th">№</th>
+            <th className="th">Никнейм</th>
+            <th className="th">Всего очков</th>
             {tasks.map((task, index) => {
               const taskLetter = String.fromCharCode(1040 + index);
               return (
-                <th key={task.task_id} style={styles.th}>{taskLetter}. {task.title}</th>
+                <th key={task.task_id} className="th">{taskLetter}. {task.title}</th>
               );
             })}
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td colSpan={3 + tasks.length} style={styles.emptyCell}>Рейтинг пока пуст</td>
+            <td colSpan={3 + tasks.length} className="empty-cell">Рейтинг пока пуст</td>
           </tr>
         </tbody>
       </table>
-      <button style={styles.exportButton}>Экспортировать результаты</button>
+      <button className="export-button">Экспортировать результаты</button>
     </div>
   );
 
@@ -412,64 +446,48 @@ function ContestMenu() {
       <Navbar />
       
       {/* Заголовок контеста */}
-      <div style={styles.header}>
-        <h3 style={styles.contestTitle}>{contest.contest_name}</h3>
+      <div className="header">
+        <h3 className="contest-title">{contest.contest_name}</h3>
       </div>
 
       {/* Вкладки */}
-      <div style={styles.tabsContainer}>
-        <div style={styles.tabs}>
-          <button 
-            style={{
-              ...styles.tab,
-              ...(activeTab === "tasks" ? styles.activeTab : {})
-            }}
+      <div className="contest-tabs-container">
+        <div className="contest-tabs">
+
+          <button
+            className={`contest-tab ${activeTab === "tasks" ? "active-tab" : ""}`}
             onClick={() => setActiveTab("tasks")}
           >
             Задачи
           </button>
 
           {!isFinished && !isOrganizer && (
-            <>
-              <button 
-                style={{
-                  ...styles.tab,
-                  ...(activeTab === "submit" ? styles.activeTab : {})
-                }}
-                onClick={() => setActiveTab("submit")}
-              >
-                Отправить решение
-              </button>
-              </>
+            <button
+              className={`contest-tab ${activeTab === "submit" ? "active-tab" : ""}`}
+              onClick={() => setActiveTab("submit")}
+            >
+              Отправить решение
+            </button>
           )}
-          {!isFinished && (
-             <>
-              <button 
-                style={{
-                  ...styles.tab,
-                  ...(activeTab === "submissions" ? styles.activeTab : {})
-                }}
-                onClick={() => setActiveTab("submissions")}
-              >
-                Все отправления
-              </button>
-              </>
-          )}
-          
 
-          <button 
-            style={{
-              ...styles.tab,
-              ...(activeTab === "rating" ? styles.activeTab : {})
-            }}
+          {!isFinished && (
+            <button
+              className={`contest-tab ${activeTab === "submissions" ? "active-tab" : ""}`}
+              onClick={() => setActiveTab("submissions")}
+            >
+              Все отправления
+            </button>
+          )}
+
+          <button
+            className={`contest-tab ${activeTab === "rating" ? "active-tab" : ""}`}
             onClick={() => setActiveTab("rating")}
           >
             Положение участников
           </button>
         </div>
-
         {/* Контент вкладок */}
-        <div style={styles.content}>
+        <div className="content">
           {activeTab === "tasks" && <TasksTab />}
           {!isFinished && !isOrganizer && activeTab === "submit" && <SubmitTab />}
           {!isFinished && activeTab === "submissions" && <SubmissionsTab />}
@@ -478,271 +496,17 @@ function ContestMenu() {
       </div>
 
       {/* Таймер */}
-      <div style={styles.timerContainer}>
-        <span style={styles.timerLabel}>До окончания:</span>
-        <span style={styles.timerValue}>{timeLeft}</span>
-      </div>
+      {!isFinished && (
+        <div className="timer-container">
+          <span className="timer-label">До окончания:</span>
+          <span className="timer-value">{timeLeft}</span>
+        </div>
+      )}
     </div>
+   
   );
 }
 
-const styles = {
-  box: {
-    background: "#f9fafb",
-    padding: "15px",
-    borderRadius: "10px",
-    border: "1px solid #e5e7eb"
-  },
-  header: {
-    position: "absolute",
-    top: 100,
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: "90%",
-    maxWidth: "1200px",
-  },
-  contestTitle: {
-    fontSize: "24px",
-    fontWeight: "700",
-    color: "#1f2739",
-    margin: 0
-  },
-  tabsContainer: {
-    position: "absolute",
-    top: 160,
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: "90%",
-    maxWidth: "1200px",
 
-  },
-  tabs: {
-    display: "flex",
-    gap: "8px",
-    marginBottom: "16px",
-    background: "white",
-    padding: "8px",
-    borderRadius: "12px",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
-  },
-  tab: {
-    flex: 1,
-    padding: "12px 24px",
-    border: "none",
-    background: "transparent",
-    borderRadius: "8px",
-    fontSize: "14px",
-    fontWeight: "500",
-    color: "#6b7280",
-    cursor: "pointer",
-    transition: "all 0.3s"
-  },
-  activeTab: {
-    background: "#3b82f6",
-    color: "white",
-    boxShadow: "0 2px 8px rgba(59, 130, 246, 0.3)"
-  },
-  content: {
-    background: "white",
-    borderRadius: "16px",
-    padding: "24px",
-    minHeight: "400px",
-    boxShadow: "0 8px 20px rgba(0,0,0,0.1)"
-  },
-  // Стили для задач
-  tasksContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px"
-  },
-  taskCard: {
-    background: "#f9fafb",
-    border: "2px solid #e5e7eb",
-    borderRadius: "12px",
-    padding: "16px 20px",
-    cursor: "pointer",
-    transition: "all 0.3s",
-    "&:hover": {
-      borderColor: "#3b82f6",
-      background: "#eff6ff",
-      transform: "translateY(-2px)",
-      boxShadow: "0 4px 12px rgba(59, 130, 246, 0.2)"
-    }
-  },
-  taskHeader: {
-    display: "flex",
-    alignItems: "center",
-    gap: "16px",
-    marginBottom: "8px"
-  },
-  taskNumber: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    fontWeight: "600",
-    fontSize: "16px",
-    color: "#1f2739"
-  },
-  taskIcon: {
-    fontSize: "18px"
-  },
-  taskLetter: {
-    color: "#3b82f6"
-  },
-  taskTitle: {
-    flex: 1,
-    fontSize: "16px",
-    fontWeight: "500",
-    color: "#111827"
-  },
-  taskFooter: {
-    display: "flex",
-    gap: "16px",
-    fontSize: "13px",
-    color: "#6b7280"
-  },
-  taskPoints: {
-    fontWeight: "600",
-    color: "#10b981"
-  },
-  taskDifficulty: {
-    color: "#6b7280"
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "40px",
-    color: "#9ca3af"
-  },
-  // Стили для отправки
-  submitContainer: {
-    maxWidth: "600px",
-    margin: "0 auto"
-  },
-  submitForm: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "20px"
-  },
-  formGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px"
-  },
-  label: {
-    fontSize: "14px",
-    fontWeight: "500",
-    color: "#374151"
-  },
-  select: {
-    padding: "10px 14px",
-    borderRadius: "8px",
-    border: "2px solid #e5e7eb",
-    fontSize: "14px",
-    background: "white",
-    cursor: "pointer"
-  },
-  fileInputWrapper: {
-    position: "relative"
-  },
-  fileInput: {
-    position: "absolute",
-    opacity: 0,
-    width: "100%",
-    height: "100%",
-    cursor: "pointer"
-  },
-  fileButton: {
-    width: "100%",
-    padding: "12px",
-    background: "#1f2937",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer"
-  },
-  submitButton: {
-    width: "100%",
-    padding: "14px",
-    background: "#3b82f6",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "16px",
-    fontWeight: "600",
-    cursor: "pointer",
-    marginTop: "10px",
-    "&:hover": {
-      background: "#2563eb"
-    }
-  },
-  // Стили для таблицы
-  submissionsContainer: {
-    overflowX: "auto"
-  },
-  ratingContainer: {
-    overflowX: "auto"
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    fontSize: "13px"
-  },
-  th: {
-    textAlign: "left",
-    padding: "12px",
-    borderBottom: "2px solid #e5e7eb",
-    fontWeight: "600",
-    color: "#374151",
-    whiteSpace: "nowrap"
-  },
-  td: {
-    padding: "12px",
-    borderBottom: "1px solid #f3f4f6",
-    color: "#6b7280"
-  },
-  emptyCell: {
-    textAlign: "center",
-    padding: "40px",
-    color: "#9ca3af"
-  },
-  exportButton: {
-    marginTop: "16px",
-    padding: "10px 20px",
-    background: "#1f2937",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer"
-  },
-  // Таймер
-  timerContainer: {
-    position: "absolute",
-    bottom: 100,
-    right: "5%",
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    background: "white",
-    padding: "12px 20px",
-    borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-    zIndex: 1000
-  },
-  timerLabel: {
-    fontSize: "14px",
-    color: "#6b7280",
-    fontWeight: "500"
-  },
-  timerValue: {
-    fontSize: "18px",
-    fontWeight: "700",
-    color: "#1f2739",
-    fontFamily: "monospace"
-  }
-};
 
 export default ContestMenu;

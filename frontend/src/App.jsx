@@ -6,7 +6,6 @@ import StudentHome from "./pages/StudentHome"
 import OrganizerHome from "./pages/OrganizerHome"
 import Contests from "./pages/Contests"
 import CreateContest from "./pages/CreateContest"
-import Drafts from "./pages/Drafts"
 import Tasks from "./pages/Tasks"
 import CreateTask from "./pages/CreateTask"
 import Profile from "./pages/Profile"
@@ -14,6 +13,7 @@ import Archive from "./pages/Archive"
 import ContestMenu from "./pages/ContestMenu"
 import TaskPage from "./pages/Task"
 import MySubmissions from "./pages/MySubmissions"
+import AdminPanel from "./pages/AdminPanel";
 
 import ProtectedRoute from "./components/ProtectedRoute"
 
@@ -33,11 +33,12 @@ function App() {
         <Route path="/organizer" element={<ProtectedRoute> <OrganizerHome /></ProtectedRoute>}/>
         <Route path="/contests" element={<ProtectedRoute><Contests /></ProtectedRoute>} />
         <Route path="/contests/create" element={<ProtectedRoute><CreateContest /></ProtectedRoute>}/>
-        <Route path="/contests/drafts" element={<ProtectedRoute><Drafts /> </ProtectedRoute>}/>
+      
         <Route path="/contests/:contest_id" element={<ProtectedRoute><ContestMenu /> </ProtectedRoute>}/>
         <Route path="/contests/:id/edit" element={<CreateContest />} />
         <Route path="/tasks/:id" element={<TaskPage />} />
         <Route path="/my-submissions" element={<MySubmissions />} /> 
+        <Route path="/admin" element={<AdminPanel />} />
 
       </Routes>
 

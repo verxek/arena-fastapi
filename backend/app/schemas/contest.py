@@ -6,28 +6,27 @@ from backend.app.schemas.task import TaskSimple
 class ContestBase(BaseModel):
     contest_name: str
     start_time: datetime
-    duration: time
+    duration: int  
     contest_status: int
 
 class ContestCreate(BaseModel):
-    contest_name: Optional[str] = None
-    start_time: Optional[datetime] = None
-    duration: Optional[time] = None
-    contest_status: int
-    task_ids: Optional[List[int]] = []
+    contest_name: str
+    start_time: datetime
+    duration: int  
+    task_ids: List[int] = []
 
 class ContestUpdate(BaseModel):
     contest_name: Optional[str] = None
     start_time: Optional[datetime] = None
-    duration: Optional[time] = None
-    contest_status: Optional[int] = None
+    duration: Optional[int] = None
+    task_ids: List[int] = []
 
 
 class ContestListResponse(BaseModel):
     contest_id: int
     contest_name: str
     start_time: datetime
-    duration: timedelta
+    duration: int
     contest_status: int  
     is_upcoming: bool = False
     is_active: bool = False

@@ -21,7 +21,6 @@ class Sandbox(Base):
     solution_rel = relationship(
         "Solution",
         back_populates="sandbox_rel",
-        uselist=False,
         lazy="selectin"
     )
     verdict_rel = relationship(

@@ -7,7 +7,7 @@ from backend.app.models.contest import Contest
 from backend.app.models.contest_task import Contest_Task
 from backend.app.models.contest_user import Contest_User
 from backend.app.models.user import User
-from backend.app.schemas.contest import ContestCreate, ContestListResponse, ContestResponse
+from backend.app.schemas.contest import ContestCreate, ContestListResponse, ContestResponse, ContestUpdate
 from backend.app.dependencies.auth import get_current_user
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession 
@@ -18,7 +18,13 @@ from sqlalchemy.orm import selectinload
 
 router = APIRouter(prefix="/contests", tags=["contests"])
 
+UTC_PLUS_5 = timezone(timedelta(hours=5))
 ORGANIZER_ROLE_ID = 2
+
+def to_local(dt):
+    if dt is None:
+        return None
+    return dt.astimezone(UTC_PLUS_5)
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_contest(
@@ -32,32 +38,17 @@ async def create_contest(
     """
 
     try:
-        if contest_data.contest_status != 1: 
-            if not contest_data.contest_name or not contest_data.start_time or not contest_data.task_ids:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Для публикации заполните все поля"
-                )
-
-        duration_input = contest_data.duration or time(0,0)
-
-        if isinstance(duration_input, time):
-            duration_delta = timedelta(hours=duration_input.hour, minutes=duration_input.minute)
-        elif isinstance(duration_input, int):
-            duration_delta = timedelta(minutes=duration_input)
-        else:
-            duration_delta = timedelta(minutes=int(duration_input))
-
-
         start_time = contest_data.start_time
         if start_time.tzinfo is None:
-            start_time = start_time.replace(tzinfo=timezone.utc)
+            start_time = start_time.replace(tzinfo=UTC_PLUS_5)
+
+        start_time = start_time.astimezone(timezone.utc)
 
         new_contest = Contest(
             contest_name=contest_data.contest_name,
             start_time=start_time,
-            duration=duration_delta,  
-            contest_status=contest_data.contest_status
+            duration=contest_data.duration,
+            contest_status=2  # upcoming
         )
         db.add(new_contest)
     
@@ -112,23 +103,27 @@ async def get_contests(
     response_list = []
     
     for contest in contests:
-        print("now:", now_utc(), now_utc().tzinfo)
-        print("start:", contest.start_time, contest.start_time.tzinfo)
-        is_upcoming = contest.is_upcoming
-        is_active = contest.is_active
-        is_finished = contest.is_finished
+        
+        now_local = to_local(now_utc())
+        start_local = to_local(contest.start_time)
+        end_local = to_local(contest.get_end_time())
+
+        is_upcoming = now_local < start_local
+        is_active = start_local <= now_local < end_local
+        is_finished = now_local >= end_local
+
+        print("NOW UTC:", now_utc())
+        print("START UTC:", contest.start_time)
         
         duration_str = contest.contest_duration_str
         total_participants = contest.total_participants
         
         author = contest.organizer.cu_user if contest.organizer else None 
         
-        
-
         contest_dict = {
             "contest_id": contest.contest_id,
             "contest_name": contest.contest_name,
-            "start_time": contest.start_time,
+            "start_time": to_local(contest.start_time).isoformat(),
             "duration": contest.duration,
             "contest_status": contest.contest_status,
             "is_upcoming": is_upcoming,
@@ -149,85 +144,10 @@ async def get_contests(
     return response_list
 
 
-@router.get("/drafts")
-async def get_drafts(
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Возвращает черновики текущего пользователя-организатора.
-    Черновик = contest_status == 1
-    """
-    
-    if current_user.role != "organizer":
-        raise HTTPException(status_code=403, detail="Доступно только организаторам")
-    
-
-    stmt = select(Contest).where(
-        Contest.contest_status == 1,  
-        Contest.get_contest_author == current_user.user_id
-    ).options(
-        joinedload(Contest.tasks),
-        joinedload(Contest.participants)
-    )
-    
-    result = await db.execute(stmt)
-    contests = result.scalars().unique().all()
-
-    response_list = []
-    for contest in contests:
-        response_list.append({
-            "contest_id": contest.contest_id,
-            "contest_name": contest.contest_name,
-            "start_time": contest.start_time,
-            "duration": contest.contest_duration_str,
-            "contest_status": contest.contest_status,
-            "tasks": [t.task_id for t in contest.tasks],
-            "total_tasks": len(contest.tasks),
-            "contest_created_at": contest.contest_created_at
-        })
-    
-    return response_list
 
 
-@router.post("/{contest_id}/publish")
-async def publish_contest(
-    contest_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Публикует черновик (меняет статус с 1 на 2 = запланирован).
-    """
-    
-    if current_user.role != "organizer":
-        raise HTTPException(status_code=403, detail="Доступно только организаторам")
-    contest = await db.get(Contest, contest_id)
-    if not contest:
-        raise HTTPException(status_code=404, detail="Контест не найден")
-    
-    if contest.get_contest_author != current_user.user_id:
-        raise HTTPException(status_code=403, detail="Доступ запрещён")
-    
-    if contest.contest_status != 1:
-        raise HTTPException(status_code=400, detail="Этот контест уже опубликован")
-    
-    if not contest.start_time:
-        raise HTTPException(status_code=400, detail="Укажите дату начала контеста")
-    
-    if not contest.duration:
-        raise HTTPException(status_code=400, detail="Укажите длительность контеста")
-    
-    contest.contest_status = 2
-    
-    await db.commit()
-    await db.refresh(contest)
-    
-    return {
-        "message": "Контест опубликован",
-        "contest_id": contest.contest_id,
-        "new_status": contest.contest_status
-    }
+
+
 
 @router.delete("/{contest_id}")
 async def delete_contest(
@@ -289,17 +209,24 @@ async def get_contest(
         p.cu_user == current_user.user_id
         for p in contest.participants
     )
+    now_local = to_local(now_utc())
+    start_local = to_local(contest.start_time)
+    end_local = to_local(contest.get_end_time())
+
+    is_upcoming = now_local < start_local
+    is_active = start_local <= now_local < end_local
+    is_finished = now_local >= end_local
 
     return {
         "contest_id": contest.contest_id,
         "contest_name": contest.contest_name,
-        "start_time": to_iso(contest.start_time),
-        "end_time": to_iso(contest.get_end_time()),
+        "start_time": to_iso(to_local(contest.start_time)),
+        "end_time": to_iso(to_local(contest.get_end_time())),
         "contest_status": contest.contest_status,
 
-        "is_finished": contest.is_finished,
-        "is_active": contest.is_active,
-        "is_upcoming": contest.is_upcoming,
+        "is_finished": is_finished,
+        "is_active": is_active,
+        "is_upcoming": is_upcoming,
 
         "total_participants": contest.total_participants,
         "contest_duration_str": contest.contest_duration_str,
@@ -316,7 +243,7 @@ async def get_contest(
 @router.put("/{contest_id}")
 async def update_contest(
     contest_id: int,
-    contest_data: ContestCreate,
+    contest_data: ContestUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -339,23 +266,21 @@ async def update_contest(
         raise HTTPException(403, detail="Доступ запрещён")
     try:
         # --- длительность ---
-        duration_input = contest_data.duration
+        
 
-        if isinstance(duration_input, time):
-            duration_delta = timedelta(
-                hours=duration_input.hour,
-                minutes=duration_input.minute
-            )
-        elif isinstance(duration_input, int):
-            duration_delta = timedelta(minutes=duration_input)
-        else:
-            duration_delta = timedelta(minutes=int(duration_input))
+        
 
 
         contest.contest_name = contest_data.contest_name
-        contest.start_time = contest_data.start_time
-        contest.duration = duration_delta
-        contest.contest_status = contest_data.contest_status
+        start_time = contest_data.start_time
+
+        if start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo=UTC_PLUS_5)
+
+        contest.start_time = start_time.astimezone(timezone.utc)
+
+        contest.duration = contest_data.duration
+        contest.contest_status = 2
 
         # --- обновляем задачи ---
    

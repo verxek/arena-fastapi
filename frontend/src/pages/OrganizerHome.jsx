@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ContestCard from "../components/ContestCard";
+import "../styles/global.css";
 
 function OrganizerHome() {
   const navigate = useNavigate();
@@ -93,61 +94,38 @@ function OrganizerHome() {
   }
 
   return (
-    <div style={{ 
-      backgroundColor: "#f3f4f6",
-      minHeight: "100vh", 
-      paddingBottom: "40px" 
-    }}>
+    <div className="page-container">
       <Navbar />
       
-      <div style={{
-        position: "absolute",
-          top: 130,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "90%",
-          maxWidth: "1200px",
-          background: "rgba(0,0,0,0)",
-          borderRadius: "20px",
-          padding: "0px 0px",
-          justifyContent: "space-between",
-          alignItems: "center",
-          boxSizing: "border-box"
-      }}>
+      <div className="page-main-container">
         
         {/* СТАТИСТИКА */}
-        <div style={{ 
-          display: "grid", 
-          gridTemplateColumns: "1fr 1fr", 
-          gap: "24px", 
-          marginBottom: "24px"
-        }}>
-          <div style={styles.statCard}>
-            <h3 style={styles.statTitle}>Создано задач</h3>
-            <div style={styles.statValue}>{userStats.tasks}</div>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h3 className="stat-title">Создано задач</h3>
+            <div className="stat-value">{userStats.tasks}</div>
           </div>
-          <div style={styles.statCard}>
-            <h3 style={styles.statTitle}>Проведено контестов</h3>
-            <div style={styles.statValue}>{userStats.contests}</div>
+          <div className="stat-card">
+            <h3 className="stat-title">Проведено контестов</h3>
+            <div className="stat-value">{userStats.contests}</div>
           </div>
         </div>
 
         {/* ДОСТУПНЫЕ КОНТЕСТЫ */}
-        <div style={styles.section}>
-          <div style={styles.sectionHeader}>
-            <h2 style={styles.sectionTitle}>Доступные контесты</h2>
+        <div className="section">
+          <div className="section-header">
+            <h1 className="page-title">Доступные контесты</h1>
             <div style={{ display: "flex", gap: "8px" }}>
-              <button onClick={() => navigate("/contests/create")} className="btn btn-primary" style={styles.smallBtn}>+ Создать</button>
-              <button onClick={() => navigate("/contests/drafts")} className="btn btn-secondary" style={styles.smallBtn}>Черновики</button>
+              <button onClick={() => navigate("/contests/create")} className="btn btn-primary" > + Создать</button>
             </div>
           </div>
           
-          <div style={styles.cardsRow}>
+          <div className="cards-row">
             {activeAndUpcoming.length === 0 ? (
-              <span style={styles.emptyText}>Нет активных контестов</span>
+              <span className="empty-text">Нет активных контестов</span>
             ) : (
               activeAndUpcoming.map(c => (
-                <div key={c.contest_id} style={styles.cardWrapper}>
+                <div key={c.contest_id} className="card-wrapper">
                   <ContestCard contest={c} userRole={role} isAuthor={c.author_id == userId} onAction={handleAction} />
                 </div>
               ))
@@ -156,18 +134,18 @@ function OrganizerHome() {
         </div>
 
         {/* ЗАВЕРШЕННЫЕ КОНТЕСТЫ */}
-        <div style={styles.section}>
-          <div style={styles.sectionHeader}>
-            <h2 style={styles.sectionTitle}>Завершенные контесты</h2>
-            <span style={styles.archiveLink} onClick={() => navigate("/archive")}>Перейти к архиву &rarr;</span>
+        <div className="section">
+          <div className="section-header">
+            <h2 className="page-title">Завершенные контесты</h2>
+            <span className="archive-link" onClick={() => navigate("/archive")}>Перейти к архиву &rarr;</span>
           </div>
           
-          <div style={styles.cardsRow}>
+          <div className="cards-row">
             {finished.length === 0 ? (
-              <span style={styles.emptyText}>Нет завершенных контестов</span>
+              <span className="empty-text">Нет завершенных контестов</span>
             ) : (
               finished.map(c => (
-                <div key={c.contest_id} style={styles.cardWrapper}>
+                <div key={c.contest_id} className="card-wrapper">
                   <ContestCard contest={c} userRole={role} isAuthor={c.author_id == userId} onAction={handleAction} />
                 </div>
               ))
@@ -180,32 +158,5 @@ function OrganizerHome() {
   );
 }
 
-const styles = {
-  statCard: {
-    background: "white",
-    padding: "24px",
-    borderRadius: "16px",
-    boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
-    textAlign: "center"
-  },
-  statTitle: { margin: "0 0 10px 0", fontSize: "16px", color: "#6b7280", fontWeight: "500" },
-  statValue: { fontSize: "32px", fontWeight: "700", color: "#1f2739" },
-  section: {
-    backgroundColor: "#ffffff",
-    borderRadius: "16px",
-    padding: "24px",
-    marginBottom: "24px",
-    boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
-  },
-  sectionHeader: {
-    display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "10px"
-  },
-  sectionTitle: { fontSize: "18px", fontWeight: "600", color: "#111827", margin: 0 },
-  smallBtn: { fontSize: "13px", padding: "6px 14px" },
-  cardsRow: { display: "flex", gap: "16px", overflowX: "auto", paddingBottom: "10px" },
-  cardWrapper: { minWidth: "280px", maxWidth: "280px", flexShrink: 0 },
-  emptyText: { color: "#9ca3af", fontSize: "14px" },
-  archiveLink: { fontSize: "13px", color: "#6b7280", cursor: "pointer", textDecoration: "underline" }
-};
 
 export default OrganizerHome;

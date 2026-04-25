@@ -42,10 +42,7 @@ class Solution(Base):
     )
     sandbox_rel = relationship(
         "Sandbox",
-        back_populates="solution_rel",
-        uselist=False,
-        cascade="all, delete-orphan",
-        lazy="selectin"
+        back_populates="solution_rel"
     )
 
     # индексы

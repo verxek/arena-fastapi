@@ -56,25 +56,23 @@ useEffect(() => {
 
   setStartTime(localDate);
 
-  const [h, m] = data.contest_duration_str.split(":");
-  setDurationHours(parseInt(h));
-  setDurationMinutes(parseInt(m));
+  const total = data.duration; // минуты
+
+  setDurationHours(Math.floor(total / 60));
+  setDurationMinutes(total % 60);
   });
 }, [id, isEditMode]);
 
 useEffect(() => {
-  if (!contestData || !Array.isArray(contestData.task_list) || allTasks.length === 0) {
-    return;
-  }
+  if (!isEditMode) return;
+  if (!contestData || allTasks.length === 0) return;
 
   const matchedTasks = allTasks.filter(task =>
-    contestData?.task_list?.includes(task.task_id)
+    contestData.task_list.includes(task.task_id)
   );
 
   setSelectedTasks(matchedTasks);
-
-}, [contestData, allTasks]);
-
+}, [contestData, allTasks, isEditMode]);
 
 
 useEffect(() => {
@@ -117,53 +115,44 @@ useEffect(() => {
   };
 
  
-  const handleSubmit = async (statusParam = "active") => {
-    if (statusParam !== "draft") {
-      if (!contestName || !startTime || selectedTasks.length === 0) {
-        alert("Заполните название, дату начала и добавьте хотя бы одну задачу");
-        return;
-      }
+  const handleSubmit = async () => {
+    if (!contestName || !startTime || selectedTasks.length === 0) {
+      alert("Заполните название, дату начала и добавьте хотя бы одну задачу");
+      return;
     }
 
     setLoading(true);
     const token = localStorage.getItem("access_token");
-    
 
     try {
-        const h = parseInt(durationHours) || 0;
-        const m = parseInt(durationMinutes) || 0;
       
-        const durationString = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
+      const durationMinutesTotal =
+        (parseInt(durationHours) || 0) * 60 +
+        (parseInt(durationMinutes) || 0);
 
-        let statusId = 2; 
-        if (statusParam === "active") statusId = 3;
-        if (statusParam === "draft") statusId = 1;
-        const dateObj = new Date(startTime);
+      const dateObj = new Date(startTime);
 
-        if (isNaN(dateObj.getTime())) {
-          alert("Некорректная дата");
-          setLoading(false);
-          return;
-        }
+      if (isNaN(dateObj.getTime())) {
+        alert("Некорректная дата");
+        setLoading(false);
+        return;
+      }
 
-        const requestData = {
+     
+      const requestData = {
         contest_name: contestName,
         start_time: new Date(startTime).toISOString(),
-        duration: durationString,
-        contest_status: statusId,
+        duration: durationMinutesTotal,
         task_ids: selectedTasks.map(t => t.task_id)
       };
 
-        console.log("Отправка данных:", requestData);
-   
+      const url = isEditMode
+        ? `http://127.0.0.1:8000/contests/${id}`
+        : "http://127.0.0.1:8000/contests";
 
-        const url = isEditMode
-          ? `http://127.0.0.1:8000/contests/${id}`
-          : "http://127.0.0.1:8000/contests";
+      const method = isEditMode ? "PUT" : "POST";
 
-        const method = isEditMode ? "PUT" : "POST";
-        
-        const response = await fetch(url, {
+      const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
@@ -171,24 +160,25 @@ useEffect(() => {
         },
         body: JSON.stringify(requestData)
       });
-        if (response.ok) {
-        alert(isEditMode 
-          ? "Контест успешно обновлён!" 
+
+      if (response.ok) {
+        alert(isEditMode
+          ? "Контест успешно обновлён!"
           : "Контест успешно создан!"
         );
         navigate("/contests");
-        } else {
+      } else {
         const error = await response.json();
-        console.error("Ошибка сервера:", error);
-        alert(`Ошибка: ${error.detail || JSON.stringify(error)}`);
-        }
-    } catch (error) {
-        console.error("Ошибка сети:", error);
-        alert("Произошла ошибка при создании контеста");
+        console.log("ERROR RESPONSE:", error);
+        alert(error.detail || "Ошибка");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Ошибка сети");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-    };
+  };
 
 
   const filteredTasks = allTasks.filter(task =>
@@ -475,7 +465,7 @@ useEffect(() => {
             borderTop: "1px solid #e5e7eb" 
           }}>
             <button
-              onClick={() => handleSubmit("upcoming")}
+              onClick={() => handleSubmit()}
               disabled={loading}
               style={{
                 background: "#1f2739",
@@ -496,25 +486,7 @@ useEffect(() => {
                 : "Сохранить"}
             </button>
             
-            {!isEditMode && (
-              <button
-                onClick={() => handleSubmit("draft")}
-                disabled={loading}
-                style={{
-                  background: "#e5e7eb",
-                  color: "#374151",
-                  border: "none",
-                  padding: "10px 24px",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  cursor: loading ? "not-allowed" : "pointer",
-                  opacity: loading ? 0.7 : 1
-                }}
-              >
-                В черновики
-              </button>
-            )}
+            
             
             <button
               onClick={() => navigate("/contests")}

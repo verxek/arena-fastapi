@@ -29,7 +29,7 @@ class AuthService:
             nickname=nickname,
             email=email,
             password_hash=hash_password(password),
-            role=UserRole.participant  # по умолчанию
+            role=UserRole.participant  # по умолчанию участник
         )
 
         return user
@@ -43,7 +43,8 @@ class AuthService:
             raise ValueError("Invalid credentials")
 
         access_token = create_access_token({
-            "sub": str(user.user_id)
+            "sub": str(user.user_id),
+            "role": user.role.value
         })
 
         refresh_token = create_refresh_token({
