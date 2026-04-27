@@ -20,3 +20,16 @@ class TokenResponse(BaseModel):
 class SessionResponse(BaseModel):
     session_id: str
     expires_at: datetime
+
+
+class SendCodeRequest(BaseModel):
+    email: EmailStr
+
+class VerifyCodeRequest(BaseModel):
+    email: EmailStr
+    code: str
+
+class RegisterRequest(BaseModel):
+    email: EmailStr
+    nickname: str
+    password: str
