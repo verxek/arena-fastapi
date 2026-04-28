@@ -3,6 +3,9 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import SubmitModal from "../components/SubmitModal";
 import "../styles/global.css";
+import { categoryIcons, difficultyIcons } from "../assets/icons";
+import { IoTimeOutline } from "react-icons/io5";
+import { TfiSave } from "react-icons/tfi";
 
 function TaskPage() {
   const { id } = useParams();
@@ -33,83 +36,80 @@ function TaskPage() {
         ← Назад к списку задач
       </Link>
 
-      {/* HEADER */}
-      <div className="task-header">
-        <h1 className="task-title">{task.task_name}</h1>
+      <div className="task-page-card">
 
-        <div className="task-meta-row">
-          <span>{task.category_name}</span>
-          <span>{task.difficulty_name}</span>
-          <span>{task.time_limit} ms</span>
-          <span>{task.memory_limit} MB</span>
+        <div className="task-header">
+
+          <h1 className="task-title">{task.task_name}</h1>
+
+          <div className="task-meta-row">
+            
+            <span className="meta-item">{categoryIcons[task.category_name] || ""} {task.category_name}</span>
+            <span className="meta-item">{difficultyIcons[task.difficulty_name] || ""} {task.difficulty_name}</span>
+            <span className="meta-item"><IoTimeOutline size={17}/>{task.time_limit} ms</span>
+            <span className="meta-item"><TfiSave size={14}/> {task.memory_limit} Mb</span>
+
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowSubmit(true)}
+            >
+              Отправить решение
+            </button>
+          </div>
+
+          
+
         </div>
-      </div>
 
-      <hr className="divider" />
+        <hr className="divider" />
 
-      {/* BODY */}
-      <div>
-        <h3>Условие</h3>
-        <div className="box">
-          {task.statement}
-        </div>
-      </div>
-
-      {/* INPUT / OUTPUT */}
-      <div className="grid-2">
+        {/* BODY */}
         <div>
-          <h4>Входные данные</h4>
-          <div className="box">
-            {task.input_format || "Не указано"}
+          <h3>Условие</h3>
+          <div> {task.statement}</div>
+        </div>
+
+        <hr className="divider" />
+
+        <div className="grid-2">
+          <div>
+            <h3>Входные данные</h3>
+            <div>{task.input_format || "Не указано"}</div>
+          </div>
+
+          <div>
+            <h3>Выходные данные</h3>
+            <div>{task.output_format || "Не указано"}</div>
           </div>
         </div>
 
+        <hr className="divider" />
+
         <div>
-          <h4>Выходные данные</h4>
-          <div className="box">
-            {task.output_format || "Не указано"}
-          </div>
-        </div>
-      </div>
+          <h3>Примеры</h3>
 
-      {/* EXAMPLES */}
-      <div>
-        <h3>Примеры</h3>
-
-        {task.examples?.length ? (
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Ввод</th>
-                <th>Вывод</th>
-              </tr>
-            </thead>
-            <tbody>
-              {task.examples.map((ex, i) => (
-                <tr key={i}>
-                  <td>{ex.input}</td>
-                  <td>{ex.output}</td>
+          {task.examples?.length ? (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Ввод</th>
+                  <th>Вывод</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="muted">Нет примеров</p>
-        )}
-      </div>
+              </thead>
+              <tbody>
+                {task.examples.map((ex, i) => (
+                  <tr key={i}>
+                    <td>{ex.input}</td>
+                    <td>{ex.output}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="muted">Нет примеров</p>
+          )}
+        </div>
 
-      {/* ACTIONS */}
-      <div className="task-actions-center">
-        <button className="btn btn-primary" onClick={() => setShowSubmit(true)}>
-          Отправить решение
-        </button>
-
-        <button
-          className="btn btn-secondary"
-          onClick={() => navigate("/my-submissions", { state: { taskId: id } })}
-        >
-          Мои отправления
-        </button>
       </div>
 
       {showSubmit && (

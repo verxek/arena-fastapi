@@ -64,7 +64,7 @@ def _generate_task_tests(task_id: int, time_limit: int, memory_limit: int):
         # =========================
         task = db.get(Task, task_id)
         if task:
-            set_status(db, task_id, "RUNNING")
+            set_status(db, task_id, "GENERATING_TESTS")
             db.commit()
 
         # =========================

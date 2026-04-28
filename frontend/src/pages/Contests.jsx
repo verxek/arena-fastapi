@@ -149,7 +149,13 @@ function Contests() {
             <h2 className="page-title">Завершенные контесты</h2>
 
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-
+              <span
+                className="archive-link"
+                onClick={() => navigate("/archive")}
+              >
+                Весь архив →
+              </span>
+              
               {userRole === "organizer" && (
                 <div className="tabs-container">
                   <button
@@ -167,12 +173,7 @@ function Contests() {
                 </div>
               )}
 
-              <span
-                className="archive-link"
-                onClick={() => navigate("/archive")}
-              >
-                Весь архив →
-              </span>
+              
 
             </div>
           </div>

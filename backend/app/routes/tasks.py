@@ -8,6 +8,7 @@ import logging
 from datetime import datetime
 import docker
 from backend.app.database import get_db
+from fastapi import Query
 from backend.app.models.user import User
 from backend.app.dependencies.auth import get_current_user
 from backend.app.models.dictionaries import Task_Category, Difficulty_Level
@@ -75,10 +76,11 @@ async def create_task(
 
 @router.get("/", response_model=List[dict])
 async def get_tasks(
+    include_hidden: bool = Query(False),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    return await get_tasks_service(db, current_user)
+    return await get_tasks_service(db, current_user, include_hidden)
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task(

@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import RegisterContestModal from "./RegisterContestModal";
 
 import { RiTimeLine } from "react-icons/ri";
-import { BiCube } from "react-icons/bi";
 import { MdOutlineDateRange, MdOutlinePeople } from "react-icons/md";
+import { GrCubes } from "react-icons/gr";
 
 import "../styles/global.css";
 
@@ -87,7 +87,7 @@ function ContestCard({ contest, userRole, isAuthor, onAction }) {
       <div className="contest-card-header">
         <h3 className="contest-card-title">
           <span className="title-row">
-            <BiCube size={20} />
+            <GrCubes size={20} />
             {contest.contest_name}
           </span>
         </h3>

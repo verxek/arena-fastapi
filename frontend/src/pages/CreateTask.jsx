@@ -69,10 +69,8 @@ function CreateTask() {
 
 
     const visibility = !formData.is_contest_task;
-    data.append("visibility", visibility);
-    
-
-    data.append("make_visible_after_contest", formData.make_visible_after_contest);
+    data.append("is_contest_task", formData.is_contest_task);
+    data.append("make_visible_after", formData.make_visible_after_contest);
 
     data.append("examples_json", JSON.stringify(examples));
     data.append("tests_file", testsFile);

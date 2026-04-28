@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link  } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "../styles/global.css";
 
@@ -44,17 +44,11 @@ function MySubmissions() {
 
         {/* HEADER */}
         <div className="header-row">
-
+          
           <h1 className="page-title">Мои отправления</h1>
-
-          {taskId && (
-            <button
-              className="btn btn-secondary"
-              onClick={() => navigate(`/tasks/${taskId}`)}
-            >
-              ← Вернуться к задаче
-            </button>
-          )}
+          <Link to="/tasks" className="back-link">
+            ← Назад к списку задач
+          </Link>
 
         </div>
 

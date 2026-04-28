@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import TaskItem from "../components/TaskItem";
 import "../styles/global.css";
+import { BiSearch } from "react-icons/bi";
 
 function Tasks() {
   const navigate = useNavigate();
@@ -91,7 +92,7 @@ function Tasks() {
   if (loading) return <div className="loading-text">Загрузка...</div>;
 
   return (
-    <div className="page-container">
+    <div className="task-page">
       <Navbar />
 
       <div className="tasks-page-container">
@@ -99,19 +100,28 @@ function Tasks() {
         <div className="header-row">
           <h1 className="page-title">Задачи</h1>
 
-          <input
-            className="search-input"
-            type="text"
-            placeholder="Найти задачу..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          <div className="search-wrapper">
+            <BiSearch className="search-icon" />
+
+            <input
+              className="search-input"
+              type="text"
+              placeholder="Найти задачу..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          {userRole === "participant" && (
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate("/my-submissions")}
+            >
+              Мои отправления
+            </button>
+          )}
 
           {userRole === "organizer" && (
             <div className="action-buttons">
-              <button className="btn btn-secondary" onClick={() => navigate("/tasks/drafts")}>
-                Черновики
-              </button>
               <button className="btn btn-primary" onClick={() => navigate("/tasks/create")}>
                 + Создать
               </button>
@@ -181,6 +191,7 @@ function Tasks() {
                 onDelete={handleDelete}
                 onSolve={(id) => navigate(`/tasks/${id}`)}
                 onSolveAgain={(id) => navigate(`/tasks/${id}`)}
+                visibility={task.visibility}
               />
             ))}
           </div>

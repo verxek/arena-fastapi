@@ -91,7 +91,7 @@ useEffect(() => {
     .then(user => {
       setUserId(user.user_id);
 
-      return fetch(`http://127.0.0.1:8000/tasks?author_id=${user.user_id}`, {
+      return fetch(`http://127.0.0.1:8000/tasks?author_id=${user.user_id}&include_hidden=true`, {
         headers: { Authorization: `Bearer ${token}` }
       });
     })

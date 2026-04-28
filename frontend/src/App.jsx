@@ -13,7 +13,8 @@ import Archive from "./pages/Archive"
 import ContestMenu from "./pages/ContestMenu"
 import TaskPage from "./pages/Task"
 import MySubmissions from "./pages/MySubmissions"
-import AdminPanel from "./pages/AdminPanel";
+import AdminPanel from "./pages/AdminPanel"
+import Drafts from "./pages/Drafts"
 
 import ProtectedRoute from "./components/ProtectedRoute"
 
@@ -22,7 +23,6 @@ function App() {
     <BrowserRouter>
 
       <Routes>
-
         <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
         <Route path="/tasks/create" element={<ProtectedRoute><CreateTask /></ProtectedRoute>} />
         <Route path="/" element={<Home />} />
@@ -33,7 +33,7 @@ function App() {
         <Route path="/organizer" element={<ProtectedRoute> <OrganizerHome /></ProtectedRoute>}/>
         <Route path="/contests" element={<ProtectedRoute><Contests /></ProtectedRoute>} />
         <Route path="/contests/create" element={<ProtectedRoute><CreateContest /></ProtectedRoute>}/>
-      
+        <Route path="/tasks/drafts" element={<Drafts />} />
         <Route path="/contests/:contest_id" element={<ProtectedRoute><ContestMenu /> </ProtectedRoute>}/>
         <Route path="/contests/:id/edit" element={<CreateContest />} />
         <Route path="/tasks/:id" element={<TaskPage />} />

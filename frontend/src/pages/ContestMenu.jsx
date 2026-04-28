@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "../styles/global.css";
+import { IoTimeOutline } from "react-icons/io5";
+import { TfiSave } from "react-icons/tfi";
 
 const loadSolutions = async () => {
   const userId = localStorage.getItem("user_id");
@@ -198,54 +200,55 @@ function ContestMenu() {
         >
           ← Назад к задачам
         </div>
+        <div className="task-header"> 
+          <h2 className="task-title">{openedTask.task_name}</h2>
 
-        <h2>{openedTask.task_name}</h2>
-
-        <div style={{ display: "flex", gap: "20px", color: "#6b7280" }}>
-          <span>{openedTask.category_name}</span>
-          <span>{openedTask.difficulty_name}</span>
-          <span>{openedTask.time_limit} ms</span>
-          <span>{openedTask.memory_limit} MB</span>
+          <div className="task-meta-row">
+            <span className="meta-item"><IoTimeOutline />{openedTask.time_limit} ms</span>
+            <span className="meta-item"><TfiSave />{openedTask.memory_limit} Mb</span>
+          </div>
         </div>
-
         <hr style={{ margin: "20px 0" }} />
 
         <h3>Условие</h3>
-        <div style={{ background: "#f9fafb", padding: "15px", borderRadius: "10px" }}>
+        <div>
           {openedTask.statement}
         </div>
 
         <h3 style={{ marginTop: "20px" }}>Входные данные</h3>
-        <div style={{ background: "#f9fafb", padding: "10px", borderRadius: "8px" }}>
+        <div>
           {openedTask.input_format || "Не указано"}
         </div>
 
         <h3 style={{ marginTop: "20px" }}>Выходные данные</h3>
-        <div style={{ background: "#f9fafb", padding: "10px", borderRadius: "8px" }}>
+        <div>
           {openedTask.output_format || "Не указано"}
         </div>
 
-        <h3 style={{ marginTop: "20px" }}>Примеры</h3>
-        {openedTask.examples?.length > 0 ? (
-          <table style={{ width: "100%", marginTop: "10px" }}>
-            <thead>
-              <tr>
-                <th>Ввод</th>
-                <th>Вывод</th>
-              </tr>
-            </thead>
-            <tbody>
-              {openedTask.examples.map((ex, i) => (
-                <tr key={i}>
-                  <td style={{ whiteSpace: "pre-wrap" }}>{ex.input}</td>
-                  <td style={{ whiteSpace: "pre-wrap" }}>{ex.output}</td>
+        <div>
+          <h3>Примеры</h3>
+
+          {openedTask?.examples?.length ? (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Ввод</th>
+                  <th>Вывод</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p>Нет примеров</p>
-        )}
+              </thead>
+              <tbody>
+                {openedTask?.examples.map((ex, i) => (
+                  <tr key={i}>
+                    <td>{ex.input}</td>
+                    <td>{ex.output}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="muted">Нет примеров</p>
+          )}
+        </div>
 
       </div>
     );
@@ -326,11 +329,12 @@ function ContestMenu() {
           <div className="file-input-wrapper">
             
             <input
-              type="file"
-              accept=".py,.cpp"
               id="solution-file"
-              className="file-input-hidden"
-              onChange={(e) => setFile(e.target.files[0])}
+              type="file"
+              onChange={(e) => {
+                console.log(e.target.files);
+                setFile(e.target.files?.[0]);
+              }}
             />
 
             <label htmlFor="solution-file" className="file-button">

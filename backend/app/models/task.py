@@ -28,7 +28,7 @@ class Task(Base):
     output_format = Column(Text, nullable=True) 
     examples = Column(JSON, nullable=True)
 
-    status = Column(String, default="PENDING")
+    status = Column(String, default="DRAFT")
 
     # связи
     author_rel = relationship(

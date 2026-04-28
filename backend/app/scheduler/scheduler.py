@@ -4,16 +4,21 @@ from sqlalchemy import select
 from backend.app.database import AsyncSessionLocal, now_utc
 from backend.app.models.contest import Contest
 from backend.app.services.contest_service import finish_contest
+from apscheduler.executors.asyncio import AsyncIOExecutor
+import asyncio
 
 
-scheduler = AsyncIOScheduler()
+executors = {
+    "default": AsyncIOExecutor()
+}
+
+scheduler = AsyncIOScheduler(executors=executors)
 
 
 async def check_contests():
     async with AsyncSessionLocal() as db:
         result = await db.execute(select(Contest))
         contests = result.scalars().all()
-
         now = now_utc()
 
         for contest in contests:
@@ -27,5 +32,11 @@ async def check_contests():
 
 
 def start_scheduler():
-    scheduler.add_job(check_contests, "interval", minutes=1)
+
+    scheduler.add_job(
+        check_contests,
+        "interval",
+        minutes=1
+    )
+
     scheduler.start()

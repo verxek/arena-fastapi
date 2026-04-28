@@ -11,6 +11,13 @@ from sqlalchemy.orm import selectinload
 
 BASE_DIR = "uploads/tasks"
 
+def parse_bool(value):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.lower() in ("true", "1", "yes", "on")
+    return False
+
 
 async def create_task_service(
     db,
@@ -26,8 +33,8 @@ async def create_task_service(
     input_format=None,
     output_format=None,
     examples_json=None,
-    is_contest_task=False,
-    make_visible_after=False
+    is_contest_task=True,
+    make_visible_after=True
 ):
     # --- проверка уникальности ---
     result = await db.execute(
@@ -36,7 +43,11 @@ async def create_task_service(
     if result.scalar_one_or_none():
         raise HTTPException(400, "Задача с таким названием уже существует")
 
-    visibility = False if is_contest_task else True
+    is_contest_t = parse_bool(is_contest_task)
+    make_visible = parse_bool(make_visible_after)
+    visibility = not is_contest_task
+    print("RAW is_contest_task:", is_contest_task, type(is_contest_task))
+    print("PARSED:", parse_bool(is_contest_task))
 
     # --- создание задачи ---
     new_task = Task(
@@ -51,7 +62,7 @@ async def create_task_service(
         memory_limit=memory_limit,
         author=current_user.user_id,
         visibility=visibility,
-        make_visible_after_contest=make_visible_after
+        make_visible_after_contest=make_visible
     )
 
     db.add(new_task)
@@ -108,9 +119,18 @@ async def create_task_service(
             detail=f"Ошибка обработки файлов: {str(e)}"
         )
     
+async def get_tasks_service(db, current_user, include_hidden: bool = False):
+    stmt = select(Task)
 
-async def get_tasks_service(db, current_user):
-    stmt = select(Task).where(Task.visibility == True)
+    if current_user.role != "organizer":
+        stmt = stmt.where(Task.visibility == True)
+
+    else:
+        if not include_hidden:
+            stmt = stmt.where(
+                (Task.visibility == True) |
+                (Task.author == current_user.user_id)
+            )
     result = await db.execute(stmt)
     tasks = result.scalars().all()
 
@@ -131,6 +151,7 @@ async def get_tasks_service(db, current_user):
             "memory_limit": t.memory_limit,
             "tests_url": f"/static/tasks/{t.task_id}/tests/",
             "solution_url": f"/static/tasks/{t.task_id}/solutions/",
+            "visibility": t.visibility,
 
             "is_solved": any(
                 sol.sol_task == t.task_id and sol.sol_user == current_user.user_id
