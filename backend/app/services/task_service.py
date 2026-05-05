@@ -6,8 +6,11 @@ from fastapi import HTTPException
 from backend.app.models.task import Task
 from backend.app.worker.tasks import generate_task_tests
 from sqlalchemy import select
+from typing import List
 import re
 from sqlalchemy.orm import selectinload
+from backend.app.repositories.task import get_tasks_by_role
+from backend.app.repositories.task import get_task_by_name, create_task, update_task_status
 
 BASE_DIR = "uploads/tasks"
 
@@ -34,39 +37,32 @@ async def create_task_service(
     output_format=None,
     examples_json=None,
     is_contest_task=True,
-    make_visible_after=True
+    make_visible_after=True,
+    points: int = None
 ):
     # --- проверка уникальности ---
-    result = await db.execute(
-        select(Task).where(Task.task_name == task_name)
-    )
-    if result.scalar_one_or_none():
+    if await get_task_by_name(db, task_name):
         raise HTTPException(400, "Задача с таким названием уже существует")
 
-    is_contest_t = parse_bool(is_contest_task)
     make_visible = parse_bool(make_visible_after)
-    visibility = not is_contest_task
-    print("RAW is_contest_task:", is_contest_task, type(is_contest_task))
-    print("PARSED:", parse_bool(is_contest_task))
+    visibility = not parse_bool(is_contest_task)
 
     # --- создание задачи ---
-    new_task = Task(
-        task_name=task_name,
-        statement=statement,
-        input_format=input_format,
-        output_format=output_format,
-        examples=json.loads(examples_json) if examples_json else [],
-        difficulty=difficulty_id,
-        category=category_id,
-        time_limit=time_limit,
-        memory_limit=memory_limit,
-        author=current_user.user_id,
-        visibility=visibility,
-        make_visible_after_contest=make_visible
-    )
-
-    db.add(new_task)
-    await db.flush()
+    new_task = await create_task(db, {
+        "task_name": task_name,
+        "statement": statement,
+        "input_format": input_format,
+        "output_format": output_format,
+        "examples": json.loads(examples_json) if examples_json else [],
+        "difficulty": difficulty_id,
+        "category": category_id,
+        "time_limit": time_limit,
+        "memory_limit": memory_limit,
+        "author": current_user.user_id,
+        "visibility": visibility,
+        "make_visible_after_contest": make_visible,
+        "points": points
+    })
 
     task_id = new_task.task_id
 
@@ -103,8 +99,7 @@ async def create_task_service(
         # --- запуск генерации ---
         generate_task_tests.delay(task_id, time_limit, memory_limit)
 
-        new_task.status = "GENERATING_TESTS"
-        await db.commit()
+        await update_task_status(db, new_task, "GENERATING_TESTS")
 
         return new_task
 
@@ -152,6 +147,7 @@ async def get_tasks_service(db, current_user, include_hidden: bool = False):
             "tests_url": f"/static/tasks/{t.task_id}/tests/",
             "solution_url": f"/static/tasks/{t.task_id}/solutions/",
             "visibility": t.visibility,
+            "points": t.points,
 
             "is_solved": any(
                 sol.sol_task == t.task_id and sol.sol_user == current_user.user_id
@@ -179,31 +175,34 @@ async def delete_task_service(db, task_id: int):
     await db.commit()
 
 
-def parse_task_ids(task_ids: str):
-    return [int(x.strip()) for x in re.split(r'[,&]', task_ids) if x.strip()]
-
-
-async def get_tasks_batch_service(db, task_ids: str):
-    ids_list = parse_task_ids(task_ids)
-
+async def get_tasks_batch_service(db, task_ids: List[int]):
+    """Получает задачи по списку ID (task_ids уже список целых чисел)""" 
+    print(f"get_tasks_batch_service: received {len(task_ids)} IDs: {task_ids}")
+    
+    if not task_ids:
+        return []
+    
     result = await db.execute(
-        select(Task).where(Task.task_id.in_(ids_list))
+        select(Task).where(Task.task_id.in_(task_ids))
     )
-
+    
     tasks = result.scalars().all()
-
+    
+    print(f"Found {len(tasks)} tasks in DB")
+    
     return [
         {
             "task_id": t.task_id,
             "task_name": t.task_name,
-            "author_id": t.author,
+            "author_id": t.author, 
             "category_name": t.category_rel.category_name if t.category_rel else "Unknown",
             "difficulty_name": t.difficulty_rel.diff_name if t.difficulty_rel else "Unknown",
             "created_at": t.created_at.isoformat() if t.created_at else None,
             "time_limit": t.time_limit,
             "memory_limit": t.memory_limit,
             "tests_url": f"/static/tasks/{t.task_id}/tests/",
-            "solution_url": f"/static/tasks/{t.task_id}/solutions/"
+            "solution_url": f"/static/tasks/{t.task_id}/solutions/",
+            "points": t.points
         }
         for t in tasks
     ]
@@ -232,5 +231,6 @@ async def get_task_service(db, task_id: int):
         "memory_limit": task.memory_limit,
         "input_format": task.input_format,
         "output_format": task.output_format,
-        "examples": task.examples or []
+        "examples": task.examples or [],
+        "points": task.points
     }

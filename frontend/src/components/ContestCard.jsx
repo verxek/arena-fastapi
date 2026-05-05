@@ -23,11 +23,11 @@ function getHours(durationStr) {
   return Number(durationStr.split(":")[0]) + " ч";
 }
 
-function ContestCard({ contest, userRole, isAuthor, onAction }) {
+function ContestCard({ contest, userRole, isAuthor, isAuth, onAction }) {
   const [showRegister, setShowRegister] = useState(false);
   const navigate = useNavigate();
 
-  const isParticipant = contest.is_participant;
+  const isParticipant = contest.is_participant || false;
   const isActive = contest.is_active;
   const isUpcoming = contest.is_upcoming;
 
@@ -82,7 +82,6 @@ function ContestCard({ contest, userRole, isAuthor, onAction }) {
 
   return (
     <div className="contest-card">
-
       {/* HEADER */}
       <div className="contest-card-header">
         <h3 className="contest-card-title">
@@ -105,7 +104,6 @@ function ContestCard({ contest, userRole, isAuthor, onAction }) {
 
       {/* INFO */}
       <div className="contest-info">
-
         <div className="contest-info-row">
           <MdOutlineDateRange />
           {formatDate(contest.start_time)}
@@ -120,17 +118,17 @@ function ContestCard({ contest, userRole, isAuthor, onAction }) {
           <MdOutlinePeople />
           {contest.total_participants || 0} участников
         </div>
-
       </div>
 
-      {/* BUTTON */}
-      <button
-        className={`contest-btn ${btnDisabled ? "disabled" : "primary"}`}
-        onClick={handleClick}
-        disabled={btnDisabled}
-      >
-        {btnText}
-      </button>
+      {isAuth && (
+        <button
+          className={`contest-btn ${btnDisabled ? "disabled" : "primary"}`}
+          onClick={handleClick}
+          disabled={btnDisabled}
+        >
+          {btnText}
+        </button>
+      )}
 
       {/* MODAL */}
       {showRegister && (

@@ -4,6 +4,8 @@ import Navbar from "../components/Navbar";
 import TaskItem from "../components/TaskItem";
 import "../styles/global.css";
 import { BiSearch } from "react-icons/bi";
+import { tasksApi } from "../api/tasks";
+import { usersApi } from "../api/users";
 
 function Tasks() {
   const navigate = useNavigate();
@@ -19,6 +21,7 @@ function Tasks() {
   const [filterDifficulty, setFilterDifficulty] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
 
+
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const role = localStorage.getItem("role");
@@ -30,26 +33,23 @@ function Tasks() {
 
     setUserRole(role);
 
-    fetch("http://127.0.0.1:8000/users/me", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
+    // Используем вынесенные API-методы
+    usersApi.getCurrent()
       .then(user => {
         setUserId(user.user_id);
-        return fetch("http://127.0.0.1:8000/tasks/", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        return tasksApi.getAll();
       })
-      .then(res => res.json())
       .then(data => {
         setTasks(data);
         setLoading(false);
       })
       .catch(err => {
-        console.error(err);
+        console.error("Failed to load data:", err);
         setLoading(false);
       });
   }, [navigate]);
+
+
 
   const filteredTasks = tasks
     .filter(task => {
@@ -65,31 +65,28 @@ function Tasks() {
       return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
     });
 
+
+
   const categories = ["all", ...new Set(tasks.map(t => t.category_name))];
   const difficulties = ["all", ...new Set(tasks.map(t => t.difficulty_name))];
+
+
 
   const handleDelete = async (id) => {
     if (!window.confirm("Удалить задачу?")) return;
 
-    const token = localStorage.getItem("access_token");
-
     try {
-      const res = await fetch(`http://127.0.0.1:8000/tasks/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (res.ok) {
-        setTasks(prev => prev.filter(t => t.task_id !== id));
-      } else {
-        alert("Ошибка удаления");
-      }
-    } catch {
-      alert("Ошибка сети");
+      await tasksApi.delete(id);
+      setTasks(prev => prev.filter(t => t.task_id !== id));
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Ошибка удаления задачи");
     }
   };
 
+
   if (loading) return <div className="loading-text">Загрузка...</div>;
+
 
   return (
     <div className="task-page">
@@ -129,12 +126,9 @@ function Tasks() {
           )}
         </div>
 
-       
-
         <div className="filters-row">
 
-          
-          {/* ФИЛЬТРЫ */}
+          {/* Фильтры */}
           <select className="filter-select" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
             <option value="all">Категории</option>
             {categories.filter(c => c !== "all").map(c => (
@@ -155,7 +149,7 @@ function Tasks() {
           </select>
 
 
-          {/* ТАБЫ */}
+          {/* Табы */}
           {userRole === "organizer" && (
             <div className="tabs-container">
               <button
@@ -176,7 +170,7 @@ function Tasks() {
 
         </div>
 
-        {/* List */}
+        {/* Список */}
         {filteredTasks.length === 0 ? (
           <div className="empty-state">Задачи не найдены</div>
         ) : (
@@ -196,7 +190,6 @@ function Tasks() {
             ))}
           </div>
         )}
-
       </div>
     </div>
   );

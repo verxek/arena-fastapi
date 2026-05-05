@@ -2,6 +2,9 @@ import os
 from backend.app.models.solution import Solution
 from backend.app.worker.tasks import run_solution
 from sqlalchemy import select
+from backend.app.models.contest_task import Contest_Task 
+from sqlalchemy import select, and_
+from sqlalchemy.orm import selectinload
 
 UPLOAD_DIR = "uploads/tasks"
 
@@ -62,3 +65,56 @@ class SolutionService:
             }
             for s in solutions
         ]
+    
+    async def get_contest_solutions(self, contest_id: int):
+        try:
+            print(f" get_contest_solutions: contest_id={contest_id}")
+            
+           
+            contest_task_ids_query = select(Contest_Task.task_ct).where(
+                Contest_Task.contest_ct == contest_id
+            )
+            task_ids_result = await self.session.execute(contest_task_ids_query)
+            task_ids = task_ids_result.scalars().all()
+            print(f"Task IDs in contest {contest_id}: {task_ids}")
+            
+            if not task_ids:
+                return []
+            
+            stmt = (
+                select(Solution)
+                .where(Solution.sol_task.in_(task_ids))
+                .options(
+                    selectinload(Solution.task_rel),        
+                    selectinload(Solution.user_rel),       
+                    selectinload(Solution.language_rel),  
+                    selectinload(Solution.state_rel),    
+                    selectinload(Solution.sandbox_rel),     
+                )
+                .order_by(Solution.sol_created_at.desc())
+            )
+            
+            result = await self.session.execute(stmt)
+            solutions = result.scalars().all()
+            
+            print(f"Found {len(solutions)} solutions")
+          
+            return [
+                {
+                    "id": s.solution_id,
+                    "task": s.task_name,
+                    "user": s.user_nickname,
+                    "language": s.language_name,
+                    "status": s.state_rel.state_name if s.state_rel else "Pending",
+                    "time": s.sol_created_at.isoformat(),
+        
+                }
+                for s in solutions
+            ]
+            
+        except Exception as e:
+            print(f"ERROR in get_contest_solutions: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
+    

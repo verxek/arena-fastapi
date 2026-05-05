@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Modal from "./Modal";
 
-function SubmitModal({ task, onClose }) {
+function SubmitModal({ task, isOpen, onClose }) {
   const [file, setFile] = useState(null);
   const [lang, setLang] = useState(1);
 
@@ -14,19 +14,24 @@ function SubmitModal({ task, onClose }) {
 
     const token = localStorage.getItem("access_token");
 
-    await fetch("http://127.0.0.1:8000/solutions/submit", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      body: formData
-    });
-
-    onClose();
+    try {
+      await fetch("http://127.0.0.1:8000/solutions/submit", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      });
+    } catch (e) {
+      console.error(e);
+      alert("Ошибка отправки");
+    } finally {
+      onClose(); 
+    }
   };
 
   return (
-    <Modal isOpen={true} onClose={onClose} title="Отправка решения">
+    <Modal isOpen={isOpen} onClose={onClose} title="Отправка решения">
 
       <label>Язык</label>
       <select onChange={(e) => setLang(e.target.value)} style={{ width: "100%", padding: "8px" }}>

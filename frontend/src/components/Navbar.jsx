@@ -1,4 +1,4 @@
-import { useState } from "react"; 
+import { useState, useCallback } from "react"; 
 import { Link, useNavigate } from "react-router-dom";
 import LoginModal from "./LoginModal";  
 import RegisterModal from "./RegisterModal";
@@ -20,6 +20,14 @@ function Navbar() {
     localStorage.removeItem("user_id");
     navigate("/");
   };
+  const handleLoginClose = useCallback(() => {
+    console.log('LoginModal closed');
+    setShowLogin(false);
+  }, []);
+
+  const handleRegisterClose = useCallback(() => {
+    setShowRegister(false);
+  }, []);
 
   return (
     <>  
@@ -129,15 +137,7 @@ function Navbar() {
           ) : (
             <button
               onClick={() => setShowLogin(true)}
-              style={{
-                background: "#1f2739",
-                color: "white",
-                border: "none",
-                padding: "8px 16px",
-                borderRadius: "12px",
-                cursor: "pointer",
-                fontWeight: "500"
-              }}
+              className="btn btn-primary"
             >
               Войти
             </button>
@@ -149,7 +149,7 @@ function Navbar() {
       {/* MODALS */}
       <LoginModal 
         isOpen={showLogin} 
-        onClose={() => setShowLogin(false)}
+        onClose={handleLoginClose}
         onSwitchToRegister={() => {
           setShowLogin(false);
           setShowRegister(true);

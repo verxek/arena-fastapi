@@ -12,6 +12,7 @@ class TaskBase(BaseModel):
     memory_limit: int  # МБ
     visibility: bool = True
     make_visible_after_contest: bool = False
+    points: int
 
 class TaskCreate(TaskBase):
     pass
@@ -24,6 +25,7 @@ class TaskUpdate(BaseModel):
     time_limit: Optional[int] = None
     memory_limit: Optional[int] = None
     visibility: Optional[bool] = None
+    points: Optional[int] = None
 
 class TaskResponse(TaskBase):
     task_id: int

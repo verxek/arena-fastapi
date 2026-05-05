@@ -4,6 +4,7 @@ import React from 'react';
 function Modal({ isOpen, onClose, title, children }) {
   if (!isOpen) return null;
 
+
   return (
     <div style={styles.overlay} onClick={onClose}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>

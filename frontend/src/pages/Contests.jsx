@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import ContestCard from "../components/ContestCard";
 import { DiVim } from "react-icons/di";
 import "../styles/global.css";
+import { getActiveAndUpcomingContests, getFinishedContests } from "../utils/contestUtils";
 
 function Contests() {
   const [allContests, setAllContests] = useState([]);
@@ -13,6 +14,7 @@ function Contests() {
 
   const [activeTabAvailable, setActiveTabAvailable] = useState("all");
   const [activeTabFinished, setActiveTabFinished] = useState("all");
+  const isAuth = !!localStorage.getItem("access_token");
 
   const navigate = useNavigate();
 
@@ -58,18 +60,16 @@ function Contests() {
       });
   }, [navigate]);
 
-  // Логика фильтрации
-  const availableContestsRaw = allContests.filter(c => c.is_upcoming || c.is_active);
-  const availableContests = availableContestsRaw.filter(c => {
-    if (activeTabAvailable === "my") return c.author_id === userId;
-    return true;
-  });
+  const sortedActiveRaw = getActiveAndUpcomingContests(allContests);
+  const sortedFinishedRaw = getFinishedContests(allContests);
 
-  const finishedContestsRaw = allContests.filter(c => c.is_finished);
-  const finishedContests = finishedContestsRaw.filter(c => {
-    if (activeTabFinished === "my") return c.author_id === userId;
-    return true;
-  });
+  const availableContests = activeTabAvailable === "my" 
+    ? sortedActiveRaw.filter(c => c.author_id === userId)
+    : sortedActiveRaw;
+
+  const finishedContests = activeTabFinished === "my"
+    ? sortedFinishedRaw.filter(c => c.author_id === userId)
+    : sortedFinishedRaw;
 
   const handleAction = (contest) => {
     if (contest.is_finished) navigate(`/contests/${contest.contest_id}`);
@@ -134,6 +134,7 @@ function Contests() {
                     contest={c}
                     userRole={userRole}
                     isAuthor={c.author_id === userId}
+                    isAuth={isAuth}   
                     onAction={handleAction}
                   />
                 </div>
@@ -188,6 +189,7 @@ function Contests() {
                     contest={c}
                     userRole={userRole}
                     isAuthor={c.author_id === userId}
+                    isAuth={isAuth}   
                     onAction={handleAction}
                   />
                 </div>

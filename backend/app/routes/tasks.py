@@ -47,7 +47,8 @@ async def create_task(
     output_format: str = Form(None),
     examples_json: str = Form(None),
     is_contest_task: bool = Form(False),
-    make_visible_after: bool = Form(False)
+    make_visible_after: bool = Form(False),
+    points: int = Form(None)
 ):
     task = await create_task_service(
         db=db,
@@ -64,7 +65,8 @@ async def create_task(
         output_format=output_format,
         examples_json=examples_json,
         is_contest_task=is_contest_task,
-        make_visible_after=make_visible_after
+        make_visible_after=make_visible_after,
+        points=points
     )
 
     return {
@@ -109,10 +111,11 @@ async def get_difficulties(db: AsyncSession = Depends(get_db)):
 
 @router.get("/batch")
 async def get_tasks_batch(
-    task_ids: str = Query(...),
+    task_ids: List[int] = Query(...),  
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    logger.info(f"Batch request for task_ids: {task_ids}") 
     return await get_tasks_batch_service(db, task_ids)
 
 @router.get("/{task_id}", response_model=dict)

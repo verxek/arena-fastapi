@@ -112,9 +112,11 @@ function TaskPage() {
 
       </div>
 
-      {showSubmit && (
-        <SubmitModal task={task} onClose={() => setShowSubmit(false)} />
-      )}
+      <SubmitModal
+        task={task}
+        isOpen={showSubmit}
+        onClose={() => setShowSubmit(false)}
+      />
 
     </div>
   </div>

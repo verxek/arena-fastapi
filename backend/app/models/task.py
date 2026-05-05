@@ -28,6 +28,8 @@ class Task(Base):
     output_format = Column(Text, nullable=True) 
     examples = Column(JSON, nullable=True)
 
+    points = Column(Integer, default=500)
+
     status = Column(String, default="DRAFT")
 
     # связи

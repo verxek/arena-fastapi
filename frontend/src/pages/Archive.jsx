@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ContestCard from "../components/ContestCard";
 import "../styles/global.css";
+import { getFinishedContests, getActiveAndUpcomingContests } from "../utils/contestUtils";
 
 function Archive() {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ function Archive() {
   const [activeTabFinished, setActiveTabFinished] = useState("all");
   const [userId, setUserId] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const isAuth = !!localStorage.getItem("access_token");
 
   const itemsPerPage = 6;
 
@@ -47,14 +49,12 @@ function Archive() {
   }, [navigate]);
 
   // === ФИЛЬТРЫ ===
-  const finishedContestsRaw = allContests.filter(c => c.is_finished);
+ 
+  const sortedFinishedRaw = getFinishedContests(allContests);
 
-  const finishedContests = finishedContestsRaw.filter(c => {
-    if (activeTabFinished === "my") {
-      return c.is_organizer === true;
-    }
-    return true;
-  });
+  const finishedContests = activeTabFinished === "my"
+    ? sortedFinishedRaw.filter(c => c.author_id === userId)
+    : sortedFinishedRaw;
 
   // === ПАГИНАЦИЯ ===
   const totalPages = Math.ceil(finishedContests.length / itemsPerPage);
@@ -129,6 +129,7 @@ function Archive() {
                   contest={c}
                   userRole={userRole}
                   isAuthor={String(c.author_id) === String(userId)}
+                  isAuth={isAuth} 
                   onAction={handleAction}
                 />
               ))

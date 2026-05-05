@@ -8,43 +8,35 @@ from backend.app.models.contest_user import Contest_User
 from backend.app.database import now_utc
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import selectinload
+from backend.app.repositories.contest import (
+    get_contest_by_id,
+    get_contest_tasks_with_task,
+    save_and_commit,
+)
+
+from datetime import datetime
+
 
 
 UTC_PLUS_5 = timezone(timedelta(hours=5))
 ORGANIZER_ROLE_ID = 2
 
 async def finish_contest(contest_id: int, db: AsyncSession):
-
-    # 1. сам контест
-    contest = await db.get(Contest, contest_id)
-    if not contest:
+    contest = await get_contest_by_id(contest_id, db)
+    if not contest or contest.contest_status == 4:
         return
 
-    if contest.contest_status == 4:
-        return
+    links = await get_contest_tasks_with_task(contest_id, db)
 
-    # 2. задачи контеста
-    result = await db.execute(
-        select(Contest_Task)
-        .where(Contest_Task.contest_ct == contest_id)
-        .options(selectinload(Contest_Task.task_rel))
-    )
-    links = result.scalars().all()
-
-    # 3. обработка задач
     for ct in links:
         task = ct.task_rel
         if not task:
             continue
-
         if task.make_visible_after_contest:
             task.visibility = True
 
-    # 4. закрываем контест
     contest.contest_status = 4
-
-    # 5. сохраняем
-    await db.commit()
+    await save_and_commit(db)
 
 
 
@@ -96,10 +88,16 @@ def build_contest_response(contest, current_user):
 
     author = contest.organizer.cu_user if contest.organizer else None
 
-    is_participant = any(
-        p.cu_user == current_user.user_id
-        for p in contest.participants
-    )
+    is_participant = False
+    if current_user is not None:
+        is_participant = any(
+            p.cu_user == current_user.user_id
+            for p in contest.participants
+        )
+
+    is_organizer = False
+    if current_user is not None and author is not None:
+        is_organizer = current_user.user_id == author
 
     return {
         "contest_id": contest.contest_id,
@@ -116,7 +114,8 @@ def build_contest_response(contest, current_user):
         "total_participants": contest.total_participants,
 
         "author_id": author,
-        "is_organizer": current_user.user_id == author,
+        
+        "is_organizer": is_organizer,
         "is_participant": is_participant
     }
 
@@ -263,3 +262,5 @@ async def register_to_contest_service(db, contest_id: int, current_user):
 
     db.add(participation)
     await db.commit()
+
+

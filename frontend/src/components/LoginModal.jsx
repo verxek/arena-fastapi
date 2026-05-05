@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/auth";
 import Modal from "./Modal";
+import { GrCodeSandbox } from "react-icons/gr";
+import { FaUser, FaLock } from "react-icons/fa";
 import "../styles/global.css";
 
 function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
@@ -32,11 +34,14 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
 
       setNickname("");
       setPassword("");
+
       onClose();
 
-      if (data.role === "admin") navigate("/admin");
-      else if (data.role === "organizer") navigate("/organizer");
-      else navigate("/student");
+      setTimeout(() => {
+        if (data.role === "admin") navigate("/admin");
+        else if (data.role === "organizer") navigate("/organizer");
+        else navigate("/student");
+      }, 50);
 
     } catch (err) {
       console.error(err);
@@ -47,64 +52,81 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Вход">
+    <Modal isOpen={isOpen} onClose={onClose} title="">
+      <div className="login-modal">
+        
+        {/* Логотип на чёрном фоне */}
+        <div className="login-logo-section">
+          
+          <h2 className="login-title">С возвращением!</h2>
+          <p className="login-subtitle">
+            Войдите, чтобы продолжить участие в контестах
+          </p>
+        </div>
 
-      <form className="form" onSubmit={handleSubmit}>
+        {/* Форма с вашими классами из global.css */}
+        <form className="form" onSubmit={handleSubmit}>
+          
+          {error && (
+            <div className="error-box">
+              {error}
+            </div>
+          )}
 
-        {error && (
-          <div className="error-box">
-            {error}
+          <div className="form-group">
+            <label className="label input-with-icon">
+              <FaUser className="input-icon" />
+              Имя пользователя
+            </label>
+            <input
+              className="input-field"
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              placeholder="Введите имя пользователя"
+              required
+              autoFocus
+            />
           </div>
-        )}
 
-        <div className="form-group">
-          <label className="label">Имя пользователя</label>
-          <input
-            className="input-field"
-            type="text"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            placeholder="Имя пользователя"
-            required
-            autoFocus
-          />
-        </div>
+          <div className="form-group">
+            <label className="label input-with-icon">
+              <FaLock className="input-icon" />
+              Пароль
+            </label>
+            <input
+              className="input-field"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Введите пароль"
+              required
+            />
+          </div>
 
-        <div className="form-group">
-          <label className="label">Пароль</label>
-          <input
-            className="input-field"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Пароль"
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="btn btn-primary full-width"
-          disabled={loading}
-        >
-          {loading ? "Вход..." : "Войти"}
-        </button>
-
-        <div className="modal-footer">
-          Нет аккаунта?{" "}
-          <span
-            className="link"
-            onClick={() => {
-              onClose();
-              onSwitchToRegister();
-            }}
+          <button
+            type="submit"
+            className="btn btn-primary full-width login-submit"
+            disabled={loading}
           >
-            Зарегистрироваться
-          </span>
-        </div>
+            {loading ? "Вход..." : "Войти"}
+          </button>
 
-      </form>
+          <div className="modal-footer">
+            Нет аккаунта?{" "}
+            <span
+              className="link"
+              onClick={() => {
+                onClose();
+                onSwitchToRegister();
+              }}
+            >
+              Зарегистрироваться
+            </span>
+          </div>
 
+        </form>
+      </div>
     </Modal>
   );
 }

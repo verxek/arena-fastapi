@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ContestCard from "../components/ContestCard";
 import "../styles/global.css";
+import { getFinishedContests, getActiveAndUpcomingContests } from "../utils/contestUtils";
 
 function OrganizerHome() {
   const navigate = useNavigate();
   const [allContests, setAllContests] = useState([]);
   const [userStats, setUserStats] = useState({ tasks: 0, contests: 0 });
   const [loading, setLoading] = useState(true);
+  const isAuth = !!localStorage.getItem("access_token");
   
   const token = localStorage.getItem("access_token");
   const userId = localStorage.getItem("user_id");
@@ -73,8 +75,8 @@ function OrganizerHome() {
 
   const safeContests = Array.isArray(allContests) ? allContests : [];
   
-  const activeAndUpcoming = safeContests.filter(c => c.is_upcoming || c.is_active);
-  const finished = safeContests.filter(c => c.is_finished);
+  const finished = getFinishedContests(allContests);
+  const activeAndUpcoming = getActiveAndUpcomingContests(allContests);
 
   const handleAction = (contest) => {
     if (contest.is_finished) navigate(`/contests/${contest.contest_id}`);
@@ -126,7 +128,7 @@ function OrganizerHome() {
             ) : (
               activeAndUpcoming.map(c => (
                 <div key={c.contest_id} className="card-wrapper">
-                  <ContestCard contest={c} userRole={role} isAuthor={c.author_id == userId} onAction={handleAction} />
+                  <ContestCard contest={c} userRole={role} isAuthor={c.author_id == userId}  isAuth={isAuth}  onAction={handleAction} />
                 </div>
               ))
             )}
@@ -146,7 +148,7 @@ function OrganizerHome() {
             ) : (
               finished.map(c => (
                 <div key={c.contest_id} className="card-wrapper">
-                  <ContestCard contest={c} userRole={role} isAuthor={c.author_id == userId} onAction={handleAction} />
+                  <ContestCard contest={c} userRole={role} isAuthor={c.author_id == userId} isAuth={isAuth}  onAction={handleAction} />
                 </div>
               ))
             )}

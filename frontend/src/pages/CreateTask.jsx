@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { MdDelete} from "react-icons/md";
 
 function CreateTask() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ function CreateTask() {
     difficulty_id: 1,
     time_limit: 1000, 
     memory_limit: 256,
+    points: 500,
     is_contest_task: false, 
     make_visible_after_contest: false
   });
@@ -179,6 +181,8 @@ function CreateTask() {
             </div>
           </div>
 
+          
+
           <div className="form-group" style={{ 
             background: "#fff", padding: "20px", borderRadius: "8px", 
             border: "1px solid #e5e7eb", marginBottom: "20px" 
@@ -206,6 +210,25 @@ function CreateTask() {
               <label htmlFor="is_contest_task" style={{ fontWeight: "500", cursor: "pointer", color: "#1f2739" }}>
                 Задача для контеста (скрыта из общего списка)
               </label>
+            </div>
+
+            <div className="form-group">
+              <label className="label">Начальная стоимость (баллы)</label>
+              <select
+                className="input-field"
+                value={formData.points}
+                onChange={(e) => setFormData({...formData, points: Number(e.target.value)})}
+              >
+                <option value={500}>500</option>
+                <option value={1000}>1000</option>
+                <option value={1500}>1500</option>
+                <option value={2000}>2000</option>
+                <option value={2500}>2500</option>
+                <option value={3000}>3000</option>
+              </select>
+              <p style={{ fontSize: "12px", color: "#6b7280", marginTop: "6px" }}>
+                Стоимость задачи в контесте. Чем раньше участник решит задачу, тем больше баллов получит.
+              </p>
             </div>
 
             <div style={{ 
@@ -254,7 +277,7 @@ function CreateTask() {
                     <textarea rows="3" className="input-field textarea" placeholder="Например: 15" value={ex.output} onChange={(e) => updateExample(index, 'output', e.target.value)} style={{ width: '100%', resize: 'vertical' }} />
                   </div>
                   <div style={{ paddingTop: '20px' }}>
-                    <button type="button" onClick={() => removeExample(index)} disabled={examples.length === 1} style={{ background: examples.length === 1 ? '#f3f4f6' : '#fee2e2', color: examples.length === 1 ? '#9ca3af' : '#ef4444', border: 'none', borderRadius: '6px', width: '32px', height: '32px', cursor: examples.length === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }} title="Удалить пример">🗑️</button>
+                    <button type="button" onClick={() => removeExample(index)} disabled={examples.length === 1} style={{ background: examples.length === 1 ? '#f3f4f6' : '#fee2e2', color: examples.length === 1 ? '#9ca3af' : '#ef4444', border: 'none', borderRadius: '6px', width: '32px', height: '32px', cursor: examples.length === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }} title="Удалить пример"><MdDelete color="#0e0e0e"/></button>
                   </div>
                 </div>
               ))}

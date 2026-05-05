@@ -8,6 +8,7 @@ import os
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.services.solution_service import SolutionService
+from backend.app.models.user import User
 
 router = APIRouter()
 
@@ -40,3 +41,13 @@ async def get_my_solutions(
     service = SolutionService(db)
 
     return await service.get_my_solutions(user.user_id)
+
+@router.get("/contests/{contest_id}/solutions")
+async def get_contest_solutions(
+    contest_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)  # только для авторизованных
+):
+    service = SolutionService(db)
+    solutions = await service.get_contest_solutions(contest_id)
+    return solutions
