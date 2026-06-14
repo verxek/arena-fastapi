@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import { adminApi } from "../api/admin";
 import "../styles/global.css";
 
 function AdminPanel() {
@@ -11,25 +12,18 @@ function AdminPanel() {
   const [password, setPassword] = useState("");
   const [newRole, setNewRole] = useState("participant");
 
-  const token = localStorage.getItem("access_token");
   const currentRole = localStorage.getItem("role");
 
   if (currentRole !== "admin") {
-    return <div>Нет доступа</div>;
+    return <div className="page-container">Нет доступа</div>;
   }
 
   const loadUsers = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/admin/users", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      const data = await res.json();
-      setUsers(data);
+      const data = await adminApi.getUsers();
+      setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to load users:", err);
     } finally {
       setLoading(false);
     }
@@ -39,57 +33,34 @@ function AdminPanel() {
     loadUsers();
   }, []);
 
-  // создание пользователя
   const handleCreateUser = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/admin/users", {
-      method: "POST",
-      headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+      await adminApi.createUser({
         email,
         nickname,
         password,
         role: newRole
-        })
       });
-      
 
-      if (!res.ok) {
-        const err = await res.json();
-        console.log(err);
-        alert("Ошибка создания пользователя");
-        return;
-      }
-
-      // очистка формы
       setEmail("");
       setNickname("");
       setPassword("");
       setNewRole("participant");
-
       loadUsers();
 
     } catch (err) {
-      console.error(err);
+      console.error("Create user error:", err);
+      alert(err.message || "Ошибка создания пользователя");
     }
   };
 
-  //  смена роли
-  const changeRole = async (userId, newRole) => {
+  const changeRole = async (userId, role) => {
     try {
-      await fetch(`http://127.0.0.1:8000/admin/users/${userId}/role?role=${newRole}`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
+      await adminApi.changeRole(userId, role);
       loadUsers();
     } catch (err) {
-      console.error(err);
+      console.error("Change role error:", err);
+      alert(err.message || "Ошибка изменения роли");
     }
   };
 
@@ -99,7 +70,6 @@ function AdminPanel() {
 
       <div className="page-layout">
 
-  
         <h2 className="page-title">Админ панель</h2>
 
         {/* Форма создания */}
@@ -130,14 +100,14 @@ function AdminPanel() {
             />
            
             <select
-                className="input-field"
-                value={newRole}
-                onChange={(e) => setNewRole(e.target.value)}
-                >
-                <option value="participant">Participant</option>
-                <option value="organizer">Organizer</option>
-                <option value="admin">Admin</option>
-                </select>
+              className="input-field"
+              value={newRole}
+              onChange={(e) => setNewRole(e.target.value)}
+            >
+              <option value="participant">Participant</option>
+              <option value="organizer">Organizer</option>
+              <option value="admin">Admin</option>
+            </select>
           </div>
 
           <button
@@ -149,7 +119,7 @@ function AdminPanel() {
           </button>
         </div>
 
-        {/*  Таблица пользователей */}
+        {/* Таблица пользователей */}
         <div className="block" style={{ marginTop: "20px" }}>
           <h3>Пользователи</h3>
 
@@ -178,9 +148,7 @@ function AdminPanel() {
                       <select
                         className="input-field"
                         value={u.role}
-                        onChange={(e) =>
-                          changeRole(u.id, e.target.value)
-                        }
+                        onChange={(e) => changeRole(u.id, e.target.value)}
                       >
                         <option value="participant">participant</option>
                         <option value="organizer">organizer</option>

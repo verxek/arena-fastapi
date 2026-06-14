@@ -10,3 +10,4 @@ export const usersApi = {
     body: JSON.stringify(data),
   }),
 };
+

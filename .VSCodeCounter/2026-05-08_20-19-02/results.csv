@@ -1,0 +1,142 @@
+"filename", "language", "JSON", "pip requirements", "Python", "PostCSS", "JavaScript", "JavaScript JSX", "Ini", "HTML", "XML", "Markdown", "comment", "blank", "total"
+"d:\vscodeProjects\arena-fastapi\alembic.ini", "Ini", 0, 0, 0, 0, 0, 0, 123, 0, 0, 0, 0, 27, 150
+"d:\vscodeProjects\arena-fastapi\alembic\env.py", "Python", 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 1, 5, 39
+"d:\vscodeProjects\arena-fastapi\alembic\versions\14cc2b6241d1_change_contest_duration_to_interval.py", "Python", 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 9, 8, 40
+"d:\vscodeProjects\arena-fastapi\alembic\versions\154a09fc8b90_add_task_formats_and_examples.py", "Python", 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 14, 8, 37
+"d:\vscodeProjects\arena-fastapi\alembic\versions\20a76f6bfbbd_update_refresh_token.py", "Python", 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 14, 7, 39
+"d:\vscodeProjects\arena-fastapi\alembic\versions\2666a1d2893d_add_user_role_enum.py", "Python", 0, 0, 39, 0, 0, 0, 0, 0, 0, 0, 8, 14, 61
+"d:\vscodeProjects\arena-fastapi\alembic\versions\365141da0201_add_task_business_logic.py", "Python", 0, 0, 188, 0, 0, 0, 0, 0, 0, 0, 16, 22, 226
+"d:\vscodeProjects\arena-fastapi\alembic\versions\3a5535ff9bf8_set_default_points_by_difficulty.py", "Python", 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 10, 26, 83
+"d:\vscodeProjects\arena-fastapi\alembic\versions\4bc29189a46a_change_duration_to_integer_minutes.py", "Python", 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 10, 9, 44
+"d:\vscodeProjects\arena-fastapi\alembic\versions\4ec22bd48818_add_sandbox_structures.py", "Python", 0, 0, 81, 0, 0, 0, 0, 0, 0, 0, 11, 16, 108
+"d:\vscodeProjects\arena-fastapi\alembic\versions\4ff3cdc93c91_change_task_status_default.py", "Python", 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 11, 9, 42
+"d:\vscodeProjects\arena-fastapi\alembic\versions\51f2c9ee33bb_add_contest_user_structures.py", "Python", 0, 0, 114, 0, 0, 0, 0, 0, 0, 0, 16, 17, 147
+"d:\vscodeProjects\arena-fastapi\alembic\versions\5e5918ce4ac4_add_many_sandboxes_per_one_solution.py", "Python", 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 14, 7, 54
+"d:\vscodeProjects\arena-fastapi\alembic\versions\76c8aeeeae60_add_contest_task_structures.py", "Python", 0, 0, 124, 0, 0, 0, 0, 0, 0, 0, 13, 18, 155
+"d:\vscodeProjects\arena-fastapi\alembic\versions\809f83b210bb_added_points_to_task.py", "Python", 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 14, 8, 41
+"d:\vscodeProjects\arena-fastapi\alembic\versions\970c436f43d3_add_task_ready_status.py", "Python", 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 14, 8, 33
+"d:\vscodeProjects\arena-fastapi\alembic\versions\9cfa7421329f_populate_reference_data.py", "Python", 0, 0, 112, 0, 0, 0, 0, 0, 0, 0, 16, 20, 148
+"d:\vscodeProjects\arena-fastapi\alembic\versions\b3713b96323a_add_solution_structures.py", "Python", 0, 0, 117, 0, 0, 0, 0, 0, 0, 0, 11, 15, 143
+"d:\vscodeProjects\arena-fastapi\alembic\versions\d87686434be7_add_refresh_token.py", "Python", 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 14, 8, 41
+"d:\vscodeProjects\arena-fastapi\alembic\versions\d9bc72401ac6_add_contest_structures.py", "Python", 0, 0, 242, 0, 0, 0, 0, 0, 0, 0, 20, 28, 290
+"d:\vscodeProjects\arena-fastapi\alembic\versions\eeaa26a3abcc_add_user_triggers_procedures_views.py", "Python", 0, 0, 240, 0, 0, 0, 0, 0, 0, 0, 23, 23, 286
+"d:\vscodeProjects\arena-fastapi\alembic\versions\f691882dbdf6_add_unique_to_nickname.py", "Python", 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 14, 8, 35
+"d:\vscodeProjects\arena-fastapi\backend\__init__.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"d:\vscodeProjects\arena-fastapi\backend\app\__init__.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"d:\vscodeProjects\arena-fastapi\backend\app\config.py", "Python", 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 3, 19
+"d:\vscodeProjects\arena-fastapi\backend\app\core\security.py", "Python", 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 5, 17, 54
+"d:\vscodeProjects\arena-fastapi\backend\app\database.py", "Python", 0, 0, 63, 0, 0, 0, 0, 0, 0, 0, 7, 13, 83
+"d:\vscodeProjects\arena-fastapi\backend\app\dependencies\auth.py", "Python", 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 1, 10, 54
+"d:\vscodeProjects\arena-fastapi\backend\app\main.py", "Python", 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 12, 52
+"d:\vscodeProjects\arena-fastapi\backend\app\models\__init__.py", "Python", 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 2, 15
+"d:\vscodeProjects\arena-fastapi\backend\app\models\contest.py", "Python", 0, 0, 85, 0, 0, 0, 0, 0, 0, 0, 8, 16, 109
+"d:\vscodeProjects\arena-fastapi\backend\app\models\contest_task.py", "Python", 0, 0, 51, 0, 0, 0, 0, 0, 0, 0, 7, 13, 71
+"d:\vscodeProjects\arena-fastapi\backend\app\models\contest_user.py", "Python", 0, 0, 45, 0, 0, 0, 0, 0, 0, 0, 6, 11, 62
+"d:\vscodeProjects\arena-fastapi\backend\app\models\dictionaries.py", "Python", 0, 0, 127, 0, 0, 0, 0, 0, 0, 0, 27, 55, 209
+"d:\vscodeProjects\arena-fastapi\backend\app\models\password_reset.py", "Python", 0, 0, 39, 0, 0, 0, 0, 0, 0, 0, 12, 13, 64
+"d:\vscodeProjects\arena-fastapi\backend\app\models\refresh_token.py", "Python", 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 3, 12
+"d:\vscodeProjects\arena-fastapi\backend\app\models\sandbox.py", "Python", 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 7, 15, 78
+"d:\vscodeProjects\arena-fastapi\backend\app\models\session.py", "Python", 0, 0, 45, 0, 0, 0, 0, 0, 0, 0, 14, 12, 71
+"d:\vscodeProjects\arena-fastapi\backend\app\models\solution.py", "Python", 0, 0, 77, 0, 0, 0, 0, 0, 0, 0, 10, 14, 101
+"d:\vscodeProjects\arena-fastapi\backend\app\models\task.py", "Python", 0, 0, 80, 0, 0, 0, 0, 0, 0, 0, 6, 16, 102
+"d:\vscodeProjects\arena-fastapi\backend\app\models\user.py", "Python", 0, 0, 106, 0, 0, 0, 0, 0, 0, 0, 13, 24, 143
+"d:\vscodeProjects\arena-fastapi\backend\app\repositories\__init__.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"d:\vscodeProjects\arena-fastapi\backend\app\repositories\base.py", "Python", 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 2, 6
+"d:\vscodeProjects\arena-fastapi\backend\app\repositories\contest.py", "Python", 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 6, 24
+"d:\vscodeProjects\arena-fastapi\backend\app\repositories\contest_task.py", "Python", 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 6, 26
+"d:\vscodeProjects\arena-fastapi\backend\app\repositories\solution.py", "Python", 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 6, 35
+"d:\vscodeProjects\arena-fastapi\backend\app\repositories\task.py", "Python", 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 10, 39
+"d:\vscodeProjects\arena-fastapi\backend\app\repositories\user.py", "Python", 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 8, 39
+"d:\vscodeProjects\arena-fastapi\backend\app\routes\admin.py", "Python", 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 5, 39
+"d:\vscodeProjects\arena-fastapi\backend\app\routes\auth.py", "Python", 0, 0, 80, 0, 0, 0, 0, 0, 0, 0, 0, 22, 102
+"d:\vscodeProjects\arena-fastapi\backend\app\routes\contests.py", "Python", 0, 0, 119, 0, 0, 0, 0, 0, 0, 0, 1, 32, 152
+"d:\vscodeProjects\arena-fastapi\backend\app\routes\solution.py", "Python", 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 9, 53
+"d:\vscodeProjects\arena-fastapi\backend\app\routes\tasks.py", "Python", 0, 0, 111, 0, 0, 0, 0, 0, 0, 0, 1, 15, 127
+"d:\vscodeProjects\arena-fastapi\backend\app\routes\users.py", "Python", 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 2, 20
+"d:\vscodeProjects\arena-fastapi\backend\app\scheduler\scheduler.py", "Python", 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 13, 42
+"d:\vscodeProjects\arena-fastapi\backend\app\schemas\__init__.py", "Python", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5
+"d:\vscodeProjects\arena-fastapi\backend\app\schemas\auth.py", "Python", 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 11, 35
+"d:\vscodeProjects\arena-fastapi\backend\app\schemas\contest.py", "Python", 0, 0, 59, 0, 0, 0, 0, 0, 0, 0, 0, 11, 70
+"d:\vscodeProjects\arena-fastapi\backend\app\schemas\solution.py", "Python", 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 5, 19
+"d:\vscodeProjects\arena-fastapi\backend\app\schemas\task.py", "Python", 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 1, 8, 46
+"d:\vscodeProjects\arena-fastapi\backend\app\schemas\user.py", "Python", 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 10, 33
+"d:\vscodeProjects\arena-fastapi\backend\app\services\admin_service.py", "Python", 0, 0, 54, 0, 0, 0, 0, 0, 0, 0, 2, 20, 76
+"d:\vscodeProjects\arena-fastapi\backend\app\services\auth.py", "Python", 0, 0, 105, 0, 0, 0, 0, 0, 0, 0, 0, 28, 133
+"d:\vscodeProjects\arena-fastapi\backend\app\services\contest_service.py", "Python", 0, 0, 186, 0, 0, 0, 0, 0, 0, 0, 7, 74, 267
+"d:\vscodeProjects\arena-fastapi\backend\app\services\scoring.py", "Python", 0, 0, 82, 0, 0, 0, 0, 0, 0, 0, 31, 27, 140
+"d:\vscodeProjects\arena-fastapi\backend\app\services\solution_service.py", "Python", 0, 0, 89, 0, 0, 0, 0, 0, 0, 0, 3, 28, 120
+"d:\vscodeProjects\arena-fastapi\backend\app\services\task_service.py", "Python", 0, 0, 179, 0, 0, 0, 0, 0, 0, 0, 11, 46, 236
+"d:\vscodeProjects\arena-fastapi\backend\app\services\user_service.py", "Python", 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 5, 19
+"d:\vscodeProjects\arena-fastapi\backend\app\services\verification_service.py", "Python", 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 1, 19, 61
+"d:\vscodeProjects\arena-fastapi\backend\app\worker\__init__.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"d:\vscodeProjects\arena-fastapi\backend\app\worker\cache.py", "Python", 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2
+"d:\vscodeProjects\arena-fastapi\backend\app\worker\celery_app.py", "Python", 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 5, 17
+"d:\vscodeProjects\arena-fastapi\backend\app\worker\executor.py", "Python", 0, 0, 92, 0, 0, 0, 0, 0, 0, 0, 12, 29, 133
+"d:\vscodeProjects\arena-fastapi\backend\app\worker\executor_docker.py", "Python", 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 9, 14, 79
+"d:\vscodeProjects\arena-fastapi\backend\app\worker\paths.py", "Python", 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 8, 28
+"d:\vscodeProjects\arena-fastapi\backend\app\worker\redis_client.py", "Python", 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8
+"d:\vscodeProjects\arena-fastapi\backend\app\worker\tasks.py", "Python", 0, 0, 204, 0, 0, 0, 0, 0, 0, 0, 51, 64, 319
+"d:\vscodeProjects\arena-fastapi\backend\app\worker\utils.py", "Python", 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5
+"d:\vscodeProjects\arena-fastapi\backend\scripts\create_org.py", "Python", 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 14, 13, 77
+"d:\vscodeProjects\arena-fastapi\backend\scripts\init_db.py", "Python", 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 6, 25
+"d:\vscodeProjects\arena-fastapi\backend\scripts\test_business_logic.py", "Python", 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 5, 6, 35
+"d:\vscodeProjects\arena-fastapi\backend\scripts\test_contest_structures.py", "Python", 0, 0, 170, 0, 0, 0, 0, 0, 0, 0, 19, 42, 231
+"d:\vscodeProjects\arena-fastapi\backend\scripts\test_contest_task_structures.py", "Python", 0, 0, 177, 0, 0, 0, 0, 0, 0, 0, 20, 36, 233
+"d:\vscodeProjects\arena-fastapi\backend\scripts\test_contest_user_structures.py", "Python", 0, 0, 175, 0, 0, 0, 0, 0, 0, 0, 13, 37, 225
+"d:\vscodeProjects\arena-fastapi\backend\scripts\test_solution_sandbox_structures.py", "Python", 0, 0, 168, 0, 0, 0, 0, 0, 0, 0, 26, 39, 233
+"d:\vscodeProjects\arena-fastapi\backend\scripts\test_task_structures.py", "Python", 0, 0, 179, 0, 0, 0, 0, 0, 0, 0, 16, 33, 228
+"d:\vscodeProjects\arena-fastapi\frontend\README.md", "Markdown", 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 8, 17
+"d:\vscodeProjects\arena-fastapi\frontend\eslint.config.js", "JavaScript", 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 2, 30
+"d:\vscodeProjects\arena-fastapi\frontend\index.html", "HTML", 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 1, 14
+"d:\vscodeProjects\arena-fastapi\frontend\package-lock.json", "JSON", 2978, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2979
+"d:\vscodeProjects\arena-fastapi\frontend\package.json", "JSON", 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 29
+"d:\vscodeProjects\arena-fastapi\frontend\public\vite.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1
+"d:\vscodeProjects\arena-fastapi\frontend\src\App.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 7, 47
+"d:\vscodeProjects\arena-fastapi\frontend\src\api\admin.js", "JavaScript", 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 3, 15
+"d:\vscodeProjects\arena-fastapi\frontend\src\api\auth.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 11, 6, 42
+"d:\vscodeProjects\arena-fastapi\frontend\src\api\client.js", "JavaScript", 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 1, 8, 30
+"d:\vscodeProjects\arena-fastapi\frontend\src\api\contests.js", "JavaScript", 0, 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 11, 48
+"d:\vscodeProjects\arena-fastapi\frontend\src\api\solutions.js", "JavaScript", 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 4, 23
+"d:\vscodeProjects\arena-fastapi\frontend\src\api\tasks.js", "JavaScript", 0, 0, 0, 0, 45, 0, 0, 0, 0, 0, 6, 13, 64
+"d:\vscodeProjects\arena-fastapi\frontend\src\api\users.js", "JavaScript", 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 5, 14
+"d:\vscodeProjects\arena-fastapi\frontend\src\assets\icons.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 3, 35
+"d:\vscodeProjects\arena-fastapi\frontend\src\assets\react.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\ContestCard.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 121, 0, 0, 0, 0, 3, 21, 145
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\LoginModal.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 110, 0, 0, 0, 0, 2, 21, 133
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\Modal.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 1, 5, 75
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\Navbar.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 149, 0, 0, 0, 0, 5, 17, 171
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\ProtectedRoute.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 5, 14
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\RatingTab.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 82, 0, 0, 0, 0, 2, 9, 93
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\RegisterContestModal.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 85, 0, 0, 0, 0, 0, 14, 99
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\RegisterModal.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 258, 0, 0, 0, 0, 2, 29, 289
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\SubmissionsTab.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 7, 73
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\SubmitModal.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 80, 0, 0, 0, 0, 0, 14, 94
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\SubmitTab.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 148, 0, 0, 0, 0, 6, 21, 175
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\TaskItem.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 75, 0, 0, 0, 0, 0, 9, 84
+"d:\vscodeProjects\arena-fastapi\frontend\src\components\TasksTab.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 1, 12, 116
+"d:\vscodeProjects\arena-fastapi\frontend\src\hooks\useAuth.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"d:\vscodeProjects\arena-fastapi\frontend\src\index.css", "PostCSS", 0, 0, 0, 70, 0, 0, 0, 0, 0, 0, 1, 10, 81
+"d:\vscodeProjects\arena-fastapi\frontend\src\layouts\MainLayout.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"d:\vscodeProjects\arena-fastapi\frontend\src\main.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 2, 12
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\AdminPanel.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 144, 0, 0, 0, 0, 2, 24, 170
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\Archive.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 167, 0, 0, 0, 0, 6, 28, 201
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\ContestMenu.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 184, 0, 0, 0, 0, 4, 36, 224
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\Contests.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 167, 0, 0, 0, 0, 3, 29, 199
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\CreateContest.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 404, 0, 0, 0, 0, 16, 50, 470
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\CreateTask.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 282, 0, 0, 0, 0, 14, 33, 329
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\Drafts.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 8, 68
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\EditTask.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 191, 0, 0, 0, 0, 13, 42, 246
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\Home.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 131, 0, 0, 0, 0, 4, 20, 155
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\MySubmissions.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 106, 0, 0, 0, 0, 3, 15, 124
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\OrganizerHome.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 137, 0, 0, 0, 0, 3, 23, 163
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\Profile.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 108, 0, 0, 0, 0, 3, 20, 131
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\StudentHome.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 131, 0, 0, 0, 0, 3, 23, 157
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\Task.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 107, 0, 0, 0, 0, 4, 21, 132
+"d:\vscodeProjects\arena-fastapi\frontend\src\pages\Tasks.jsx", "JavaScript JSX", 0, 0, 0, 0, 0, 157, 0, 0, 0, 0, 3, 36, 196
+"d:\vscodeProjects\arena-fastapi\frontend\src\styles\global.css", "PostCSS", 0, 0, 0, 949, 0, 0, 0, 0, 0, 0, 38, 208, 1195
+"d:\vscodeProjects\arena-fastapi\frontend\src\utils\contestUtils.js", "JavaScript", 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 36, 16, 101
+"d:\vscodeProjects\arena-fastapi\frontend\vite.config.js", "JavaScript", 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 1, 2, 8
+"d:\vscodeProjects\arena-fastapi\package-lock.json", "JSON", 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 32
+"d:\vscodeProjects\arena-fastapi\package.json", "JSON", 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6
+"d:\vscodeProjects\arena-fastapi\requirements.txt", "pip requirements", 0, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 39
+"Total", "-", 3042, 39, 5299, 1019, 225, 3938, 123, 13, 2, 9, 836, 2233, 16778

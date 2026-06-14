@@ -1,5 +1,3 @@
-// frontend/src/utils/contestUtils.js
-
 /**
  * Вычисляет время окончания контеста
  * @param {Object} contest - Объект контеста

@@ -1,8 +1,8 @@
-// frontend/src/pages/CreateTask.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { MdDelete} from "react-icons/md";
+import { MdDelete } from "react-icons/md";
+import { tasksApi } from "../api/tasks";
 
 function CreateTask() {
   const navigate = useNavigate();
@@ -32,19 +32,21 @@ function CreateTask() {
   ]);
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    fetch("http://127.0.0.1:8000/tasks/categories", { headers: { Authorization: `Bearer ${token}` } })
-      .then(res => res.json())
-      .then(data => setCategories(data))
-      .catch(err => console.error(err));
-
-    fetch("http://127.0.0.1:8000/tasks/difficulties", { headers: { Authorization: `Bearer ${token}` } })
-      .then(res => res.json())
-      .then(data => setDifficulties(data))
-      .catch(err => console.error(err));
+    const loadReferences = async () => {
+      try {
+        const [cats, diffs] = await Promise.all([
+          tasksApi.getCategories(),
+          tasksApi.getDifficulties()
+        ]);
+        setCategories(cats);
+        setDifficulties(diffs);
+      } catch (err) {
+        console.error("Failed to load references:", err);
+      }
+    };
+    loadReferences();
   }, []);
 
-  // Функции управления примерами
   const addExample = () => setExamples([...examples, { input: "", output: "" }]);
   const removeExample = (index) => {
     const newExamples = examples.filter((_, i) => i !== index);
@@ -58,10 +60,13 @@ function CreateTask() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!testsFile || !solutionFile) { alert("Загрузите файлы!"); return; }
+    if (!testsFile || !solutionFile) { 
+      alert("Загрузите файлы!"); 
+      return; 
+    }
     
     setLoading(true);
-    const token = localStorage.getItem("access_token");
+    
     const data = new FormData();
     
     Object.keys(formData).forEach(key => {
@@ -69,30 +74,22 @@ function CreateTask() {
       data.append(key, formData[key]);
     });
 
-
     const visibility = !formData.is_contest_task;
     data.append("is_contest_task", formData.is_contest_task);
     data.append("make_visible_after", formData.make_visible_after_contest);
-
     data.append("examples_json", JSON.stringify(examples));
     data.append("tests_file", testsFile);
     data.append("solution_file", solutionFile);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/tasks/", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: data
-      });
-      if (res.ok) {
-        alert("Задача создана!");
-        navigate("/tasks");
-      } else {
-        const err = await res.json();
-        alert(`Ошибка: ${err.detail}`);
-      }
+      const res = await tasksApi.createWithFiles(data);
+      
+      alert("Задача создана!");
+      navigate("/tasks");
+      
     } catch (err) {
-      alert("Ошибка сети");
+      console.error("Create task error:", err);
+      alert(`Ошибка: ${err.message || "Не удалось создать задачу"}`);
     } finally {
       setLoading(false);
     }
@@ -181,8 +178,7 @@ function CreateTask() {
             </div>
           </div>
 
-          
-
+          {/* Настройки публикации */}
           <div className="form-group" style={{ 
             background: "#fff", padding: "20px", borderRadius: "8px", 
             border: "1px solid #e5e7eb", marginBottom: "20px" 
@@ -191,7 +187,7 @@ function CreateTask() {
               Настройки публикации задачи
             </label>
             
-            {/* Чекбокс 1: Для контеста */}
+            {/* Чекбокс: Для контеста */}
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "15px" }}>
               <input 
                 type="checkbox" 
@@ -212,6 +208,7 @@ function CreateTask() {
               </label>
             </div>
 
+            {/* Начальная стоимость */}
             <div className="form-group">
               <label className="label">Начальная стоимость (баллы)</label>
               <select
@@ -231,6 +228,7 @@ function CreateTask() {
               </p>
             </div>
 
+            {/* Чекбокс: Сделать видимой после контеста */}
             <div style={{ 
               display: "flex", alignItems: "center", gap: "10px", 
               opacity: formData.is_contest_task ? 1 : 0.5, 
@@ -241,7 +239,7 @@ function CreateTask() {
                 id="make_visible_after"
                 checked={formData.make_visible_after_contest}
                 onChange={(e) => setFormData({...formData, make_visible_after_contest: e.target.checked})}
-                disabled={!formData.is_contest_task} // Программная блокировка
+                disabled={!formData.is_contest_task}
                 style={{ width: "18px", height: "18px", cursor: formData.is_contest_task ? "pointer" : "not-allowed" }}
               />
               <label htmlFor="make_visible_after" style={{ fontWeight: "500", cursor: formData.is_contest_task ? "pointer" : "not-allowed", color: "#1f2739" }}>
@@ -256,7 +254,7 @@ function CreateTask() {
             </p>
           </div>
 
-          {/* Таблица примеров */}
+          {/* Примеры */}
           <div className="form-group">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
               <label className="label" style={{ margin: 0 }}>Примеры входных и выходных данных</label>
@@ -264,7 +262,7 @@ function CreateTask() {
                 + Добавить пример
               </button>
             </div>
-            {/* ... (код таблицы примеров остается без изменений) ... */}
+            
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
               {examples.map((ex, index) => (
                 <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '10px', alignItems: 'start', background: '#fff', padding: '15px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
@@ -277,16 +275,19 @@ function CreateTask() {
                     <textarea rows="3" className="input-field textarea" placeholder="Например: 15" value={ex.output} onChange={(e) => updateExample(index, 'output', e.target.value)} style={{ width: '100%', resize: 'vertical' }} />
                   </div>
                   <div style={{ paddingTop: '20px' }}>
-                    <button type="button" onClick={() => removeExample(index)} disabled={examples.length === 1} style={{ background: examples.length === 1 ? '#f3f4f6' : '#fee2e2', color: examples.length === 1 ? '#9ca3af' : '#ef4444', border: 'none', borderRadius: '6px', width: '32px', height: '32px', cursor: examples.length === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }} title="Удалить пример"><MdDelete color="#0e0e0e"/></button>
+                    <button type="button" onClick={() => removeExample(index)} disabled={examples.length === 1} style={{ background: examples.length === 1 ? '#f3f4f6' : '#fee2e2', color: examples.length === 1 ? '#9ca3af' : '#ef4444', border: 'none', borderRadius: '6px', width: '32px', height: '32px', cursor: examples.length === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }} title="Удалить пример">
+                      <MdDelete color="#0e0e0e"/>
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Файлы (с кнопками удаления) */}
+          {/* Файлы */}
           <div className="form-group file-section">
             <label className="label">Файлы</label>
+            
             {/* Архив с тестами */}
             <div className="file-input-group" style={{ position: 'relative', marginBottom: '15px' }}>
               <span className="file-hint">Архив с тестами (.zip с файлами .in)</span>
@@ -298,6 +299,7 @@ function CreateTask() {
               </div>
               {testsFile && <div style={{ fontSize: '13px', color: '#1f2739', marginTop: '4px', marginLeft: '2px' }}>Выбран: <strong>{testsFile.name}</strong></div>}
             </div>
+            
             {/* Решение */}
             <div className="file-input-group" style={{ position: 'relative' }}>
               <span className="file-hint">Эталонное решение (.py или .cpp)</span>

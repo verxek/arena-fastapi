@@ -1,21 +1,22 @@
-// frontend/src/pages/OrganizerHome.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ContestCard from "../components/ContestCard";
-import "../styles/global.css";
 import { getFinishedContests, getActiveAndUpcomingContests } from "../utils/contestUtils";
+import { contestsApi } from "../api/contests";
+import { usersApi } from "../api/users";
+import "../styles/global.css";
 
 function OrganizerHome() {
   const navigate = useNavigate();
   const [allContests, setAllContests] = useState([]);
   const [userStats, setUserStats] = useState({ tasks: 0, contests: 0 });
   const [loading, setLoading] = useState(true);
-  const isAuth = !!localStorage.getItem("access_token");
   
   const token = localStorage.getItem("access_token");
   const userId = localStorage.getItem("user_id");
   const role = "organizer";
+  const isAuth = !!token;
 
   useEffect(() => {
     if (!token) { 
@@ -25,37 +26,15 @@ function OrganizerHome() {
 
     const loadData = async () => {
       try {
-        const userRes = await fetch("http://127.0.0.1:8000/users/me", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (!userRes.ok) {
-          if (userRes.status === 401) {
-            localStorage.clear();
-            navigate("/login");
-            return;
-          }
-          throw new Error(`Ошибка пользователя: ${userRes.status}`);
-        }
-
-        const user = await userRes.json();
-      
+        const user = await usersApi.getCurrent();
+        
         setUserStats({
           tasks: user.authored_tasks_count || 0,
           contests: user.organized_contests_count || 0
         });
 
-        const contestsRes = await fetch("http://127.0.0.1:8000/contests/", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const data = await contestsApi.getAll();
 
-        if (!contestsRes.ok) {
-          throw new Error(`Ошибка контестов: ${contestsRes.status}`);
-        }
-
-        const data = await contestsRes.json();
-
-        // Убеждаемся, что данные - это массив
         if (Array.isArray(data)) {
           setAllContests(data);
         } else {
@@ -65,6 +44,11 @@ function OrganizerHome() {
 
       } catch (err) {
         console.error("Ошибка при загрузке:", err);
+        
+        if (err.message?.includes("401")) {
+          localStorage.clear();
+          navigate("/login");
+        }
       } finally {
         setLoading(false);
       }
@@ -75,8 +59,8 @@ function OrganizerHome() {
 
   const safeContests = Array.isArray(allContests) ? allContests : [];
   
-  const finished = getFinishedContests(allContests);
-  const activeAndUpcoming = getActiveAndUpcomingContests(allContests);
+  const finished = getFinishedContests(safeContests);
+  const activeAndUpcoming = getActiveAndUpcomingContests(safeContests);
 
   const handleAction = (contest) => {
     if (contest.is_finished) navigate(`/contests/${contest.contest_id}`);
@@ -118,7 +102,9 @@ function OrganizerHome() {
           <div className="section-header">
             <h1 className="page-title">Доступные контесты</h1>
             <div style={{ display: "flex", gap: "8px" }}>
-              <button onClick={() => navigate("/contests/create")} className="btn btn-primary" > + Создать</button>
+              <button onClick={() => navigate("/contests/create")} className="btn btn-primary">
+                + Создать
+              </button>
             </div>
           </div>
           
@@ -128,7 +114,13 @@ function OrganizerHome() {
             ) : (
               activeAndUpcoming.map(c => (
                 <div key={c.contest_id} className="card-wrapper">
-                  <ContestCard contest={c} userRole={role} isAuthor={c.author_id == userId}  isAuth={isAuth}  onAction={handleAction} />
+                  <ContestCard 
+                    contest={c} 
+                    userRole={role} 
+                    isAuthor={c.author_id == userId}
+                    isAuth={isAuth}
+                    onAction={handleAction} 
+                  />
                 </div>
               ))
             )}
@@ -139,7 +131,9 @@ function OrganizerHome() {
         <div className="section">
           <div className="section-header">
             <h2 className="page-title">Завершенные контесты</h2>
-            <span className="archive-link" onClick={() => navigate("/archive")}>Перейти к архиву &rarr;</span>
+            <span className="archive-link" onClick={() => navigate("/archive")}>
+              Перейти к архиву &rarr;
+            </span>
           </div>
           
           <div className="cards-row">
@@ -148,7 +142,13 @@ function OrganizerHome() {
             ) : (
               finished.map(c => (
                 <div key={c.contest_id} className="card-wrapper">
-                  <ContestCard contest={c} userRole={role} isAuthor={c.author_id == userId} isAuth={isAuth}  onAction={handleAction} />
+                  <ContestCard 
+                    contest={c} 
+                    userRole={role} 
+                    isAuthor={c.author_id == userId}
+                    isAuth={isAuth}
+                    onAction={handleAction} 
+                  />
                 </div>
               ))
             )}
@@ -159,6 +159,5 @@ function OrganizerHome() {
     </div>
   );
 }
-
 
 export default OrganizerHome;

@@ -1,7 +1,7 @@
-// frontend/src/components/SubmitTab.jsx
 import { useState } from "react";
+import { solutionsApi } from "../api/solutions";
 
-const SubmitTab = ({ tasks, token, onSubmitted }) => {
+const SubmitTab = ({ tasks, onSubmitted }) => {
   const [localFile, setLocalFile] = useState(null);
   const [localSelectedTask, setLocalSelectedTask] = useState("");
   const [localSelectedLang, setLocalSelectedLang] = useState("");
@@ -11,7 +11,6 @@ const SubmitTab = ({ tasks, token, onSubmitted }) => {
   const handleSubmit = async () => {
     setError("");
     
-    // Валидация
     if (!localFile) {
       setError("Выберите файл с решением");
       return;
@@ -26,38 +25,28 @@ const SubmitTab = ({ tasks, token, onSubmitted }) => {
     }
 
     setSubmitting(true);
+    
     const formData = new FormData();
     formData.append("task_id", localSelectedTask);
     formData.append("language_id", localSelectedLang);
     formData.append("file", localFile);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/solutions/submit", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData
-      });
-
-      if (res.ok) {
-        // Успех
-        alert("Решение отправлено");
-        
-        // Сброс формы
-        setLocalFile(null);
-        setLocalSelectedTask("");
-        setLocalSelectedLang("");
-        const input = document.getElementById('solution-file-submit');
-        if (input) input.value = '';
-        
-        // Уведомляем родителя
-        onSubmitted?.();
-      } else {
-        const errorData = await res.json().catch(() => ({}));
-        setError(errorData.detail || `Ошибка: ${res.statusText}`);
-      }
+      await solutionsApi.submit(formData);
+      
+      alert("Решение отправлено");
+      
+      setLocalFile(null);
+      setLocalSelectedTask("");
+      setLocalSelectedLang("");
+      const input = document.getElementById('solution-file-submit');
+      if (input) input.value = '';
+      
+      onSubmitted?.();
+      
     } catch (err) {
       console.error("Submit error:", err);
-      setError("Ошибка сети. Проверьте подключение.");
+      setError(err.message || "Ошибка сети. Проверьте подключение.");
     } finally {
       setSubmitting(false);
     }
@@ -112,7 +101,7 @@ const SubmitTab = ({ tasks, token, onSubmitted }) => {
           </select>
         </div>
 
-        {/* Выбор файла (в стиле CreateTask) */}
+        {/* Выбор файла */}
         <div className="form-group">
           <label className="label">Файл с решением:</label>
 

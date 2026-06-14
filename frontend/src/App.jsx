@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
-import Login from "./pages/Login"
 import Home from "./pages/Home"
 import StudentHome from "./pages/StudentHome"
 import OrganizerHome from "./pages/OrganizerHome"
@@ -26,7 +25,6 @@ function App() {
         <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
         <Route path="/tasks/create" element={<ProtectedRoute><CreateTask /></ProtectedRoute>} />
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
         <Route path="/archive" element={<ProtectedRoute><Archive /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /> </ProtectedRoute>} />
         <Route path="/student" element={<ProtectedRoute><StudentHome /></ProtectedRoute>}/>

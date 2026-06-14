@@ -1,32 +1,36 @@
 import { useState } from "react";
 import Modal from "./Modal";
+import { solutionsApi } from "../api/solutions";
 
 function SubmitModal({ task, isOpen, onClose }) {
   const [file, setFile] = useState(null);
   const [lang, setLang] = useState(1);
+  const [submitting, setSubmitting] = useState(false); 
 
   const submit = async () => {
-    const formData = new FormData();
+    if (!file) {
+      alert("Выберите файл с решением");
+      return;
+    }
 
+    setSubmitting(true);
+    
+    const formData = new FormData();
     formData.append("task_id", task.task_id);
     formData.append("language_id", lang);
     formData.append("file", file);
 
-    const token = localStorage.getItem("access_token");
-
     try {
-      await fetch("http://127.0.0.1:8000/solutions/submit", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: formData
-      });
+      await solutionsApi.submit(formData);
+      
+      alert("Решение отправлено");
+      onClose();
+      
     } catch (e) {
-      console.error(e);
-      alert("Ошибка отправки");
+      console.error("Submit error:", e);
+      alert(e.message || "Ошибка отправки");
     } finally {
-      onClose(); 
+      setSubmitting(false);
     }
   };
 
@@ -34,33 +38,51 @@ function SubmitModal({ task, isOpen, onClose }) {
     <Modal isOpen={isOpen} onClose={onClose} title="Отправка решения">
 
       <label>Язык</label>
-      <select onChange={(e) => setLang(e.target.value)} style={{ width: "100%", padding: "8px" }}>
+      <select 
+        onChange={(e) => setLang(e.target.value)} 
+        style={{ width: "100%", padding: "8px" }}
+        disabled={submitting}  
+      >
         <option value={1}>Python 3.8</option>
         <option value={2}>C++ 20</option>
       </select>
 
       <label style={{ marginTop: "10px", display: "block" }}>Файл</label>
-      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+      <input 
+        type="file" 
+        onChange={(e) => setFile(e.target.files[0])} 
+        disabled={submitting} 
+      />
 
       <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
-        <button onClick={submit} style={{
-          flex: 1,
-          padding: "10px",
-          background: "#111827",
-          color: "white",
-          border: "none",
-          borderRadius: "8px"
-        }}>
-          Отправить
+        <button 
+          onClick={submit} 
+          disabled={submitting}  
+          style={{
+            flex: 1,
+            padding: "10px",
+            background: submitting ? "#6b7280" : "#111827",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            cursor: submitting ? "not-allowed" : "pointer"
+          }}
+        >
+          {submitting ? "Отправка..." : "Отправить"}
         </button>
 
-        <button onClick={onClose} style={{
-          flex: 1,
-          padding: "10px",
-          background: "#e5e7eb",
-          border: "none",
-          borderRadius: "8px"
-        }}>
+        <button 
+          onClick={onClose} 
+          disabled={submitting}  
+          style={{
+            flex: 1,
+            padding: "10px",
+            background: "#e5e7eb",
+            border: "none",
+            borderRadius: "8px",
+            cursor: submitting ? "not-allowed" : "pointer"
+          }}
+        >
           Отмена
         </button>
       </div>

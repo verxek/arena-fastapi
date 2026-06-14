@@ -1,31 +1,26 @@
 import { useState } from "react";
+import { contestsApi } from "../api/contests";
 
 function RegisterContestModal({ contest, onClose, onSuccess }) {
   const [checked, setChecked] = useState(false);
-  const token = localStorage.getItem("access_token");
+  const [registering, setRegistering] = useState(false); 
 
   const handleRegister = async () => {
     if (!checked) return;
 
+    setRegistering(true);
+    
     try {
-      const res = await fetch(
-        `http://127.0.0.1:8000/contests/${contest.contest_id}/register`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
-      if (res.ok) {
-        onSuccess();
-        onClose();
-      } else {
-        alert("Ошибка регистрации");
-      }
+      await contestsApi.register(contest.contest_id);
+      
+      onSuccess();
+      onClose();
+      
     } catch (e) {
-      console.error(e);
+      console.error("Registration error:", e);
+      alert(e.message || "Ошибка регистрации");
+    } finally {
+      setRegistering(false);
     }
   };
 
@@ -49,23 +44,29 @@ function RegisterContestModal({ contest, onClose, onSuccess }) {
             type="checkbox"
             checked={checked}
             onChange={(e) => setChecked(e.target.checked)}
+            disabled={registering}  
           />
           Я согласен с правилами
         </label>
 
         <div style={styles.buttons}>
-          <button onClick={onClose}>Отмена</button>
+          <button 
+            onClick={onClose} 
+            disabled={registering} 
+          >
+            Отмена
+          </button>
 
           <button
             onClick={handleRegister}
-            disabled={!checked}
+            disabled={!checked || registering}  
             style={{
-              background: checked ? "#3b82f6" : "#e5e7eb",
-              color: checked ? "white" : "#9ca3af",
-              cursor: checked ? "pointer" : "not-allowed"
+              background: (!checked || registering) ? "#e5e7eb" : "#3b82f6",
+              color: (!checked || registering) ? "#9ca3af" : "white",
+              cursor: (!checked || registering) ? "not-allowed" : "pointer"
             }}
           >
-            Зарегистрироваться
+            {registering ? "Регистрация..." : "Зарегистрироваться"}
           </button>
         </div>
       </div>

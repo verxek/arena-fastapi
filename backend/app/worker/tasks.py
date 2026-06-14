@@ -1,8 +1,8 @@
 from backend.app.worker.celery_app import celery
 from backend.app.worker.executor import (
-    compile_cpp_container,
-    run_python_container,
-    run_cpp_container,
+    compile_cpp,    
+    run_python,       
+    run_cpp,          
     run_with_limits
 )
 
@@ -91,7 +91,7 @@ def _generate_task_tests(task_id: int, time_limit: int, memory_limit: int):
 
             if redis_client.set(key, "1", nx=True, ex=86400):
                 try:
-                    container = compile_cpp_container(
+                    container = compile_cpp(
                         code_path=f"/app/solutions/{os.path.basename(solution_cpp)}",
                         workdir=task_dir,
                         memory_limit_mb=max(memory_limit, 1024)
@@ -120,7 +120,7 @@ def _generate_task_tests(task_id: int, time_limit: int, memory_limit: int):
             if solution_file.endswith(".py"):
 
                 result = run_with_limits(
-                    run_python_container,
+                    run_python,
                     code_file=f"solutions/{os.path.basename(solution_file)}",
                     input_file=input_path,
                     workdir=task_dir,
@@ -131,7 +131,7 @@ def _generate_task_tests(task_id: int, time_limit: int, memory_limit: int):
             else:
 
                 result = run_with_limits(
-                    run_cpp_container,
+                    run_cpp,
                     input_file=in_file,
                     workdir=task_dir,
                     time_limit_ms=time_limit,
@@ -177,7 +177,7 @@ def run_solution(solution_id: int):
         run_with_limits,
         run_python,
         run_cpp,
-        compile_cpp_container
+        compile_cpp    
     )
 
     import os
@@ -209,14 +209,14 @@ def run_solution(solution_id: int):
         # =========================
         if not is_py:
             try:
-                container = compile_cpp_container(
+                container = compile_cpp(
                     code_path=f"/app/solutions/{file_name}",
                     workdir=base_dir,
                     memory_limit_mb=256
                 )
                 container.wait()
             except Exception:
-                solution.sol_state = 9  # Compilation Error
+                solution.sol_state = 9  
                 db.commit()
                 return
 

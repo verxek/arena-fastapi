@@ -1,23 +1,27 @@
 import { useState, useEffect } from "react";
+import { contestsApi } from "../api/contests";
 
-const RatingTab = ({ contestId, token, tasks }) => {
+const RatingTab = ({ contestId, tasks }) => {  
   const [rating, setRating] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!contestId || !token) return;
+    if (!contestId) return;  
 
-    fetch(`http://127.0.0.1:8000/contests/${contestId}/rating`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch rating");
-        return res.json();
-      })
-      .then((data) => setRating(Array.isArray(data) ? data : []))
-      .catch((err) => console.error("Rating error:", err))
-      .finally(() => setLoading(false));
-  }, [contestId, token]);
+    const fetchRating = async () => {
+      try {
+        const data = await contestsApi.getRating(contestId);
+        setRating(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Rating error:", err);
+        setRating([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRating();
+  }, [contestId]);  
 
   if (loading) {
     return <div className="empty-state">Загрузка рейтинга...</div>;
@@ -59,7 +63,7 @@ const RatingTab = ({ contestId, token, tasks }) => {
 
                 {/* Ячейки задач */}
                 {tasks?.map((task, idx) => {
-                  const stat = row.tasks[idx]; 
+                  const stat = row.tasks?.[idx]; 
                   return (
                     <td key={task.task_id} className="td" style={{ textAlign: "center" }}>
                       {stat?.score > 0 ? (

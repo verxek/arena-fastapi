@@ -1,16 +1,16 @@
-// frontend/src/pages/ContestMenu.jsx
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import "../styles/global.css";
-import { IoTimeOutline } from "react-icons/io5";
-import { TfiSave } from "react-icons/tfi";
+import { contestsApi } from "../api/contests";
+import { tasksApi } from "../api/tasks";
+import { solutionsApi } from "../api/solutions";
 import SubmitTab from "../components/SubmitTab";
 import SubmissionsTab from "../components/SubmissionsTab";
 import TasksTab from "../components/TasksTab";
 import RatingTab from "../components/RatingTab";
-
-
+import "../styles/global.css";
+import { IoTimeOutline } from "react-icons/io5";
+import { TfiSave } from "react-icons/tfi";
 
 function ContestMenu() {
   const { contest_id } = useParams();
@@ -23,15 +23,14 @@ function ContestMenu() {
   const [selectedTask, setSelectedTask] = useState("");  
   const [selectedLang, setSelectedLang] = useState(""); 
   const [file, setFile] = useState(null);
-  const [solutions, setSolutions] = useState([]);
   const isFinished = contest?.is_finished;
   const [openedTask, setOpenedTask] = useState(null);
   const [loadingTask, setLoadingTask] = useState(false);
 
-  
   const token = localStorage.getItem("access_token");
   const userId = localStorage.getItem("user_id");
   const isOrganizer = contest?.is_organizer;
+
   const handleSubmit = async () => {
     if (!file || !selectedTask || !selectedLang) {
       alert("Выберите задачу, язык и файл");
@@ -44,27 +43,16 @@ function ContestMenu() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/solutions/submit", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: formData
-      });
-
-      if (res.ok) {
-        alert("Решение отправлено");
-        // Опционально: сбросить форму
-        setFile(null);
-        setSelectedTask("");
-        setSelectedLang("");
-      } else {
-        const error = await res.json();
-        alert(`Ошибка: ${error.detail || "Неизвестная ошибка"}`);
-      }
+      await solutionsApi.submit(formData);
+      
+      alert("Решение отправлено");
+      setFile(null);
+      setSelectedTask("");
+      setSelectedLang("");
+      
     } catch (err) {
-      console.error(err);
-      alert("Ошибка сети");
+      console.error("Submit error:", err);
+      alert(`Ошибка: ${err.message || "Неизвестная ошибка"}`);
     }
   };
   
@@ -72,7 +60,6 @@ function ContestMenu() {
     if (!contest?.end_time) return;
 
     const endTime = new Date(contest.end_time).getTime();
-
     const interval = setInterval(() => {
       const now = new Date().getTime();
       const diff = endTime - now;
@@ -94,61 +81,43 @@ function ContestMenu() {
       );
     }, 1000);
 
-  return () => clearInterval(interval);
+    return () => clearInterval(interval);
   }, [contest]);
 
+  
   useEffect(() => {
     if (isFinished && (activeTab === "submit" || activeTab === "submissions")) {
       setActiveTab("tasks");
     }
-  }, [isFinished]);
+  }, [isFinished, activeTab]);
+
 
   const loadContestData = useCallback(async () => {
     try {
-      const contestRes = await fetch(`http://127.0.0.1:8000/contests/${contest_id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (!contestRes.ok) {
-        throw new Error(`Ошибка загрузки контеста: ${contestRes.status}`);
-      }
-
-      const contestData = await contestRes.json();
+      const contestData = await contestsApi.getById(contest_id);
       setContest(contestData);
 
       const taskIds = contestData.task_list || [];
-      console.log("Task IDs to load:", taskIds);
-      
       if (taskIds.length > 0) {
-        const params = new URLSearchParams();
-        taskIds.forEach(id => params.append('task_ids', String(id)));
-        
-        const tasksRes = await fetch(
-          `http://127.0.0.1:8000/tasks/batch?${params.toString()}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        
-        if (tasksRes.ok) {
-          const tasksData = await tasksRes.json();
-          console.log(" Loaded tasks:", tasksData);
-          setTasks(tasksData);
-        } else {
-          const error = await tasksRes.json();
-          console.error(" Tasks error:", error);
-        }
+        const tasksData = await tasksApi.getBatch(taskIds);
+        setTasks(Array.isArray(tasksData) ? tasksData : []);
       }
+      
     } catch (err) {
       console.error("Ошибка при загрузке:", err);
+      
+      if (err.message?.includes("404")) {
+        alert("Контест не найден");
+        navigate("/contests");
+      }
     } finally {
       setLoading(false);
     }
-  }, [contest_id, token]);  
+  }, [contest_id, navigate]);  
 
   useEffect(() => {
     loadContestData();
   }, [loadContestData]);
-  
-  
   
 
   if (loading) {
@@ -185,7 +154,6 @@ function ContestMenu() {
       {/* Вкладки */}
       <div className="contest-tabs-container">
         <div className="contest-tabs">
-
           <button
             className={`contest-tab ${activeTab === "tasks" ? "active-tab" : ""}`}
             onClick={() => setActiveTab("tasks")}
@@ -218,39 +186,26 @@ function ContestMenu() {
             Положение участников
           </button>
         </div>
+
         {/* Контент вкладок */}
         <div className="content">
-
           {activeTab === "tasks" && (
-            <TasksTab 
-              tasks={tasks} 
-              token={token} 
-            />
+            <TasksTab tasks={tasks} token={token} />
           )}
 
           {!isFinished && !isOrganizer && activeTab === "submit" && (
             <SubmitTab 
               tasks={tasks} 
-              token={token}
-              onSubmitted={() => {
-                console.log("Решение отправлено!");
-              }} 
+              onSubmitted={() => console.log("Решение отправлено!")} 
             />
           )}
 
           {!isFinished && activeTab === "submissions" && (
-            <SubmissionsTab 
-              contestId={contest_id}  
-              token={token}           
-            />
+            <SubmissionsTab contestId={contest_id}  />
           )}
 
           {activeTab === "rating" && (
-            <RatingTab 
-              contestId={contest_id} 
-              token={token} 
-              tasks={tasks} 
-            />
+            <RatingTab contestId={contest_id} tasks={tasks} />
           )}
         </div>
       </div>
@@ -263,10 +218,7 @@ function ContestMenu() {
         </div>
       )}
     </div>
-   
   );
 }
-
-
 
 export default ContestMenu;

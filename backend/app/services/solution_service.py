@@ -50,8 +50,14 @@ class SolutionService:
         result = await self.session.execute(
             select(Solution)
             .where(Solution.sol_user == user_id)
+            .options(
+                selectinload(Solution.state_rel),  
+                selectinload(Solution.task_rel),
+                selectinload(Solution.language_rel)
+            )
             .order_by(Solution.sol_created_at.desc())
         )
+
 
         solutions = result.scalars().all()
 

@@ -1,107 +1,91 @@
-// frontend/src/pages/CreateContest.jsx
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { useParams } from "react-router-dom";
+import { contestsApi } from "../api/contests";
+import { usersApi } from "../api/users";
 
 function CreateContest() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = Boolean(id);
-  // Состояния формы
+
+  // состояния формы
   const [contestName, setContestName] = useState("");
   const [startTime, setStartTime] = useState("");
   const [durationHours, setDurationHours] = useState(2);
-   const [durationMinutes, setDurationMinutes] = useState(0); 
+  const [durationMinutes, setDurationMinutes] = useState(0); 
   const [selectedTasks, setSelectedTasks] = useState([]);
   
-  // Состояния для выпадающего списка
+  // для выпадающего списка
   const [allTasks, setAllTasks] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState(null);
-
-  
-  
   const [contestData, setContestData] = useState(null);
 
-useEffect(() => {
-  if (!isEditMode) return;
+  // загрузка данных в режиме редактирования
+  useEffect(() => {
+    if (!isEditMode) return;
 
-  const token = localStorage.getItem("access_token");
+    const loadContest = async () => {
+      try {
+        const data = await contestsApi.getById(id);
+        setContestData(data); 
+        setContestName(data.contest_name);
 
-  fetch(`http://127.0.0.1:8000/contests/${id}`, {
-  headers: { Authorization: `Bearer ${token}` }
-})
-  .then(res => {
-  if (!res.ok) {
-    throw new Error("Ошибка загрузки контеста");
-  }
-  return res.json();
-})
-  .then(data => {
- 
+        const date = new Date(data.start_time);
+        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+          .toISOString()
+          .slice(0, 16);
+        setStartTime(localDate);
 
-  setContestData(data); 
+        const total = data.duration;
+        setDurationHours(Math.floor(total / 60));
+        setDurationMinutes(total % 60);
+      } catch (err) {
+        console.error("Ошибка загрузки контеста:", err);
+        alert("Не удалось загрузить данные контеста");
+      }
+    };
 
-  setContestName(data.contest_name);
+    loadContest();
+  }, [id, isEditMode]);
 
-  const date = new Date(data.start_time);
+  useEffect(() => {
+    if (!isEditMode || !contestData || allTasks.length === 0) return;
 
-  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, 16);
+    const matchedTasks = allTasks.filter(task =>
+      contestData.task_list?.includes(task.task_id)
+    );
+    setSelectedTasks(matchedTasks);
+  }, [contestData, allTasks, isEditMode]);
 
-  setStartTime(localDate);
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    const role = localStorage.getItem("role");
 
-  const total = data.duration; // минуты
+    if (!token || role !== "organizer") {
+      navigate("/login");
+      return;
+    }
 
-  setDurationHours(Math.floor(total / 60));
-  setDurationMinutes(total % 60);
-  });
-}, [id, isEditMode]);
+    const loadData = async () => {
+      try {
+        const user = await usersApi.getCurrent();
+        setUserId(user.user_id);
 
-useEffect(() => {
-  if (!isEditMode) return;
-  if (!contestData || allTasks.length === 0) return;
+        const tasks = await contestsApi.getAuthorTasks(user.user_id, true);
+        setAllTasks(Array.isArray(tasks) ? tasks : []);
+      } catch (err) {
+        console.error("Ошибка загрузки данных:", err);
+      }
+    };
 
-  const matchedTasks = allTasks.filter(task =>
-    contestData.task_list.includes(task.task_id)
-  );
+    loadData();
+  }, [navigate]);
 
-  setSelectedTasks(matchedTasks);
-}, [contestData, allTasks, isEditMode]);
-
-
-useEffect(() => {
-  const token = localStorage.getItem("access_token");
-  const role = localStorage.getItem("role");
-
-  if (!token || role !== "organizer") {
-    navigate("/login");
-    return;
-  }
-
-  fetch("http://127.0.0.1:8000/users/me", {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-    .then(res => res.json())
-    .then(user => {
-      setUserId(user.user_id);
-
-      return fetch(`http://127.0.0.1:8000/tasks?author_id=${user.user_id}&include_hidden=true`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-    })
-    .then(res => res.json())
-    .then(tasks => {
-      setAllTasks(tasks);
-    })
-    .catch(err => console.error("Ошибка загрузки задач:", err));
-
-}, []);
   const handleSelectTask = (task) => {
     if (!selectedTasks.find(t => t.task_id === task.task_id)) {
       setSelectedTasks([...selectedTasks, task]);
@@ -114,7 +98,6 @@ useEffect(() => {
     setSelectedTasks(selectedTasks.filter(t => t.task_id !== taskId));
   };
 
- 
   const handleSubmit = async () => {
     if (!contestName || !startTime || selectedTasks.length === 0) {
       alert("Заполните название, дату начала и добавьте хотя бы одну задачу");
@@ -122,64 +105,38 @@ useEffect(() => {
     }
 
     setLoading(true);
-    const token = localStorage.getItem("access_token");
 
     try {
-      
       const durationMinutesTotal =
         (parseInt(durationHours) || 0) * 60 +
         (parseInt(durationMinutes) || 0);
 
       const dateObj = new Date(startTime);
-
       if (isNaN(dateObj.getTime())) {
         alert("Некорректная дата");
         setLoading(false);
         return;
       }
 
-     
       const requestData = {
         contest_name: contestName,
-        start_time: new Date(startTime).toISOString(),
+        start_time: dateObj.toISOString(),
         duration: durationMinutesTotal,
         task_ids: selectedTasks.map(t => t.task_id)
       };
 
-      const url = isEditMode
-        ? `http://127.0.0.1:8000/contests/${id}`
-        : "http://127.0.0.1:8000/contests";
-
-      const method = isEditMode ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(requestData)
-      });
-
-      if (response.ok) {
-        alert(isEditMode
-          ? "Контест успешно обновлён!"
-          : "Контест успешно создан!"
-        );
-        navigate("/contests");
-      } else {
-        const error = await response.json();
-        console.log("ERROR RESPONSE:", error);
-        alert(error.detail || "Ошибка");
-      }
+      await contestsApi.save(requestData, isEditMode ? id : null);
+      
+      alert(isEditMode ? "Контест успешно обновлён!" : "Контест успешно создан!");
+      navigate("/contests");
+      
     } catch (err) {
-      console.error(err);
-      alert("Ошибка сети");
+      console.error("Save error:", err);
+      alert(err.message || "Ошибка сохранения контеста");
     } finally {
       setLoading(false);
     }
   };
-
 
   const filteredTasks = allTasks.filter(task =>
     task.task_name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -485,8 +442,6 @@ useEffect(() => {
                 ? "Сохранить изменения"
                 : "Сохранить"}
             </button>
-            
-            
             
             <button
               onClick={() => navigate("/contests")}

@@ -14,7 +14,6 @@ function Tasks() {
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
-
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
@@ -33,7 +32,6 @@ function Tasks() {
 
     setUserRole(role);
 
-    // Используем вынесенные API-методы
     usersApi.getCurrent()
       .then(user => {
         setUserId(user.user_id);

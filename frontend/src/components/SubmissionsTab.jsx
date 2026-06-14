@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useSolutionPolling } from "../hooks/useSolutionPolling"; // <-- используем хук
+import SubmissionRow from "../components/SubmissionRow";
 
 const SubmissionsTab = ({ contestId, token }) => {
   const [solutions, setSolutions] = useState([]);
@@ -52,25 +54,15 @@ const SubmissionsTab = ({ contestId, token }) => {
         <tbody>
           {solutions.length === 0 ? (
             <tr>
-              <td colSpan="8" className="empty-cell">Пока нет отправок</td>
+              <td colSpan="6" className="empty-cell">Пока нет отправок</td>
             </tr>
           ) : (
             solutions.map((s, index) => (
-              <tr key={s.id}>
-                <td className="td">{index + 1}</td>
-                <td className="td">{new Date(s.time).toLocaleString()}</td>
-                <td className="td">{s.user || "-"}</td>
-                <td className="td">{s.task || "-"}</td>
-                <td className="td">{s.language || "-"}</td>
-                <td className="td">
-                  <span style={{ 
-                    color: s.status === "Accepted" ? "#10b981" : "#6b7280",
-                    fontWeight: s.status === "Accepted" ? "600" : "400"
-                  }}>
-                    {s.status}
-                  </span>
-                </td>
-              </tr>
+              <SubmissionRow
+                key={s.id}
+                solution={s}
+                index={index}
+              />
             ))
           )}
         </tbody>

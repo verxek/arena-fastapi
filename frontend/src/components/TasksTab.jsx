@@ -1,7 +1,7 @@
-// frontend/src/components/TasksTab.jsx
 import { useState } from "react";
 import { IoTimeOutline } from "react-icons/io5";
 import { TfiSave } from "react-icons/tfi";
+import { tasksApi } from "../api/tasks";
 
 const TasksTab = ({ tasks, token }) => {
   const [openedTask, setOpenedTask] = useState(null);
@@ -10,21 +10,16 @@ const TasksTab = ({ tasks, token }) => {
   const openTask = async (taskId) => {
     try {
       setLoadingTask(true);
-      const res = await fetch(`http://127.0.0.1:8000/tasks/${taskId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (!res.ok) throw new Error("Failed to load task");
-      const data = await res.json();
+      const data = await tasksApi.getById(taskId);
       setOpenedTask(data);
     } catch (e) {
       console.error("Error loading task:", e);
+      alert("Не удалось загрузить условие задачи");
     } finally {
       setLoadingTask(false);
     }
   };
 
-  // Если задача открыта — показываем её детальное описание
   if (openedTask) {
     return (
       <div>

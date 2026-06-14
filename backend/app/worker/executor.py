@@ -2,27 +2,16 @@ import docker
 import time
 import os
 
-
-
-from backend.app.worker.executor_docker import (
-    compile_cpp_container,
-    run_cpp_container,
-    run_python_container
-)
-
 client = docker.from_env()
 
 
-
 # =========================
-# COMPILATION
+# COMPILATION (C++)
 # =========================
-
 def compile_cpp(code_path: str, workdir: str, memory_limit_mb: int):
-
+    """Компилирует C++ код в изолированном контейнере"""
     workdir = os.path.abspath(workdir)
     build_dir = os.path.join(workdir, "build")
-
     os.makedirs(build_dir, exist_ok=True)
 
     container = client.containers.run(
@@ -35,18 +24,20 @@ def compile_cpp(code_path: str, workdir: str, memory_limit_mb: int):
         working_dir="/app",
         network_disabled=True,
         mem_limit=f"{memory_limit_mb}m",
-        stderr=True,
+        security_opt=["no-new-privileges"], 
         stdout=True,
-        remove=True
+        stderr=True,
+        detach=True,
+        remove=False  
     )
     return container
 
 
 # =========================
-# PYTHON RUN
+# RUN PYTHON
 # =========================
-
-def run_python(code_file, input_file, workdir, memory_limit_mb):
+def run_python(code_file: str, input_file: str, workdir: str, memory_limit_mb: int):
+    """Запускает Python-решение в изолированном контейнере"""
     workdir = os.path.abspath(workdir)
 
     return client.containers.run(
@@ -56,18 +47,19 @@ def run_python(code_file, input_file, workdir, memory_limit_mb):
         working_dir="/app",
         network_disabled=True,
         mem_limit=f"{memory_limit_mb}m",
-        detach=True,
+        security_opt=["no-new-privileges"],
         stdout=True,
         stderr=True,
+        detach=True,
         remove=False
     )
 
 
 # =========================
-# CPP RUN
+# RUN C++
 # =========================
-
-def run_cpp(input_file, workdir, memory_limit_mb):
+def run_cpp(input_file: str, workdir: str, memory_limit_mb: int):
+    """Запускает скомпилированный C++ бинарник в изолированном контейнере"""
     workdir = os.path.abspath(workdir)
 
     return client.containers.run(
@@ -80,27 +72,27 @@ def run_cpp(input_file, workdir, memory_limit_mb):
         working_dir="/app",
         network_disabled=True,
         mem_limit=f"{memory_limit_mb}m",
+        security_opt=["no-new-privileges"],
         stdout=True,
         stderr=True,
-        remove=False,
-        detach=True  
+        detach=True,
+        remove=False
     )
 
-    
-# =========================
-# TIME + MEMORY LIMIT WRAPPER
-# =========================
 
+# =========================
+# WRAPPER: TIME + MEMORY LIMITS
+# =========================
 def run_with_limits(func, *, time_limit_ms: int, memory_limit_mb: int, **kwargs):
-
+    """
+    Запускает функцию с ограничениями по времени и памяти.
+    Возвращает dict: {status, output, time_ms, memory_kb}
+    """
     start = time.time()
     container = None
 
     try:
-        container = func(
-            memory_limit_mb=memory_limit_mb,
-            **kwargs
-        )
+        container = func(memory_limit_mb=memory_limit_mb, **kwargs)
 
         try:
             container.wait(timeout=time_limit_ms / 1000)
@@ -110,24 +102,34 @@ def run_with_limits(func, *, time_limit_ms: int, memory_limit_mb: int, **kwargs)
                 container.wait()
             except:
                 pass
-
             return {
                 "status": "TLE",
                 "output": "",
-                "time_ms": int((time.time() - start) * 1000)
+                "time_ms": int((time.time() - start) * 1000),
+                "memory_kb": 0
             }
+
+        memory_kb = 0
+        try:
+            stats = container.stats(stream=False)
+            usage = stats.get('memory_stats', {}).get('usage')
+            if usage:
+                memory_kb = int(usage / 1024)  
+        except:
+            pass  
 
         logs = container.logs(stdout=True, stderr=True).decode("utf-8", errors="ignore")
 
         return {
             "status": "OK",
             "output": logs,
-            "time_ms": int((time.time() - start) * 1000)
+            "time_ms": int((time.time() - start) * 1000),
+            "memory_kb": memory_kb
         }
 
     finally:
         if container:
             try:
-                container.remove(force=True) 
+                container.remove(force=True)
             except:
                 pass

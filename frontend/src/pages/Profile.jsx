@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { usersApi } from "../api/users";
 
 function Profile() {
   const navigate = useNavigate();
@@ -16,23 +17,18 @@ function Profile() {
       return;
     }
 
-    fetch("http://127.0.0.1:8000/users/me", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Auth error");
-        return res.json();
-      })
+    usersApi.getCurrent()
       .then((data) => {
         setUser(data);
         setLoading(false);
       })
       .catch((err) => {
-        console.error(err);
-        localStorage.clear();
-        navigate("/login");
+        console.error("Failed to load profile:", err);
+        
+        if (err.message?.includes("401")) {
+          localStorage.clear();
+          navigate("/login");
+        }
       });
   }, [navigate]);
 
@@ -53,7 +49,6 @@ function Profile() {
 
         {/* PROFILE CARD */}
         <div className="section">
-
           <div className="section-header">
             <h1 className="page-title">Профиль</h1>
           </div>

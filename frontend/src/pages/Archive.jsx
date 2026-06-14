@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ContestCard from "../components/ContestCard";
-import "../styles/global.css";
+import { usersApi } from "../api/users";
+import { contestsApi } from "../api/contests";
 import { getFinishedContests, getActiveAndUpcomingContests } from "../utils/contestUtils";
+import "../styles/global.css";
 
 function Archive() {
   const navigate = useNavigate();
@@ -25,31 +27,31 @@ function Archive() {
       return;
     }
 
-    fetch("http://127.0.0.1:8000/users/me", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(user => {
+    const loadData = async () => {
+      try {
+        const user = await usersApi.getCurrent();
         setUserId(user.user_id);
         setUserRole(user.role);
 
-        return fetch("http://127.0.0.1:8000/contests/", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-      })
-      .then(res => res.json())
-      .then(data => {
+        const data = await contestsApi.getAll(true);
         setAllContests(data);
+        
+      } catch (err) {
+        console.error("Failed to load archive:", err);
+      
+        if (err.message?.includes("401")) {
+          localStorage.clear();
+          navigate("/login");
+        }
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+      }
+    };
+
+    loadData();
   }, [navigate]);
 
   // === ФИЛЬТРЫ ===
- 
   const sortedFinishedRaw = getFinishedContests(allContests);
 
   const finishedContests = activeTabFinished === "my"

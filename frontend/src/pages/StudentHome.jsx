@@ -1,21 +1,22 @@
-// frontend/src/pages/OrganizerHome.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ContestCard from "../components/ContestCard";
-import "../styles/global.css";
 import { getFinishedContests, getActiveAndUpcomingContests } from "../utils/contestUtils";
+import { contestsApi } from "../api/contests";
+import { usersApi } from "../api/users";
+import "../styles/global.css";
 
 function StudentHome() {
   const navigate = useNavigate();
   const [allContests, setAllContests] = useState([]);
   const [userStats, setUserStats] = useState({ tasks: 0, contests: 0 });
   const [loading, setLoading] = useState(true);
-  const isAuth = !!localStorage.getItem("access_token");
   
   const token = localStorage.getItem("access_token");
   const userId = localStorage.getItem("user_id");
   const role = "participant";
+  const isAuth = !!token;
 
   useEffect(() => {
     if (!token) { 
@@ -25,35 +26,14 @@ function StudentHome() {
 
     const loadData = async () => {
       try {
-        const userRes = await fetch("http://127.0.0.1:8000/users/me", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (!userRes.ok) {
-          if (userRes.status === 401) {
-            localStorage.clear();
-            navigate("/login");
-            return;
-          }
-          throw new Error(`Ошибка пользователя: ${userRes.status}`);
-        }
-
-        const user = await userRes.json();
-      
+        const user = await usersApi.getCurrent();
+        
         setUserStats({
           tasks: user.solved_tasks_count || 0,
           contests: user.participated_contests_count || 0
         });
 
-        const contestsRes = await fetch("http://127.0.0.1:8000/contests/", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (!contestsRes.ok) {
-          throw new Error(`Ошибка контестов: ${contestsRes.status}`);
-        }
-
-        const data = await contestsRes.json();
+        const data = await contestsApi.getAll();
 
         if (Array.isArray(data)) {
           setAllContests(data);
@@ -64,6 +44,11 @@ function StudentHome() {
 
       } catch (err) {
         console.error("Ошибка при загрузке:", err);
+        
+        if (err.message?.includes("401")) {
+          localStorage.clear();
+          navigate("/login");
+        }
       } finally {
         setLoading(false);
       }
@@ -74,13 +59,12 @@ function StudentHome() {
 
   const safeContests = Array.isArray(allContests) ? allContests : [];
   
-  const finished = getFinishedContests(allContests);
-  const activeAndUpcoming = getActiveAndUpcomingContests(allContests);
+  const finished = getFinishedContests(safeContests);
+  const activeAndUpcoming = getActiveAndUpcomingContests(safeContests);
 
   const handleAction = (contest) => {
     if (contest.is_finished) navigate(`/contests/${contest.contest_id}`);
     else if (contest.is_active) navigate(`/contests/${contest.contest_id}`);
-    //else if (contest.is_upcoming) navigate(`/contests/${contest.contest_id}`);
   };
 
   if (loading) {
@@ -124,7 +108,13 @@ function StudentHome() {
             ) : (
               activeAndUpcoming.map(c => (
                 <div key={c.contest_id} className="card-wrapper">
-                  <ContestCard contest={c} userRole={role} isAuthor={c.author_id == userId} isAuth={isAuth}  onAction={handleAction} />
+                  <ContestCard 
+                    contest={c} 
+                    userRole={role} 
+                    isAuthor={c.author_id == userId}
+                    isAuth={isAuth}
+                    onAction={handleAction} 
+                  />
                 </div>
               ))
             )}
@@ -135,7 +125,9 @@ function StudentHome() {
         <div className="section">
           <div className="section-header">
             <h2 className="section-title">Завершенные контесты</h2>
-            <span className="archive-link" onClick={() => navigate("/archive")}>Перейти к архиву &rarr;</span>
+            <span className="archive-link" onClick={() => navigate("/archive")}>
+              Перейти к архиву &rarr;
+            </span>
           </div>
           
           <div className="cards-row">
@@ -144,7 +136,13 @@ function StudentHome() {
             ) : (
               finished.map(c => (
                 <div key={c.contest_id} className="card-wrapper">
-                  <ContestCard contest={c} userRole={role} isAuthor={c.author_id == userId} isAuth={isAuth} onAction={handleAction} />
+                  <ContestCard 
+                    contest={c} 
+                    userRole={role} 
+                    isAuthor={c.author_id == userId}
+                    isAuth={isAuth}
+                    onAction={handleAction} 
+                  />
                 </div>
               ))
             )}
@@ -155,4 +153,5 @@ function StudentHome() {
     </div>
   );
 }
+
 export default StudentHome;

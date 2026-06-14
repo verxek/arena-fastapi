@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ContestCard from "../components/ContestCard";
-import { DiVim } from "react-icons/di";
-import "../styles/global.css";
+import { usersApi } from "../api/users";
+import { contestsApi } from "../api/contests";
 import { getActiveAndUpcomingContests, getFinishedContests } from "../utils/contestUtils";
+import "../styles/global.css";
 
 function Contests() {
   const [allContests, setAllContests] = useState([]);
@@ -29,35 +30,28 @@ function Contests() {
 
     setUserRole(role);
 
-    fetch("http://127.0.0.1:8000/users/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Auth error");
-        return res.json();
-      })
-      .then((user) => {
+    const loadData = async () => {
+      try {
+        const user = await usersApi.getCurrent();
         setUserId(user.user_id);
-        return fetch("http://127.0.0.1:8000/contests", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to load contests");
-        return res.json();
-      })
-      .then((data) => {
+
+        const data = await contestsApi.getAll();
         setAllContests(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-        if (err.message.includes("Auth")) {
+        
+      } catch (err) {
+        console.error("Failed to load data:", err);
+  
+        if (err.message?.includes("401") || err.message?.includes("Auth")) {
           localStorage.clear();
           navigate("/login");
+          return;
         }
-      });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, [navigate]);
 
   const sortedActiveRaw = getActiveAndUpcomingContests(allContests);
@@ -77,10 +71,16 @@ function Contests() {
     else if (contest.is_upcoming) navigate(`/contests/${contest.contest_id}`);
   };
 
-
-  if (loading) return <div style={{paddingTop: "100px", textAlign: "center"}}>Загрузка...</div>;
-
+  // Индикатор загрузки
+  if (loading) {
     return (
+      <div style={{ paddingTop: "100px", textAlign: "center" }}>
+        Загрузка...
+      </div>
+    );
+  }
+
+  return (
     <div className="page-container">
       <Navbar />
 
@@ -89,7 +89,6 @@ function Contests() {
         {/* ДОСТУПНЫЕ */}
         <div className="block">
           <div className="section-header">
-
             <h1 className="page-title">Доступные контесты</h1>
 
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -103,7 +102,6 @@ function Contests() {
                     + Создать
                   </button>
 
-                  
                   <div className="tabs-container">
                     <button
                       onClick={() => setActiveTabAvailable("all")}
@@ -120,7 +118,6 @@ function Contests() {
                   </div>
                 </>
               )}
-
             </div>
           </div>
 
@@ -146,7 +143,6 @@ function Contests() {
         {/* ЗАВЕРШЕННЫЕ */}
         <div className="section">
           <div className="section-header">
-
             <h2 className="page-title">Завершенные контесты</h2>
 
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -173,9 +169,6 @@ function Contests() {
                   </button>
                 </div>
               )}
-
-              
-
             </div>
           </div>
 
