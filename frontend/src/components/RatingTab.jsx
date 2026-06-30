@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { contestsApi } from "../api/contests";
+import { getContestRating } from "../api/contests";
 
 const RatingTab = ({ contestId, tasks }) => {  
   const [rating, setRating] = useState([]);
@@ -10,7 +10,7 @@ const RatingTab = ({ contestId, tasks }) => {
 
     const fetchRating = async () => {
       try {
-        const data = await contestsApi.getRating(contestId);
+        const data = await getContestRating(contestId);
         setRating(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Rating error:", err);
@@ -28,18 +28,21 @@ const RatingTab = ({ contestId, tasks }) => {
   }
 
   return (
-    <div className="rating-container" style={{ overflowX: "auto" }}>
+    <div className="rating-container">
       <table className="table">
         <thead>
           <tr>
-            <th className="th" style={{ width: "50px" }}>#</th>
-            <th className="th">Участник</th>
-            <th className="th" style={{ width: "80px" }}>Решено</th>
-            <th className="th" style={{ width: "80px" }}>Очки</th>
-            {/* Колонки для каждой задачи */}
+            <th className="rating-col-rank">#</th>
+            <th>Участник</th>
+            <th className="rating-col-solved">Решено</th>
+            <th className="rating-col-score">Очки</th>
             {tasks?.map((_, index) => {
-              const letter = String.fromCharCode(1040 + index); // А, Б, В...
-              return <th key={index} className="th" style={{ textAlign: "center", width: "70px" }}>{letter}</th>;
+              const letter = String.fromCharCode(1040 + index);
+              return (
+                <th key={index} className="rating-col-task">
+                  {letter}
+                </th>
+              );
             })}
           </tr>
         </thead>
@@ -53,30 +56,32 @@ const RatingTab = ({ contestId, tasks }) => {
           ) : (
             rating.map((row) => (
               <tr key={row.user_id}>
-                <td className="td" style={{ fontWeight: row.rank <= 3 ? "700" : "400" }}>
+                <td className={row.rank <= 3 ? "rating-rank-top" : ""}>
                   {row.rank}
                 </td>
-                <td className="td" style={{ fontWeight: "600" }}>{row.nickname}</td>
-                <td className="td">{row.solved}</td>
-                <td className="td" style={{ fontWeight: "700", color: "#1f2739" }}>{row.score}</td>
-            
+                <td className="rating-nickname">{row.nickname}</td>
+                <td>{row.solved}</td>
+                <td className="rating-score">{row.score}</td>
 
-                {/* Ячейки задач */}
                 {tasks?.map((task, idx) => {
-                  const stat = row.tasks?.[idx]; 
+                  const stat = row.tasks?.[idx];
                   return (
-                    <td key={task.task_id} className="td" style={{ textAlign: "center" }}>
+                    <td key={task.task_id} className="rating-task-cell">
                       {stat?.score > 0 ? (
                         <div>
-                          <span style={{ color: "#10b981", fontWeight: "700" }}>+{stat.score}</span>
+                          <span className="rating-task-solved">+{stat.score}</span>
                           {stat.wrong_attempts > 0 && (
-                            <div style={{ fontSize: "11px", color: "#ef4444" }}>−{stat.wrong_attempts}</div>
+                            <div className="rating-task-penalty">
+                              −{stat.wrong_attempts}
+                            </div>
                           )}
                         </div>
                       ) : stat?.wrong_attempts > 0 ? (
-                        <span style={{ color: "#ef4444" }}>−{stat.wrong_attempts}</span>
+                        <span className="rating-task-wrong">
+                          −{stat.wrong_attempts}
+                        </span>
                       ) : (
-                        <span style={{ color: "#9ca3af" }}>•</span>
+                        <span className="rating-task-empty">•</span>
                       )}
                     </td>
                   );

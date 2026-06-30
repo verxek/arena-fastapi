@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { usersApi } from "../api/users";
+import { getCurrentUser } from "../api/users";
 
 function Profile() {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ function Profile() {
       return;
     }
 
-    usersApi.getCurrent()
+    getCurrentUser()
       .then((data) => {
         setUser(data);
         setLoading(false);

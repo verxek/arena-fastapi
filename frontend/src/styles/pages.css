@@ -1,0 +1,65 @@
+/* === DASHBOARD === */
+.page-loading-text {
+  padding-top: 200px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.page-error-text {
+  padding-top: 200px;
+  text-align: center;
+  color: #ef4444;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* === ARCHIVE === */
+.archive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.archive-grid .empty-state {
+  grid-column: 1 / -1;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.pagination-info {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* === HOME PAGE === */
+.home-auth-notice {
+  margin-bottom: 24px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.home-auth-text {
+  margin: 0;
+  color: #1e40af;
+  font-size: 14px;
+  text-align: center;
+}
+
+.home-auth-link {
+  color: #1e40af;
+  text-decoration: underline;
+}
+
+.home-auth-link:hover {
+  color: #1e3a8a;
+}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import { adminApi } from "../api/admin";
+import { getAllUsers, createUser, changeUserRole } from "../api/admin";
 import "../styles/global.css";
 
 function AdminPanel() {
@@ -20,7 +20,7 @@ function AdminPanel() {
 
   const loadUsers = async () => {
     try {
-      const data = await adminApi.getUsers();
+      const data = await getAllUsers();
       setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to load users:", err);
@@ -35,7 +35,7 @@ function AdminPanel() {
 
   const handleCreateUser = async () => {
     try {
-      await adminApi.createUser({
+      await createUser({
         email,
         nickname,
         password,
@@ -56,7 +56,7 @@ function AdminPanel() {
 
   const changeRole = async (userId, role) => {
     try {
-      await adminApi.changeRole(userId, role);
+      await changeUserRole(userId, role);
       loadUsers();
     } catch (err) {
       console.error("Change role error:", err);

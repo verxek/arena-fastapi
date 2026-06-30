@@ -1,8 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
 import Home from "./pages/Home"
-import StudentHome from "./pages/StudentHome"
-import OrganizerHome from "./pages/OrganizerHome"
 import Contests from "./pages/Contests"
 import CreateContest from "./pages/CreateContest"
 import Tasks from "./pages/Tasks"
@@ -14,6 +12,7 @@ import TaskPage from "./pages/Task"
 import MySubmissions from "./pages/MySubmissions"
 import AdminPanel from "./pages/AdminPanel"
 import Drafts from "./pages/Drafts"
+import Dashboard from "./pages/Dashboard"
 
 import ProtectedRoute from "./components/ProtectedRoute"
 
@@ -27,8 +26,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/archive" element={<ProtectedRoute><Archive /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /> </ProtectedRoute>} />
-        <Route path="/student" element={<ProtectedRoute><StudentHome /></ProtectedRoute>}/>
-        <Route path="/organizer" element={<ProtectedRoute> <OrganizerHome /></ProtectedRoute>}/>
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/contests" element={<ProtectedRoute><Contests /></ProtectedRoute>} />
         <Route path="/contests/create" element={<ProtectedRoute><CreateContest /></ProtectedRoute>}/>
         <Route path="/tasks/drafts" element={<Drafts />} />

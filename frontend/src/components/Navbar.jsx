@@ -20,8 +20,8 @@ function Navbar() {
     localStorage.removeItem("user_id");
     navigate("/");
   };
+  
   const handleLoginClose = useCallback(() => {
-    console.log('LoginModal closed');
     setShowLogin(false);
   }, []);
 
@@ -32,105 +32,50 @@ function Navbar() {
   return (
     <>  
       {/* НАВБАР */}
-      <div style={{
-        position: "fixed",
-        top: 20,
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "90%",
-        maxWidth: "1200px",
-        background: "#ffffff",
-        borderRadius: "20px",
-        boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
-        padding: "15px 30px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        boxSizing: "border-box",
-        zIndex: 1000
-      }}>
+      <div className="navbar">
 
         {/* LOGO */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          fontSize: "20px",
-          fontWeight: "700",
-          color: "#1f2739",
-          gap: "10px",
-          lineHeight: 1
-        }}>
+        <div className="navbar-logo">
           <GrCodeSandbox size={22} />
           code arena
         </div>
 
-        {/* МЕНЮ */}
-        <div style={{ display: "flex", gap: "25px", alignItems: "center" }}>
-
-          
+        <div className="navbar-menu">
           {role === "admin" ? (
-            <Link
-              to="/admin"
-              style={{ textDecoration: "none", color: "#1f2739", fontWeight: "600" }}
-            >
+            <Link to="/admin" className="navbar-link navbar-link--admin">
               Админ панель
             </Link>
           ) : (
             <>
-              <Link to={role === "organizer" ? "/organizer" : "/student"} style={{textDecoration:"none", color:"#1f2739"}}>
+              <Link to="/dashboard" className="navbar-link">
                 Главная
               </Link>
-              <Link to="/contests" style={{textDecoration:"none", color:"#1f2739"}}>
+              <Link to="/contests" className="navbar-link">
                 Контесты
               </Link>
-              <Link to="/tasks" style={{textDecoration:"none", color:"#1f2739"}}>
+              <Link to="/tasks" className="navbar-link">
                 Задачи
               </Link>
-              <Link to="/archive" style={{textDecoration:"none", color:"#1f2739"}}>
+              <Link to="/archive" className="navbar-link">
                 Архив
               </Link>
             </>
           )}
-
         </div>
 
-        {/* ПРАВАЯ ЧАСТЬ */}
-        <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
-
+        <div className="navbar-actions">
           {token ? (
             <>
               {role !== "admin" && (
                 <button
                   onClick={() => navigate("/profile")}
-                  style={{
-                    background: "#f3f4f6",
-                    border: "none",
-                    width: "36px",
-                    height: "36px",
-                    borderRadius: "50%",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                  className="profile-btn"
                 >
-                  <FaUser  />
+                  <FaUser />
                 </button>
               )}
 
-              <button
-                onClick={logout}
-                style={{
-                  background: "#f3f4f6",
-                  border: "none",
-                  padding: "8px 16px",
-                  borderRadius: "12px",
-                  cursor: "pointer",
-                  fontWeight: "500",
-                  fontSize: "14px",
-                  color: "#1f2739"
-                }}
-              >
+              <button onClick={logout} className="logout-btn">
                 Выйти
               </button>
             </>
@@ -142,7 +87,6 @@ function Navbar() {
               Войти
             </button>
           )}
-
         </div>
       </div>
 

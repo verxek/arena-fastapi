@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ContestCard from "../components/ContestCard";
-import { usersApi } from "../api/users";
-import { contestsApi } from "../api/contests";
-import { getFinishedContests, getActiveAndUpcomingContests } from "../utils/contestUtils";
+import { getCurrentUser } from "../api/users";
+import { getAllContests } from "../api/contests";
+import { getFinishedContests } from "../utils/contestUtils";
 import "../styles/global.css";
 
 function Archive() {
@@ -29,11 +29,11 @@ function Archive() {
 
     const loadData = async () => {
       try {
-        const user = await usersApi.getCurrent();
+        const user = await getCurrentUser();
         setUserId(user.user_id);
         setUserRole(user.role);
 
-        const data = await contestsApi.getAll(true);
+        const data = await getAllContests(true);
         setAllContests(data);
         
       } catch (err) {
@@ -111,15 +111,9 @@ function Archive() {
           </div>
 
           {/* GRID */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: "16px"
-            }}
-          >
+          <div className="archive-grid">
             {currentContests.length === 0 ? (
-              <div className="empty-state" style={{ gridColumn: "1 / -1" }}>
+              <div className="empty-state">
                 {userRole === "organizer" && activeTabFinished === "my"
                   ? "У вас нет завершенных контестов"
                   : "Архив пуст"}
@@ -140,16 +134,7 @@ function Archive() {
 
           {/* PAGINATION */}
           {totalPages > 1 && (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                gap: "8px",
-                marginTop: "24px",
-                paddingTop: "16px",
-                borderTop: "1px solid #e5e7eb"
-              }}
-            >
+            <div className="pagination">
               <button
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
@@ -179,14 +164,7 @@ function Archive() {
           )}
 
           {/* INFO */}
-          <div
-            style={{
-              textAlign: "center",
-              marginTop: "16px",
-              fontSize: "13px",
-              color: "#6b7280"
-            }}
-          >
+          <div className="pagination-info">
             Показано {currentContests.length} из {finishedContests.length} контестов
             {userRole === "organizer" && activeTabFinished === "my" && " (ваши)"}
           </div>

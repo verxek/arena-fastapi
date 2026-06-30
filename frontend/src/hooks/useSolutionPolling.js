@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { solutionsApi } from "../api/solutions";
+import { getSolutionStatus } from "../api/solutions";
 
 const INTERMEDIATE_STATUSES = ["Pending", "In Queue", "Processing"];
 
@@ -10,18 +10,13 @@ export function useSolutionPolling(solutionId, interval = 2000) {
   const timerRef = useRef(null);
 
   useEffect(() => {
-    if (!solutionId) {
-      setStatus("Pending");
-      setResult(null);
-      setIsLoading(false);
-      return;
-    }
+    if (!solutionId) return;
 
     let isMounted = true;
 
     const poll = async () => {
       try {
-        const data = await solutionsApi.getStatus(solutionId);
+        const data = await getSolutionStatus(solutionId);
         
         if (!isMounted) return;
         
@@ -34,7 +29,7 @@ export function useSolutionPolling(solutionId, interval = 2000) {
           return; // Останавливаем опрос
         }
         
-        // продолжаем 
+        // Продолжаем опрос
         timerRef.current = setTimeout(poll, interval);
       } catch (err) {
         console.error("Polling error:", err);
@@ -46,11 +41,18 @@ export function useSolutionPolling(solutionId, interval = 2000) {
     };
 
     poll();
+    
     return () => {
       isMounted = false;
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [solutionId, interval]);
+
+  // Возвращаем дефолтные значения, если solutionId нет
+  
+  if (!solutionId) {
+    return { status: "Pending", result: null, isLoading: false };
+  }
 
   return { status, result, isLoading };
 }

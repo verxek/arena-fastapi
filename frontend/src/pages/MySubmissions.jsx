@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { getMySolutions, getSolutionStatus } from "../api/solutions";
 import "../styles/global.css";
 
 // Финальные статусы — для них не нужен опрос
@@ -11,7 +12,7 @@ const FINAL_STATUSES = [
 
 function MySubmissions() {
   const [solutions, setSolutions] = useState([]);
-  const pollTimers = useRef({}); // храним таймеры для каждой посылки
+  const pollTimers = useRef({});
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,10 +24,7 @@ function MySubmissions() {
   const startPolling = (solutionId) => {
     const poll = async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/solutions/${solutionId}/status`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const data = await res.json();
+        const data = await getSolutionStatus(solutionId);
         
         // Обновляем статус в стейте
         setSolutions(prev => prev.map(s => 
@@ -53,16 +51,12 @@ function MySubmissions() {
   useEffect(() => {
     const loadSolutions = async () => {
       try {
-        const res = await fetch(
-          `http://127.0.0.1:8000/solutions/my?user_id=${userId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        const data = await res.json();
-        const list = Array.isArray(data) ? data : [];
-        setSolutions(list);
+        const list = await getMySolutions(userId);
+        const safeList = Array.isArray(list) ? list : [];
+        setSolutions(safeList);
         
         // Запускаем опрос для незавершённых решений
-        list.forEach(s => {
+        safeList.forEach(s => {
           if (!FINAL_STATUSES.includes(s.status)) {
             startPolling(s.id);
           }
@@ -82,6 +76,13 @@ function MySubmissions() {
     };
   }, [userId, token]);
 
+  const getVerdictClass = (status) => {
+    if (status === "Accepted") return "verdict-accepted";
+    if (status === "Wrong Answer") return "verdict-wrong";
+    if (status === "Pending" || status === "In Queue" || status === "Processing") return "verdict-pending";
+    return "verdict-error";
+  };
+
   return (
     <div className="page-container">
       <Navbar />
@@ -92,16 +93,22 @@ function MySubmissions() {
         </div>
 
         <div className="section">
-          <div style={{ overflowX: "auto" }}>
+          <div className="submissions-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th>№</th><th>Время</th><th>Задача</th><th>Язык</th><th>Вердикт</th>
+                  <th>№</th>
+                  <th>Время</th>
+                  <th>Задача</th>
+                  <th>Язык</th>
+                  <th>Вердикт</th>
                 </tr>
               </thead>
               <tbody>
                 {solutions.length === 0 ? (
-                  <tr><td colSpan="5" className="empty-state">Пока нет отправок</td></tr>
+                  <tr>
+                    <td colSpan="5" className="empty-state">Пока нет отправок</td>
+                  </tr>
                 ) : (
                   solutions.map((s, index) => (
                     <tr key={s.id}>
@@ -110,11 +117,7 @@ function MySubmissions() {
                       <td>{s.task || "-"}</td>
                       <td>{s.language || "-"}</td>
                       <td>
-                        <span style={{
-                          color: s.status === "Accepted" ? "green" :
-                                 s.status === "Wrong Answer" ? "red" : "#f59e0b",
-                          fontWeight: "500"
-                        }}>
+                        <span className={getVerdictClass(s.status)}>
                           {s.status}
                         </span>
                       </td>

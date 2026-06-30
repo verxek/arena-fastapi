@@ -4,8 +4,8 @@ import Navbar from "../components/Navbar";
 import TaskItem from "../components/TaskItem";
 import "../styles/global.css";
 import { BiSearch } from "react-icons/bi";
-import { tasksApi } from "../api/tasks";
-import { usersApi } from "../api/users";
+import { getAllTasks, deleteTask } from "../api/tasks";
+import { getCurrentUser } from "../api/users";
 
 function Tasks() {
   const navigate = useNavigate();
@@ -32,10 +32,10 @@ function Tasks() {
 
     setUserRole(role);
 
-    usersApi.getCurrent()
+    getCurrentUser()
       .then(user => {
         setUserId(user.user_id);
-        return tasksApi.getAll();
+        return getAllTasks();
       })
       .then(data => {
         setTasks(data);
@@ -63,18 +63,14 @@ function Tasks() {
       return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
     });
 
-
-
   const categories = ["all", ...new Set(tasks.map(t => t.category_name))];
   const difficulties = ["all", ...new Set(tasks.map(t => t.difficulty_name))];
-
-
 
   const handleDelete = async (id) => {
     if (!window.confirm("Удалить задачу?")) return;
 
     try {
-      await tasksApi.delete(id);
+      await deleteTask(id);
       setTasks(prev => prev.filter(t => t.task_id !== id));
     } catch (err) {
       console.error("Delete error:", err);
@@ -82,9 +78,7 @@ function Tasks() {
     }
   };
 
-
   if (loading) return <div className="loading-text">Загрузка...</div>;
-
 
   return (
     <div className="task-page">

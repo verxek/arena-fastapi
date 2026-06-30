@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ContestCard from "../components/ContestCard";
-import { usersApi } from "../api/users";
-import { contestsApi } from "../api/contests";
+import { getCurrentUser } from "../api/users";
+import { getAllContests } from "../api/contests";
 import { getActiveAndUpcomingContests, getFinishedContests } from "../utils/contestUtils";
 import "../styles/global.css";
 
@@ -32,10 +32,10 @@ function Contests() {
 
     const loadData = async () => {
       try {
-        const user = await usersApi.getCurrent();
+        const user = await getCurrentUser();
         setUserId(user.user_id);
 
-        const data = await contestsApi.getAll();
+        const data = await getAllContests();
         setAllContests(data);
         
       } catch (err) {
@@ -71,7 +71,6 @@ function Contests() {
     else if (contest.is_upcoming) navigate(`/contests/${contest.contest_id}`);
   };
 
-  // Индикатор загрузки
   if (loading) {
     return (
       <div style={{ paddingTop: "100px", textAlign: "center" }}>

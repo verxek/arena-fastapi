@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { contestsApi } from "../api/contests";
-import { usersApi } from "../api/users";
+import { getContestById, saveContest, getAuthorTasks } from "../api/contests";
+import { getCurrentUser } from "../api/users";
 
 function CreateContest() {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ function CreateContest() {
 
     const loadContest = async () => {
       try {
-        const data = await contestsApi.getById(id);
+        const data = await getContestById(id);
         setContestData(data); 
         setContestName(data.contest_name);
 
@@ -73,10 +73,10 @@ function CreateContest() {
 
     const loadData = async () => {
       try {
-        const user = await usersApi.getCurrent();
+        const user = await getCurrentUser();
         setUserId(user.user_id);
 
-        const tasks = await contestsApi.getAuthorTasks(user.user_id, true);
+        const tasks = await getAuthorTasks(user.user_id, true);
         setAllTasks(Array.isArray(tasks) ? tasks : []);
       } catch (err) {
         console.error("Ошибка загрузки данных:", err);
@@ -125,7 +125,7 @@ function CreateContest() {
         task_ids: selectedTasks.map(t => t.task_id)
       };
 
-      await contestsApi.save(requestData, isEditMode ? id : null);
+      await saveContest(requestData, isEditMode ? id : null);
       
       alert(isEditMode ? "Контест успешно обновлён!" : "Контест успешно создан!");
       navigate("/contests");
@@ -143,82 +143,49 @@ function CreateContest() {
   );
 
   return (
-    <div style={{ backgroundColor: "#f3f4f6", minHeight: "100vh", paddingBottom: "40px" }}>
+    <div className="contest-form-page">
       <Navbar />
       
-      <div style={{
-        position: "absolute",
-        top: "100px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "90%",
-        maxWidth: "1200px",
-        boxSizing: "border-box"
-      }}>
+      <div className="contest-form-container">
         
         {/* Заголовок страницы */}
-        <h3>
+        <h3 className="page-title">
           {isEditMode ? "Редактирование контеста" : "Новый контест"}
         </h3>
 
         {/* Основная форма */}
-        <div style={{
-          backgroundColor: "#ffffff",
-          borderRadius: "16px",
-          padding: "32px",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.1)"
-        }}>
+        <div className="contest-form-card">
           
           {/* Поле: Название */}
-          <div style={{ marginBottom: "24px" }}>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "#374151", marginBottom: "8px" }}>
-              Название
-            </label>
+          <div className="form-field">
+            <label className="form-label">Название</label>
             <input
               type="text"
               value={contestName}
               onChange={(e) => setContestName(e.target.value)}
               placeholder="Введите название контеста"
-              style={{
-                width: "100%",
-                maxWidth: "400px",
-                padding: "10px 14px",
-                borderRadius: "8px",
-                border: "1px solid #d1d5db",
-                fontSize: "14px",
-                outline: "none"
-              }}
+              className="input-field input-limited"
             />
           </div>
 
           {/* Поле: Дата и время начала */}
-          <div style={{ marginBottom: "24px" }}>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "#374151", marginBottom: "8px" }}>
-              Дата и время начала
-            </label>
+          <div className="form-field">
+            <label className="form-label">Дата и время начала</label>
             <input
               type="datetime-local"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              style={{
-                padding: "10px 14px",
-                borderRadius: "8px",
-                border: "1px solid #d1d5db",
-                fontSize: "14px",
-                outline: "none"
-              }}
+              className="input-field"
             />
           </div>
 
           {/* Поле: Длительность */}
-          <div style={{ marginBottom: "24px" }}>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "#374151", marginBottom: "8px" }}>
-              Длительность 
-            </label>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div className="form-field">
+            <label className="form-label">Длительность</label>
+            <div className="duration-row">
               
               {/* Часы */}
-              <div style={{ display: "flex", flexDirection: "column" }}>
+              <div className="duration-column">
                 <input
                   type="number"
                   min="0"
@@ -230,21 +197,15 @@ function CreateContest() {
                     if (val > 23) val = 23;
                     setDurationHours(val);
                   }}
-                  style={{
-                    width: "70px",
-                    padding: "10px 14px",
-                    borderRadius: "8px",
-                    border: "1px solid #d1d5db",
-                    fontSize: "14px",
-                    outline: "none"
-                  }}
+                  className="duration-input"
                 />
-                <span style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px", textAlign: "center" }}>Часы</span>
+                <span className="duration-label">Часы</span>
               </div>
-              <span style={{ fontSize: "20px", fontWeight: "bold", color: "#9ca3af", marginTop: "20px" }}>:</span>
+              
+              <span className="duration-separator">:</span>
 
               {/* Минуты */}
-              <div style={{ display: "flex", flexDirection: "column" }}>
+              <div className="duration-column">
                 <input
                   type="number"
                   min="0"
@@ -256,63 +217,31 @@ function CreateContest() {
                     if (val > 59) val = 59;
                     setDurationMinutes(val);
                   }}
-                  style={{
-                    width: "70px",
-                    padding: "10px 14px",
-                    borderRadius: "8px",
-                    border: "1px solid #d1d5db",
-                    fontSize: "14px",
-                    outline: "none"
-                  }}
+                  className="duration-input"
                 />
-                <span style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px", textAlign: "center" }}>Минуты</span>
+                <span className="duration-label">Минуты</span>
               </div>
             </div>
           </div>
 
           {/* Поле: Список задач */}
-          <div style={{ marginBottom: "32px" }}>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "#374151", marginBottom: "8px" }}>
-              Список задач
-            </label>
+          <div className="form-field-wide">
+            <label className="form-label">Список задач</label>
             
             {/* Выпадающий список для выбора задач */}
-            <div style={{ position: "relative", width: "100%", maxWidth: "400px", marginBottom: "16px" }}>
+            <div className="dropdown-wrapper">
               <div
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "10px 14px",
-                  borderRadius: "8px",
-                  border: "1px solid #d1d5db",
-                  backgroundColor: "#fff",
-                  cursor: "pointer",
-                  fontSize: "14px"
-                }}
+                className="dropdown-trigger"
               >
-                <span style={{ color: searchQuery ? "#111827" : "#9ca3af" }}>
+                <span className={`dropdown-trigger-text ${searchQuery ? "active" : ""}`}>
                   {searchQuery || "Выберите задачу..."}
                 </span>
-                <span style={{ fontSize: "16px" }}>▼</span>
+                <span className="dropdown-arrow">▼</span>
               </div>
 
               {isDropdownOpen && (
-                <div style={{
-                  position: "absolute",
-                  top: "100%",
-                  left: 0,
-                  right: 0,
-                  marginTop: "4px",
-                  backgroundColor: "#fff",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "8px",
-                  boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                  zIndex: 100,
-                  maxHeight: "200px",
-                  overflowY: "auto"
-                }}>
+                <div className="dropdown-menu">
                   {/* Поиск внутри dropdown */}
                   <input
                     type="text"
@@ -320,20 +249,12 @@ function CreateContest() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Поиск задач..."
                     onClick={(e) => e.stopPropagation()}
-                    style={{
-                      width: "100%",
-                      padding: "8px 12px",
-                      border: "none",
-                      borderBottom: "1px solid #e5e7eb",
-                      outline: "none",
-                      fontSize: "14px",
-                      boxSizing: "border-box"
-                    }}
+                    className="dropdown-search"
                   />
                   
                   {/* Список задач */}
                   {filteredTasks.length === 0 ? (
-                    <div style={{ padding: "12px", color: "#9ca3af", fontSize: "14px" }}>
+                    <div className="dropdown-empty">
                       Нет доступных задач
                     </div>
                   ) : (
@@ -341,15 +262,7 @@ function CreateContest() {
                       <div
                         key={task.task_id}
                         onClick={() => handleSelectTask(task)}
-                        style={{
-                          padding: "10px 12px",
-                          cursor: "pointer",
-                          fontSize: "14px",
-                          borderBottom: "1px solid #f3f4f6",
-                          hover: { backgroundColor: "#f9fafb" }
-                        }}
-                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#f9fafb"}
-                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#fff"}
+                        className="dropdown-item"
                       >
                         {task.task_name}
                       </div>
@@ -360,10 +273,9 @@ function CreateContest() {
             </div>
 
             {/* Список выбранных задач */}
-            <div style={{ marginTop: "16px" }}>
-
+            <div className="selected-tasks-list">
               {selectedTasks.length === 0 && (
-                <div style={{ color: "#9ca3af", fontSize: "14px" }}>
+                <div className="dropdown-empty">
                   Задачи не добавлены
                 </div>
               )}
@@ -371,91 +283,46 @@ function CreateContest() {
               {selectedTasks.map((task, index) => (
                 <div
                   key={task.task_id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "12px 16px",
-                    backgroundColor: "#f9fafb",
-                    borderRadius: "8px",
-                    marginBottom: "8px",
-                    border: "1px solid #e5e7eb"
-                  }}
+                  className="selected-task-item"
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                    <span style={{ 
-                      fontWeight: "600", 
-                      color: "#6b7280",
-                      minWidth: "20px"
-                    }}>
+                  <div className="selected-task-info">
+                    <span className="selected-task-letter">
                       {String.fromCharCode(65 + index)}.
                     </span>
-                    <span style={{ fontSize: "14px", color: "#111827" }}>
+                    <span className="selected-task-name">
                       {task.task_name}
                     </span>
                   </div>
 
                   <button
                     onClick={() => handleRemoveTask(task.task_id)}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      color: "#ef4444",
-                      cursor: "pointer",
-                      fontSize: "18px"
-                    }}
+                    className="remove-task-btn"
                   >
                     ✕
                   </button>
                 </div>
               ))}
-
             </div>
-         
           </div>
 
           {/* Кнопки действий */}
-          <div style={{ 
-            display: "flex", 
-            gap: "12px", 
-            paddingTop: "24px", 
-            borderTop: "1px solid #e5e7eb" 
-          }}>
+          <div className="form-actions">
             <button
               onClick={() => handleSubmit()}
               disabled={loading}
-              style={{
-                background: "#1f2739",
-                color: "white",
-                border: "none",
-                padding: "10px 24px",
-                borderRadius: "8px",
-                fontSize: "14px",
-                fontWeight: "600",
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1
-              }}
+              className="btn btn-primary"
             >
               {loading
-              ? "Сохранение..."
-              : isEditMode
-                ? "Сохранить изменения"
-                : "Сохранить"}
+                ? "Сохранение..."
+                : isEditMode
+                  ? "Сохранить изменения"
+                  : "Сохранить"}
             </button>
             
             <button
               onClick={() => navigate("/contests")}
               disabled={loading}
-              style={{
-                background: "transparent",
-                color: "#6b7280",
-                border: "1px solid #d1d5db",
-                padding: "10px 24px",
-                borderRadius: "8px",
-                fontSize: "14px",
-                fontWeight: "600",
-                cursor: loading ? "not-allowed" : "pointer"
-              }}
+              className="btn btn-outline"
             >
               Отмена
             </button>

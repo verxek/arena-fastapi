@@ -3,11 +3,28 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ContestCard from "../components/ContestCard";
 import { getFinishedContests, getActiveAndUpcomingContests } from "../utils/contestUtils";
-import { contestsApi } from "../api/contests";
-import { usersApi } from "../api/users";
+import { getAllContests } from "../api/contests";
+import { getCurrentUser } from "../api/users";
 import "../styles/global.css";
 
-function StudentHome() {
+const ROLE_CONFIG = {
+  organizer: {
+    stats: {
+      tasks: { label: "Создано задач", field: "authored_tasks_count" },
+      contests: { label: "Проведено контестов", field: "organized_contests_count" }
+    },
+    showCreateButton: true
+  },
+  student: {
+    stats: {
+      tasks: { label: "Решено задач", field: "solved_tasks_count" },
+      contests: { label: "Участие в контестах", field: "participated_contests_count" }
+    },
+    showCreateButton: false
+  }
+};
+
+function Dashboard() {
   const navigate = useNavigate();
   const [allContests, setAllContests] = useState([]);
   const [userStats, setUserStats] = useState({ tasks: 0, contests: 0 });
@@ -15,8 +32,10 @@ function StudentHome() {
   
   const token = localStorage.getItem("access_token");
   const userId = localStorage.getItem("user_id");
-  const role = "participant";
+  const role = localStorage.getItem("role") || "student";
   const isAuth = !!token;
+
+  const config = ROLE_CONFIG[role] || ROLE_CONFIG.student;
 
   useEffect(() => {
     if (!token) { 
@@ -26,14 +45,14 @@ function StudentHome() {
 
     const loadData = async () => {
       try {
-        const user = await usersApi.getCurrent();
+        const user = await getCurrentUser();
         
         setUserStats({
-          tasks: user.solved_tasks_count || 0,
-          contests: user.participated_contests_count || 0
+          tasks: user[config.stats.tasks.field] || 0,
+          contests: user[config.stats.contests.field] || 0
         });
 
-        const data = await contestsApi.getAll();
+        const data = await getAllContests();
 
         if (Array.isArray(data)) {
           setAllContests(data);
@@ -55,7 +74,7 @@ function StudentHome() {
     };
 
     loadData();
-  }, [navigate, token]);
+  }, [navigate, token, config.stats.tasks.field, config.stats.contests.field]);
 
   const safeContests = Array.isArray(allContests) ? allContests : [];
   
@@ -63,17 +82,14 @@ function StudentHome() {
   const activeAndUpcoming = getActiveAndUpcomingContests(safeContests);
 
   const handleAction = (contest) => {
-    if (contest.is_finished) navigate(`/contests/${contest.contest_id}`);
-    else if (contest.is_active) navigate(`/contests/${contest.contest_id}`);
+    navigate(`/contests/${contest.contest_id}`);
   };
 
   if (loading) {
     return (
       <div className="page-container">
         <Navbar />
-        <div style={{ paddingTop: "200px", textAlign: "center", color: "#6b7280" }}>
-          Загрузка дашборда...
-        </div>
+        <div className="page-loading-text">Загрузка дашборда...</div>
       </div>
     );
   }
@@ -87,11 +103,11 @@ function StudentHome() {
         {/* СТАТИСТИКА */}
         <div className="stats-grid">
           <div className="stat-card">
-            <h3 className="stat-title">Решено задач</h3>
+            <h3 className="stat-title">{config.stats.tasks.label}</h3>
             <div className="stat-value">{userStats.tasks}</div>
           </div>
           <div className="stat-card">
-            <h3 className="stat-title">Участие в контестах</h3>
+            <h3 className="stat-title">{config.stats.contests.label}</h3>
             <div className="stat-value">{userStats.contests}</div>
           </div>
         </div>
@@ -100,6 +116,14 @@ function StudentHome() {
         <div className="section">
           <div className="section-header">
             <h2 className="section-title">Доступные контесты</h2>
+            {config.showCreateButton && (
+              <button 
+                onClick={() => navigate("/contests/create")} 
+                className="btn btn-primary"
+              >
+                + Создать
+              </button>
+            )}
           </div>
           
           <div className="cards-row">
@@ -154,4 +178,4 @@ function StudentHome() {
   );
 }
 
-export default StudentHome;
+export default Dashboard;

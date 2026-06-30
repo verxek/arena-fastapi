@@ -38,8 +38,7 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
 
       setTimeout(() => {
         if (data.role === "admin") navigate("/admin");
-        else if (data.role === "organizer") navigate("/organizer");
-        else navigate("/student");
+        else navigate("/dashboard");
       }, 50);
 
     } catch (err) {
@@ -54,7 +53,6 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
     <Modal isOpen={isOpen} onClose={onClose} title="">
       <div className="login-modal">
         
-        {/* Логотип на чёрном фоне */}
         <div className="login-logo-section">
           
           <h2 className="login-title">С возвращением!</h2>
@@ -63,7 +61,6 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
           </p>
         </div>
 
-        {/* Форма с вашими классами из global.css */}
         <form className="form" onSubmit={handleSubmit}>
           
           {error && (

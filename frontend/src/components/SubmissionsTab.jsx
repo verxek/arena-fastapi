@@ -1,37 +1,52 @@
-import { useState, useEffect } from "react";
-import { useSolutionPolling } from "../hooks/useSolutionPolling"; // <-- используем хук
+import { useState, useEffect, useRef } from "react";
 import SubmissionRow from "../components/SubmissionRow";
+import { getContestSolutions } from "../api/solutions";
 
-const SubmissionsTab = ({ contestId, token }) => {
+
+const SubmissionsTab = ({ contestId }) => {
   const [solutions, setSolutions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("access_token");
+  const intervalRef = useRef(null);
 
+  const fetchSolutions = async (showLoader = false) => {
+    if (!contestId || !token) return;
+    
+    if (showLoader) setLoading(true);
+    
+    try {
+      const data = await getContestSolutions(contestId, token);
+      setSolutions(data);
+    } catch (err) {
+      console.error("Error fetching solutions:", err);
+      if (showLoader) setSolutions([]);
+    } finally {
+      if (showLoader) setLoading(false);
+    }
+  };
+
+  // Первоначальная загрузка
+  useEffect(() => {
+    if (!contestId || !token) {
+      setLoading(false);
+      return;
+    }
+    fetchSolutions(true);
+  }, [contestId, token]);
+
+  // Polling каждые 3 секунды для обновления статусов
   useEffect(() => {
     if (!contestId || !token) return;
-
-    const fetchSolutions = async () => {
-      try {
-        const res = await fetch(
-          `http://127.0.0.1:8000/solutions/contests/${contestId}/solutions`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        
-        if (res.ok) {
-          const data = await res.json();
-          setSolutions(Array.isArray(data) ? data : []);
-        } else {
-          console.error("Failed to fetch solutions");
-          setSolutions([]);
-        }
-      } catch (err) {
-        console.error("Network error:", err);
-        setSolutions([]);
-      } finally {
-        setLoading(false);
+    
+    intervalRef.current = setInterval(() => {
+      fetchSolutions(false);
+    }, 3000);
+    
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
       }
     };
-
-    fetchSolutions();
   }, [contestId, token]);
 
   if (loading) {
@@ -43,12 +58,12 @@ const SubmissionsTab = ({ contestId, token }) => {
       <table className="table">
         <thead>
           <tr>
-            <th className="th">№</th>
-            <th className="th">Время</th>
-            <th className="th">Никнейм</th>
-            <th className="th">Задача</th>
-            <th className="th">Язык</th>
-            <th className="th">Вердикт</th>
+            <th>№</th>
+            <th>Время</th>
+            <th>Никнейм</th>
+            <th>Задача</th>
+            <th>Язык</th>
+            <th>Вердикт</th>
           </tr>
         </thead>
         <tbody>

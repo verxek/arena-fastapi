@@ -15,7 +15,6 @@ export async function login(nickname, password) {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    // Бросаем ошибку с сообщением от сервера — она попадёт в catch компонента
     throw new Error(error.detail || "Неверный логин или пароль");
   }
 
@@ -23,8 +22,8 @@ export async function login(nickname, password) {
 }
 
 /**
- * Регистрация нового пользователя (на будущее)
- * @param {Object} data 
+ * Регистрация нового пользователя
+ * @param {Object} data - { email, nickname, password }
  */
 export async function register(data) {
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
@@ -36,6 +35,45 @@ export async function register(data) {
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     throw new Error(error.detail || "Ошибка регистрации");
+  }
+
+  return response.json();
+}
+
+/**
+ * Отправка кода подтверждения на email
+ * @param {string} email 
+ */
+export async function sendRegistrationCode(email) {
+  const response = await fetch(`${API_BASE_URL}/auth/register/send-code`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || "Ошибка отправки кода");
+  }
+
+  return response.json();
+}
+
+/**
+ * Проверка кода подтверждения
+ * @param {string} email 
+ * @param {string} code 
+ */
+export async function verifyRegistrationCode(email, code) {
+  const response = await fetch(`${API_BASE_URL}/auth/register/verify-code`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, code }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || "Неверный код подтверждения");
   }
 
   return response.json();

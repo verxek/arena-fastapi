@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { solutionsApi } from "../api/solutions";
+import { submitSolution } from "../api/solutions";
 
 const SubmitTab = ({ tasks, onSubmitted }) => {
   const [localFile, setLocalFile] = useState(null);
@@ -32,7 +32,7 @@ const SubmitTab = ({ tasks, onSubmitted }) => {
     formData.append("file", localFile);
 
     try {
-      await solutionsApi.submit(formData);
+      await submitSolution(formData);
       
       alert("Решение отправлено");
       
@@ -56,9 +56,8 @@ const SubmitTab = ({ tasks, onSubmitted }) => {
     <div className="submit-container">
       <div className="submit-form">
         
-        {/* Сообщение об ошибке */}
         {error && (
-          <div className="error-box" style={{ marginBottom: "16px" }}>
+          <div className="error-box">
             {error}
           </div>
         )}
@@ -120,13 +119,11 @@ const SubmitTab = ({ tasks, onSubmitted }) => {
               <label 
                 htmlFor="solution-file-submit" 
                 className="file-button"
-                style={{ opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
               >
                 {localFile ? localFile.name : "Импортировать файл с решением"}
               </label>
             </div>
             
-            {/* Кнопка удаления файла */}
             {localFile && !submitting && (
               <button
                 type="button"
@@ -135,20 +132,7 @@ const SubmitTab = ({ tasks, onSubmitted }) => {
                   const input = document.getElementById('solution-file-submit');
                   if (input) input.value = '';
                 }}
-                style={{
-                  background: '#fee2e2',
-                  color: '#ef4444',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '28px',
-                  height: '28px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '16px',
-                  marginTop: '8px'
-                }}
+                className="file-remove-btn"
                 title="Удалить файл"
               >
                 ✕
@@ -162,7 +146,6 @@ const SubmitTab = ({ tasks, onSubmitted }) => {
           className="submit-button btn btn-primary full-width" 
           onClick={handleSubmit}
           disabled={submitting}
-          style={{ opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
         >
           {submitting ? "Отправка..." : "Отправить решение"}
         </button>

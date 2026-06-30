@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import SubmitModal from "../components/SubmitModal";
-import { tasksApi } from "../api/tasks";
+import { getTaskById } from "../api/tasks";
 import { categoryIcons, difficultyIcons } from "../assets/icons";
 import { IoTimeOutline } from "react-icons/io5";
 import { TfiSave } from "react-icons/tfi";
@@ -15,7 +15,7 @@ function TaskPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    tasksApi.getById(id)
+    getTaskById(id)
       .then(data => setTask(data))
       .catch(err => {
         console.error("Failed to load task:", err);

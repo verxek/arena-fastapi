@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { IoTimeOutline } from "react-icons/io5";
 import { TfiSave } from "react-icons/tfi";
-import { tasksApi } from "../api/tasks";
+import { getTaskById } from "../api/tasks";
 
 const TasksTab = ({ tasks, token }) => {
   const [openedTask, setOpenedTask] = useState(null);
@@ -10,7 +10,7 @@ const TasksTab = ({ tasks, token }) => {
   const openTask = async (taskId) => {
     try {
       setLoadingTask(true);
-      const data = await tasksApi.getById(taskId);
+      const data = await getTaskById(taskId);
       setOpenedTask(data);
     } catch (e) {
       console.error("Error loading task:", e);

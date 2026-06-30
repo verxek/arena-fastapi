@@ -1,0 +1,112 @@
+.btn {
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  text-align: center;
+  margin: 0;
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn-primary {
+  background: #1f2739;
+  color: white;
+  box-shadow: 0 2px 8px rgba(31, 39, 57, 0.15);
+}
+
+.btn-primary:hover {
+  background-color: #2c364d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(31, 39, 57, 0.3);
+}
+
+.btn-secondary {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.btn-secondary:hover {
+  background-color: #d1d5db;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-outline {
+  background-color: white;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-outline:hover {
+  background-color: #f9fafb;
+}
+
+.btn-sm {
+  padding: 8px 18px;
+  font-size: 13px;
+}
+
+.btn-xs {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.submit-button,
+.file-button,
+.export-button {
+  width: 100%;
+  padding: 12px;
+  background: #1f2739;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.submit-button {
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 18px;
+  transition: background 0.2s;
+}
+
+.icon-btn.edit,
+.icon-btn.delete {
+  color: #6b7280;
+}
+
+.icon-btn.edit:hover,
+.icon-btn.delete:hover {
+  background-color: #eeeeee;
+  color: #1f2739;
+}

@@ -1,0 +1,109 @@
+/* таблицы */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.table th,
+.table td {
+  border: 1px solid #e5e7eb;
+  padding: 10px;
+  text-align: left;
+  white-space: pre-wrap;
+}
+
+.table th {
+  background: #f3f4f6;
+}
+
+.submissions-container,
+.rating-container {
+  overflow-x: auto;
+}
+
+.empty-cell,
+.empty-state,
+.empty-text,
+.loading-text {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.empty-state,
+.loading-text {
+  padding: 40px;
+  font-size: 16px;
+}
+
+/* === RATING TABLE === */
+.rating-col-rank {
+  width: 50px;
+}
+
+.rating-col-solved,
+.rating-col-score {
+  width: 80px;
+}
+
+.rating-col-task {
+  width: 70px;
+  text-align: center;
+}
+
+.rating-rank-top {
+  font-weight: 700;
+}
+
+.rating-nickname {
+  font-weight: 600;
+}
+
+.rating-score {
+  font-weight: 700;
+  color: #1f2739;
+}
+
+.rating-task-cell {
+  text-align: center;
+}
+
+.rating-task-solved {
+  color: #10b981;
+  font-weight: 700;
+}
+
+.rating-task-penalty {
+  font-size: 11px;
+  color: #ef4444;
+}
+
+.rating-task-wrong {
+  color: #ef4444;
+}
+
+.rating-task-empty {
+  color: #9ca3af;
+}
+
+/* === VERDICT COLORS === */
+.verdict-accepted {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.verdict-wrong {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.verdict-pending {
+  color: #f59e0b;
+  font-weight: 500;
+}
+
+.verdict-error {
+  color: #6b7280;
+  font-weight: 500;
+}

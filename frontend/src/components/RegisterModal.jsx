@@ -1,6 +1,6 @@
-// frontend/src/components/RegisterModal.jsx
 import { useState } from "react";
 import Modal from "./Modal";
+import { sendRegistrationCode, verifyRegistrationCode, register } from "../api/auth";
 
 function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const [step, setStep] = useState(1); 
@@ -26,18 +26,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/auth/register/send-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.detail || "Ошибка отправки кода");
-      }
-
+      await sendRegistrationCode(formData.email);
       setStep(2);
     } catch (err) {
       setError(err.message);
@@ -52,21 +41,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/auth/register/verify-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          email: formData.email,
-          code: formData.code 
-        })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.detail || "Неверный код подтверждения");
-      }
-
+      await verifyRegistrationCode(formData.email, formData.code);
       setStep(3);
     } catch (err) {
       setError(err.message);
@@ -81,21 +56,11 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          nickname: formData.nickname,
-          password: formData.password
-        })
+      await register({
+        email: formData.email,
+        nickname: formData.nickname,
+        password: formData.password
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.detail || "Ошибка регистрации");
-      }
 
       handleClose();
       onSwitchToLogin();
@@ -109,17 +74,12 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Регистрация участника">
-      <form onSubmit={step === 1 ? handleSendCode : step === 2 ? handleVerifyCode : handleRegister} 
-            style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        
+      <form 
+        onSubmit={step === 1 ? handleSendCode : step === 2 ? handleVerifyCode : handleRegister} 
+        className="form"
+      >
         {error && (
-          <div style={{ 
-            padding: "12px", 
-            background: "#fef2f2", 
-            color: "#dc2626", 
-            borderRadius: "8px",
-            fontSize: "14px"
-          }}>
+          <div className="error-box">
             {error}
           </div>
         )}
@@ -127,12 +87,12 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
         {step === 1 && (
           <>
             <div>
-              <label style={styles.label}>Email</label>
+              <label className="form-label">Email</label>
               <input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                style={styles.input}
+                className="input-field"
                 placeholder="your@email.com"
                 required
                 autoFocus
@@ -140,9 +100,8 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
             </div>
             <button 
               type="submit" 
-              className="btn btn-primary"
+              className="btn btn-primary full-width"
               disabled={loading}
-              style={{ ...styles.button, opacity: loading ? 0.6 : 1 }}
             >
               {loading ? "Отправка..." : "Получить код"}
             </button>
@@ -151,17 +110,17 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
         {step === 2 && (
           <>
-            <div style={{ textAlign: "center", color: "#6b7280", fontSize: "14px" }}>
+            <div className="text-hint">
               Введите код из письма<br/>
-              <span style={{ color: "#374151" }}>{formData.email}</span>
+              <span>{formData.email}</span>
             </div>
             <div>
-              <label style={styles.label}>Код подтверждения</label>
+              <label className="form-label">Код подтверждения</label>
               <input
                 type="text"
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value.replace(/\D/g, '').slice(0, 6) })}
-                style={{...styles.input, textAlign: "center", fontSize: "24px", letterSpacing: "8px"}}
+                className="input-field code-input"
                 placeholder="000000"
                 required
                 autoFocus
@@ -170,16 +129,15 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
             </div>
             <button 
               type="submit" 
-              className="btn btn-primary"
+              className="btn btn-primary full-width"
               disabled={loading || formData.code.length !== 6}
-              style={{ ...styles.button, opacity: loading ? 0.6 : 1 }}
             >
               {loading ? "Проверка..." : "Подтвердить"}
             </button>
             <button 
               type="button"
               onClick={() => setStep(1)}
-              style={{ ...styles.button, background: "#f3f4f6", color: "#374151" }}
+              className="btn btn-secondary full-width"
             >
               Изменить email
             </button>
@@ -188,24 +146,18 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
         {step === 3 && (
           <>
-            <div style={{ 
-              padding: "12px", 
-              background: "#eff6ff", 
-              borderRadius: "8px",
-              fontSize: "13px",
-              color: "#1e40af"
-            }}>
+            <div className="info-box">
               Email подтверждён. Теперь создайте аккаунт.<br/>
               <strong>Роль: Участник</strong>
             </div>
 
             <div>
-              <label style={styles.label}>Никнейм</label>
+              <label className="form-label">Никнейм</label>
               <input
                 type="text"
                 value={formData.nickname}
                 onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
-                style={styles.input}
+                className="input-field"
                 placeholder="Придумайте никнейм"
                 required
                 minLength={3}
@@ -214,12 +166,12 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
             </div>
 
             <div>
-              <label style={styles.label}>Пароль</label>
+              <label className="form-label">Пароль</label>
               <input
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                style={styles.input}
+                className="input-field"
                 placeholder="••••••••"
                 required
                 minLength={6}
@@ -228,25 +180,15 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
             <button 
               type="submit" 
-              className="btn btn-primary"
+              className="btn btn-primary full-width"
               disabled={loading}
-              style={{ ...styles.button, opacity: loading ? 0.6 : 1 }}
             >
               {loading ? "Регистрация..." : "Зарегистрироваться"}
             </button>
           </>
         )}
 
-        {/* Инфо для организаторов */}
-        <div style={{ 
-          marginTop: "16px", 
-          padding: "12px", 
-          background: "#fffbeb", 
-          borderRadius: "8px",
-          fontSize: "13px",
-          color: "#92400e",
-          textAlign: "center"
-        }}>
+        <div className="warning-box">
           Хотите стать организатором?<br/>
           <strong>Свяжитесь с администрацией</strong>
         </div>
@@ -254,36 +196,5 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     </Modal>
   );
 }
-
-const styles = {
-  label: {
-    display: "block",
-    fontSize: "14px",
-    fontWeight: "500",
-    color: "#374151",
-    marginBottom: "6px"
-  },
-  input: {
-    width: "100%",
-    padding: "10px 12px",
-    border: "1px solid #d1d5db",
-    borderRadius: "8px",
-    fontSize: "14px",
-    outline: "none",
-    boxSizing: "border-box",
-    transition: "border-color 0.2s"
-  },
-  button: {
-    width: "100%",
-    padding: "12px",
-    borderRadius: "8px",
-    border: "none",
-    background: "#1f2739",
-    color: "white",
-    fontSize: "16px",
-    fontWeight: "600",
-    cursor: "pointer"
-  }
-};
 
 export default RegisterModal;

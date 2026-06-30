@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Modal from "./Modal";
-import { solutionsApi } from "../api/solutions";
+import { submitSolution } from "../api/solutions";
 
 function SubmitModal({ task, isOpen, onClose }) {
   const [file, setFile] = useState(null);
@@ -21,7 +21,7 @@ function SubmitModal({ task, isOpen, onClose }) {
     formData.append("file", file);
 
     try {
-      await solutionsApi.submit(formData);
+      await submitSolution(formData);
       
       alert("Решение отправлено");
       onClose();
@@ -36,57 +36,47 @@ function SubmitModal({ task, isOpen, onClose }) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Отправка решения">
+      <div className="form">
+        <div>
+          <label className="form-label">Язык</label>
+          <select 
+            onChange={(e) => setLang(e.target.value)} 
+            className="modal-select"
+            disabled={submitting}  
+          >
+            <option value={1}>Python 3.8</option>
+            <option value={2}>C++ 20</option>
+          </select>
+        </div>
 
-      <label>Язык</label>
-      <select 
-        onChange={(e) => setLang(e.target.value)} 
-        style={{ width: "100%", padding: "8px" }}
-        disabled={submitting}  
-      >
-        <option value={1}>Python 3.8</option>
-        <option value={2}>C++ 20</option>
-      </select>
+        <div>
+          <label className="form-label">Файл</label>
+          <input 
+            type="file" 
+            onChange={(e) => setFile(e.target.files[0])} 
+            className="modal-file-input"
+            disabled={submitting} 
+          />
+        </div>
 
-      <label style={{ marginTop: "10px", display: "block" }}>Файл</label>
-      <input 
-        type="file" 
-        onChange={(e) => setFile(e.target.files[0])} 
-        disabled={submitting} 
-      />
+        <div className="modal-buttons">
+          <button 
+            onClick={submit} 
+            disabled={submitting}  
+            className="btn btn-primary full-width"
+          >
+            {submitting ? "Отправка..." : "Отправить"}
+          </button>
 
-      <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
-        <button 
-          onClick={submit} 
-          disabled={submitting}  
-          style={{
-            flex: 1,
-            padding: "10px",
-            background: submitting ? "#6b7280" : "#111827",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            cursor: submitting ? "not-allowed" : "pointer"
-          }}
-        >
-          {submitting ? "Отправка..." : "Отправить"}
-        </button>
-
-        <button 
-          onClick={onClose} 
-          disabled={submitting}  
-          style={{
-            flex: 1,
-            padding: "10px",
-            background: "#e5e7eb",
-            border: "none",
-            borderRadius: "8px",
-            cursor: submitting ? "not-allowed" : "pointer"
-          }}
-        >
-          Отмена
-        </button>
+          <button 
+            onClick={onClose} 
+            disabled={submitting}  
+            className="btn btn-secondary full-width"
+          >
+            Отмена
+          </button>
+        </div>
       </div>
-
     </Modal>
   );
 }
