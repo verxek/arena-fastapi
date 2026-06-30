@@ -1,10 +1,8 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import selectinload
 from backend.app.database import get_db
 from backend.app.models.solution import Solution
-from backend.app.worker.tasks import run_solution
 from backend.app.dependencies.auth import get_current_user
-import os
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.services.solution_service import SolutionService
@@ -73,8 +71,7 @@ async def get_solution_status(
     # Проверка прав доступа
     if not solution or solution.sol_user != current_user.user_id:
         raise HTTPException(status_code=404, detail="Solution not found")
-    
-    # Получаем название статуса из БД
+
     state_name = solution.state_rel.state_name if solution.state_rel else "Pending"
     
     # Базовый ответ

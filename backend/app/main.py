@@ -11,12 +11,8 @@ import os
 from backend.app.scheduler.scheduler import start_scheduler, scheduler
 from contextlib import asynccontextmanager
 
-
-
-
 os.makedirs("uploads/tasks/tests", exist_ok=True)
 os.makedirs("uploads/tasks/solutions", exist_ok=True)
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -36,7 +32,6 @@ app.add_middleware(
     allow_methods=["*"],  
     allow_headers=["*"],  
 )
-
 
 app.mount("/static/tasks", StaticFiles(directory="uploads/tasks"), name="static_tasks")
 

@@ -32,7 +32,6 @@ class VerificationService:
             "attempts": 0
         }
 
-        # email send (future)
         print(f"CODE: {code}")
 
         return {"message": "Код отправлен"}

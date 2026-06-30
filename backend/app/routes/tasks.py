@@ -5,7 +5,6 @@ from typing import List
 import os
 import uuid
 import logging
-from datetime import datetime
 import docker
 from backend.app.database import get_db
 from fastapi import Query
@@ -24,7 +23,6 @@ except docker.errors.DockerException as e:
     logger.error(f"Не удалось подключиться к Docker: {e}")
     client = None
 
-# КОНФИГУРАЦИЯ 
 BASE_UPLOAD_DIR = "uploads/tasks"
 os.makedirs(BASE_UPLOAD_DIR, exist_ok=True)
 

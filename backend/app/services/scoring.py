@@ -12,20 +12,17 @@ def calculate_contest_rating(contest, participants, solutions, tasks_ordered):
     # Группируем решения по пользователям
     solutions_by_user = defaultdict(list)
     for s in solutions:
-        # ВАЖНО: используй sol_task и sol_user из твоей модели Solution
         solutions_by_user[s.sol_user].append(s)
 
     result = []
 
-    # Перебираем участников
     for user in participants:
         user_solutions = solutions_by_user.get(user.user_id, [])
         
         solved_tasks = []
         total_score = 0
-        total_penalty_time = 0 # Время в секундах (для тай-брейкера)
+        total_penalty_time = 0 
 
-        # ВАЖНО: идем не по sorted(keys), а по порядку задач в контесте (A, B, C)
         for task in tasks_ordered:
             task_id = task.task_id
             base_points = task.points or 500 # Защита от None
@@ -44,9 +41,7 @@ def calculate_contest_rating(contest, participants, solutions, tasks_ordered):
             task_score = 0
 
             for attempt in attempts:
-                # Проверяем статус (Accepted)
                 if attempt.is_accepted:
-                    # Рассчитываем очки
                     task_score = calculate_task_score(
                         base_points=base_points,
                         contest_start=contest_start,
@@ -59,24 +54,21 @@ def calculate_contest_rating(contest, participants, solutions, tasks_ordered):
                     break
                 else:
                     # Считаем штрафы только за реальные ошибки (не Compilation Error)
-                    # Используем state_rel.state_name для проверки
                     state_name = attempt.state_rel.state_name if attempt.state_rel else ""
                     if state_name != "Compilation Error":
                         wrong_attempts += 1
             
-            # Если задача не решена, очки 0
             if not solved:
                 task_score = 0
 
             solved_tasks.append({
                 "task_id": task_id,
                 "score": task_score,
-                "wrong_attempts": wrong_attempts # Сохраняем для отображения
+                "wrong_attempts": wrong_attempts 
             })
             
             total_score += task_score
             
-            # Если задача решена, добавляем время сдачи в общий пенальти (для тай-брейкера)
             if solved:
                 # Находим время принятой попытки
                 solved_attempt = next(a for a in attempts if a.is_accepted)
@@ -133,8 +125,6 @@ def calculate_task_score(
     # Итоговая формула
     final_score = decayed_points - penalty
 
-    # Минимальный порог (согласно твоему ТЗ: не меньше 30% от базы)
-    # Если хочешь как в настоящем Codeforces (где можно уйти в 0 из-за штрафов), убери эту строку
     min_score = base_points * 0.3
     
     return max(int(final_score), int(min_score))

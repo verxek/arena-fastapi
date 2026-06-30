@@ -16,8 +16,6 @@ export const contestsApi = {
   }),
   
   delete: (id) => api(`/contests/${id}`, { method: "DELETE" }),
-  
-  getRating: (id) => api(`/contests/${id}/rating`),
    
   recalculateScores: (id) => api(`/contests/${id}/recalculate-scores`, {
     method: "POST",

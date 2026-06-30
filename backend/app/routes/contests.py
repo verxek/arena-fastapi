@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
-from datetime import datetime, timedelta, time, timezone, tzinfo
+from datetime import  timedelta,timezone
 from typing import List, Optional
 from backend.app.database import get_db
 from backend.app.schemas.contest import ContestCreate, ContestListResponse, ContestUpdate
 from backend.app.dependencies.auth import get_current_user
-from sqlalchemy import select, func
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession 
 from backend.app.models import Contest, Contest_User, Contest_Task, Solution, User
 from backend.app.services.contest_service import create_contest_service, build_contest_response, delete_contest_service, get_contest_service, update_contest_service, register_to_contest_service
@@ -16,11 +16,6 @@ router = APIRouter(prefix="/contests", tags=["contests"])
 
 UTC_PLUS_5 = timezone(timedelta(hours=5))
 ORGANIZER_ROLE_ID = 2
-
-def to_local(dt):
-    if dt is None:
-        return None
-    return dt.astimezone(UTC_PLUS_5)
 
 @router.post("/", status_code=201)
 async def create_contest(
@@ -140,7 +135,6 @@ async def get_contest_rating(
     
     solutions = (await db.execute(solutions_stmt)).scalars().all()
 
-    # 5. Подсчет рейтинга
     rating = calculate_contest_rating(
         contest=contest,
         participants=participants,

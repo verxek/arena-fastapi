@@ -3,13 +3,7 @@ from backend.app.schemas.user import UserCreate, UserResponse
 from backend.app.schemas.auth import UserLogin
 from backend.app.services.auth import AuthService
 from backend.app.database import get_db
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from backend.app.core.security import (
-    create_access_token,
-    decode_token
-)
-from jose import JWTError
 from backend.app.models import RefreshToken
 from sqlalchemy import select
 from backend.app.services.verification_service import VerificationService
@@ -74,9 +68,6 @@ async def logout(refresh_token: str, session = Depends(get_db)):
         await session.commit()
 
     return {"message": "Logged out"}
-
-
-
 
 @router.post("/register/send-code")
 async def send_code(request: SendCodeRequest, db=Depends(get_db)):

@@ -205,7 +205,6 @@ async def update_contest_service(db, contest_id: int, contest_data, current_user
         raise HTTPException(403, "Доступ запрещён")
 
     try:
-        # --- обновление основных полей ---
         contest.contest_name = contest_data.contest_name
 
         start_time = contest_data.start_time
@@ -216,7 +215,6 @@ async def update_contest_service(db, contest_id: int, contest_data, current_user
         contest.duration = contest_data.duration
         contest.contest_status = 2
 
-        # --- обновление задач ---
         await db.execute(
             Contest_Task.__table__.delete().where(
                 Contest_Task.contest_ct == contest_id

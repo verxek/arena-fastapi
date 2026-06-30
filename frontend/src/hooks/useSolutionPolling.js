@@ -25,7 +25,6 @@ export function useSolutionPolling(solutionId, interval = 2000) {
         
         if (!isMounted) return;
         
-        // data.status теперь содержит строку из БД, например "Accepted" или "Processing"
         setStatus(data.status);
         setIsLoading(false);
         
@@ -35,7 +34,7 @@ export function useSolutionPolling(solutionId, interval = 2000) {
           return; // Останавливаем опрос
         }
         
-        // Иначе продолжаем опрос
+        // продолжаем 
         timerRef.current = setTimeout(poll, interval);
       } catch (err) {
         console.error("Polling error:", err);

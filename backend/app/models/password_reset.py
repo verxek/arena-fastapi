@@ -1,8 +1,7 @@
-from sqlalchemy import Column, String, DateTime, Boolean, ForeignKey, UniqueConstraint, Index, Integer
+from sqlalchemy import Column, String, DateTime, Boolean, ForeignKey, Index, Integer
 from sqlalchemy.orm import relationship
 from backend.app.database import Base, now_utc
-from datetime import datetime, timedelta
-from typing import Optional
+from datetime import timedelta
 import secrets
 
 class PasswordReset(Base):

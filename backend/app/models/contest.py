@@ -2,7 +2,6 @@ from sqlalchemy import Column, Integer, String, DateTime, Time, ForeignKey, Uniq
 from sqlalchemy.orm import relationship
 from backend.app.database import Base, now_utc
 from datetime import datetime, timedelta
-from typing import List, Optional
 
 
 class Contest(Base):
@@ -53,10 +52,6 @@ class Contest(Base):
 
     def __repr__(self):
         return f"<Contest(id={self.contest_id}, name='{self.contest_name}')>"
-    @property
-    def get_tasks_list(self) -> List[int]:
-        return self.tasks
-
     
     def get_end_time(self) -> datetime:
         return self.start_time + timedelta(minutes=self.duration)
@@ -79,16 +74,6 @@ class Contest(Base):
     def total_participants(self) -> int:
         """Количество участников контеста"""
         return len(self.participants)
-
-    @property
-    def total_tasks(self) -> int:
-        """Количество задач в контесте"""
-        return len(self.tasks)
-
-    @property
-    def active_participants(self) -> List:
-        """Список активных участников (с фильтром по статусу)"""
-        return [p for p in self.participants if p.role_rel.role_name != "Removed"]
 
     @property
     def get_contest_author(self) -> int:

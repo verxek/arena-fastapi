@@ -49,6 +49,3 @@ def require_role(required_role: str):
         return user
 
     return role_checker
-
-def require_admin():
-    return require_role("admin")

@@ -11,7 +11,6 @@ class Contest_Task(Base):
     task_ct = Column(Integer, ForeignKey('task.task_id', ondelete='CASCADE'), nullable=False,index=True)
     contest_ct = Column(Integer, ForeignKey('contest.contest_id', ondelete='CASCADE'), nullable=False,index=True)
 
-    # связи
     task_rel = relationship(
         "Task",
         back_populates="contest_tasks",

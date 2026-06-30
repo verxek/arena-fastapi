@@ -1,11 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-
 from backend.app.database import get_db
 from backend.app.models.user import User, UserRole
 from backend.app.schemas.user import UserCreate
-from backend.app.dependencies.auth import get_current_user
 from backend.app.dependencies.auth import require_role
 from backend.app.services.admin_service import AdminService
 

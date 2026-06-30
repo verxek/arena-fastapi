@@ -9,7 +9,6 @@ from sqlalchemy import select
 from typing import List
 import re
 from sqlalchemy.orm import selectinload
-from backend.app.repositories.task import get_tasks_by_role
 from backend.app.repositories.task import get_task_by_name, create_task, update_task_status
 
 BASE_DIR = "uploads/tasks"
@@ -40,14 +39,12 @@ async def create_task_service(
     make_visible_after=True,
     points: int = None
 ):
-    # --- проверка уникальности ---
     if await get_task_by_name(db, task_name):
         raise HTTPException(400, "Задача с таким названием уже существует")
 
     make_visible = parse_bool(make_visible_after)
     visibility = not parse_bool(is_contest_task)
 
-    # --- создание задачи ---
     new_task = await create_task(db, {
         "task_name": task_name,
         "statement": statement,
@@ -66,7 +63,6 @@ async def create_task_service(
 
     task_id = new_task.task_id
 
-    # --- директории ---
     task_dir = os.path.join(BASE_DIR, str(task_id))
     tests_dir = os.path.join(task_dir, "tests")
     sol_dir = os.path.join(task_dir, "solutions")
@@ -75,14 +71,12 @@ async def create_task_service(
     os.makedirs(sol_dir, exist_ok=True)
 
     try:
-        # --- решение ---
         sol_ext = os.path.splitext(solution_file.filename)[1]
         sol_path = os.path.join(sol_dir, f"solution{sol_ext}")
 
         with open(sol_path, "wb") as f:
             shutil.copyfileobj(solution_file.file, f)
 
-        # --- тесты ---
         zip_path = os.path.join(task_dir, "tests.zip")
 
         with open(zip_path, "wb") as f:
@@ -93,10 +87,9 @@ async def create_task_service(
 
         os.remove(zip_path)
 
-        # --- commit ---
+
         await db.commit()
 
-        # --- запуск генерации ---
         generate_task_tests.delay(task_id, time_limit, memory_limit)
 
         await update_task_status(db, new_task, "GENERATING_TESTS")
@@ -158,7 +151,6 @@ async def get_tasks_service(db, current_user, include_hidden: bool = False):
     return result_list
 
 async def delete_task_service(db, task_id: int):
-    # поиск задачи
     task = await db.get(Task, task_id)
 
     if not task:
